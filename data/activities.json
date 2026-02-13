@@ -1,0 +1,386 @@
+[
+  {
+    "id": "6a1a19b5a5c7b3a8",
+    "type": "approval_approved",
+    "agentId": "noah",
+    "message": "Approved outreach from echo",
+    "taskId": null,
+    "createdAt": "2026-02-13T21:18:40.949Z"
+  },
+  {
+    "id": "eecd8bcfe316e80f",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected email from atlas",
+    "taskId": null,
+    "createdAt": "2026-02-13T21:18:39.209Z"
+  },
+  {
+    "id": "d1ad534ebcefe853",
+    "type": "approval_approved",
+    "agentId": "noah",
+    "message": "Approved linkedin from echo",
+    "taskId": null,
+    "createdAt": "2026-02-13T20:02:34.056Z"
+  },
+  {
+    "id": "61c09e036d0e1beb",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected tweet from echo",
+    "taskId": null,
+    "createdAt": "2026-02-13T20:02:32.945Z"
+  },
+  {
+    "id": "3fa2f2816858b4bb",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected tweet from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:09:22.664Z"
+  },
+  {
+    "id": "bdba0a8a7483cab3",
+    "type": "approval_approved",
+    "agentId": "noah",
+    "message": "Approved outreach from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:09:18.684Z"
+  },
+  {
+    "id": "f9efa1b3238f5917",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected email from atlas",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:09:15.372Z"
+  },
+  {
+    "id": "3cd72716fdda4008",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected linkedin from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:09:03.518Z"
+  },
+  {
+    "id": "17056d602552647f",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected tweet from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:08:59.465Z"
+  },
+  {
+    "id": "c33671e6a48bef61",
+    "type": "approval_approved",
+    "agentId": "noah",
+    "message": "Approved outreach from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:08:57.375Z"
+  },
+  {
+    "id": "4245c92641dacf3c",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected tweet from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:08:55.340Z"
+  },
+  {
+    "id": "aaf4392831169bc6",
+    "type": "approval_approved",
+    "agentId": "noah",
+    "message": "Approved email from atlas",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:08:52.775Z"
+  },
+  {
+    "id": "197fe130be6bacd6",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected linkedin from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:08:51.942Z"
+  },
+  {
+    "id": "9efa8447d5eb11ba",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected linkedin from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:08:51.122Z"
+  },
+  {
+    "id": "f931631eb7d76c4c",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected tweet from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:08:49.694Z"
+  },
+  {
+    "id": "64e98a815d75a068",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected tweet from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:08:48.665Z"
+  },
+  {
+    "id": "3fcb47aed8931d87",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected outreach from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:08:47.642Z"
+  },
+  {
+    "id": "f8fdfc5fc9f35444",
+    "type": "approval_approved",
+    "agentId": "noah",
+    "message": "Approved email from atlas",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:08:46.113Z"
+  },
+  {
+    "id": "93dc5c07581bec58",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected linkedin from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:08:44.773Z"
+  },
+  {
+    "id": "561baa3501f924d6",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected tweet from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T22:08:43.370Z"
+  },
+  {
+    "id": "d2e634da14f4e4d2",
+    "type": "approval_approved",
+    "agentId": "noah",
+    "message": "Approved tweet from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:46:01.071Z"
+  },
+  {
+    "id": "9ee0c197d13a5a46",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected outreach from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:46:00.048Z"
+  },
+  {
+    "id": "969d01a83f6ede86",
+    "type": "approval_approved",
+    "agentId": "noah",
+    "message": "Approved email from atlas",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:45:58.106Z"
+  },
+  {
+    "id": "64f4f31dd708f0c6",
+    "type": "approval_approved",
+    "agentId": "noah",
+    "message": "Approved linkedin from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:45:23.399Z"
+  },
+  {
+    "id": "648b306951bc6e06",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected tweet from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:45:22.464Z"
+  },
+  {
+    "id": "162e3bc0f8e30e47",
+    "type": "approval_requested",
+    "agentId": "echo",
+    "message": "Submitted tweet for approval",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:45:18.595Z"
+  },
+  {
+    "id": "9944c470bf7caebe",
+    "type": "approval_requested",
+    "agentId": "echo",
+    "message": "Submitted outreach for approval",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:45:18.593Z"
+  },
+  {
+    "id": "63a0e5facc2ef7f5",
+    "type": "approval_requested",
+    "agentId": "atlas",
+    "message": "Submitted email for approval",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:45:18.591Z"
+  },
+  {
+    "id": "000f4227f018e12e",
+    "type": "approval_requested",
+    "agentId": "echo",
+    "message": "Submitted linkedin for approval",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:45:18.589Z"
+  },
+  {
+    "id": "5886f8df1a42cbd5",
+    "type": "approval_requested",
+    "agentId": "echo",
+    "message": "Submitted tweet for approval",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:45:18.585Z"
+  },
+  {
+    "id": "6719a7c341d51576",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected tweet from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:37:44.186Z"
+  },
+  {
+    "id": "249478ee7382769b",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected outreach from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:37:43.533Z"
+  },
+  {
+    "id": "61fb327b743838a7",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected email from atlas",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:37:29.565Z"
+  },
+  {
+    "id": "504b756c49282919",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected linkedin from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:33:05.606Z"
+  },
+  {
+    "id": "fe56e68294b78bd5",
+    "type": "approval_rejected",
+    "agentId": "noah",
+    "message": "Rejected tweet from echo",
+    "taskId": null,
+    "createdAt": "2026-02-12T20:32:55.712Z"
+  },
+  {
+    "id": "2c629187559b37cf",
+    "type": "approval_requested",
+    "agentId": "echo",
+    "message": "Submitted tweet for approval",
+    "taskId": null,
+    "createdAt": "2026-02-12T19:45:35.811Z"
+  },
+  {
+    "id": "fe48299a77fcdd79",
+    "type": "approval_requested",
+    "agentId": "echo",
+    "message": "Submitted outreach for approval",
+    "taskId": null,
+    "createdAt": "2026-02-12T19:45:35.809Z"
+  },
+  {
+    "id": "e551aee94f6332a7",
+    "type": "approval_requested",
+    "agentId": "atlas",
+    "message": "Submitted email for approval",
+    "taskId": null,
+    "createdAt": "2026-02-12T19:45:35.807Z"
+  },
+  {
+    "id": "9148a35e880e2905",
+    "type": "approval_requested",
+    "agentId": "echo",
+    "message": "Submitted linkedin for approval",
+    "taskId": null,
+    "createdAt": "2026-02-12T19:45:35.805Z"
+  },
+  {
+    "id": "0bb678070b26165e",
+    "type": "approval_requested",
+    "agentId": "echo",
+    "message": "Submitted tweet for approval",
+    "taskId": null,
+    "createdAt": "2026-02-12T19:45:35.798Z"
+  },
+  {
+    "id": "a001",
+    "type": "task_created",
+    "agentId": "morgan",
+    "message": "Created task: Morgan Hub — Mission Control system",
+    "taskId": "t005",
+    "createdAt": "2026-02-12T18:00:00.000Z"
+  },
+  {
+    "id": "a002",
+    "type": "status_changed",
+    "agentId": "morgan",
+    "message": "Moved \"@proclawed Twitter\" to done — 18 accounts followed",
+    "taskId": "t008",
+    "createdAt": "2026-02-12T18:30:00.000Z"
+  },
+  {
+    "id": "a003",
+    "type": "comment",
+    "agentId": "atlas",
+    "message": "Morning check-in sent to #ops — pushed Noah on LinkedIn engagement",
+    "taskId": "t002",
+    "createdAt": "2026-02-12T14:00:00.000Z"
+  },
+  {
+    "id": "a004",
+    "type": "status_changed",
+    "agentId": "morgan",
+    "message": "Moved \"Gmail API setup\" to done",
+    "taskId": "t004",
+    "createdAt": "2026-02-12T18:00:00.000Z"
+  },
+  {
+    "id": "a005",
+    "type": "task_created",
+    "agentId": "morgan",
+    "message": "Created task: Review ProClawed landing page v2",
+    "taskId": "t001",
+    "createdAt": "2026-02-12T11:00:00.000Z"
+  },
+  {
+    "id": "a006",
+    "type": "comment",
+    "agentId": "echo",
+    "message": "Drafted content calendar outline for ProClawed — 4 pillars identified",
+    "taskId": "t003",
+    "createdAt": "2026-02-12T17:00:00.000Z"
+  },
+  {
+    "id": "a007",
+    "type": "task_created",
+    "agentId": "haven",
+    "message": "Proposed 13 cron jobs for habits, meals, and health tracking",
+    "taskId": "t006",
+    "createdAt": "2026-02-11T20:00:00.000Z"
+  },
+  {
+    "id": "a008",
+    "type": "status_changed",
+    "agentId": "forge",
+    "message": "Started technical content research for ProClawed",
+    "taskId": "t003",
+    "createdAt": "2026-02-12T16:00:00.000Z"
+  }
+]

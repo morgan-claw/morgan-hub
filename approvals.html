@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Approvals — Morgan Hub</title>
+  <style>
+    :root{--bg:#0a0a0a;--surface:#111;--surface2:#1a1a1a;--border:#222;--border2:#333;--text:#e5e5e5;--muted:#666;--accent:#FF4500;--accent-dim:#FF450015;--green:#22c55e;--yellow:#f59e0b;--blue:#3b82f6;--purple:#8b5cf6;--pink:#ec4899;--red:#ef4444}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;height:100dvh;overflow:hidden;-webkit-user-select:none;user-select:none}
+
+    .shell{display:flex;flex-direction:column;height:100vh;height:100dvh}
+    @media(min-width:768px){.shell{flex-direction:row}}
+
+    /* Sidebar */
+    .sidebar{display:none;width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:1.5rem 0;flex-direction:column}
+    .sidebar .brand{display:flex;align-items:center;gap:0.6rem;padding:0 1.25rem 1.25rem;border-bottom:1px solid var(--border);margin-bottom:0.75rem}
+    .sidebar .brand .mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;color:#fff}
+    .sidebar .brand span{font-weight:600;font-size:1rem}
+    .sidebar a{display:flex;align-items:center;gap:0.6rem;padding:0.55rem 1.25rem;color:var(--muted);text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.12s,background 0.12s}
+    .sidebar a:hover{color:var(--text);background:var(--surface2)}
+    .sidebar a.active{color:var(--accent);background:var(--accent-dim)}
+    .sidebar a svg{width:18px;height:18px;flex-shrink:0}
+    @media(min-width:768px){.sidebar{display:flex}.tab-bar{display:none!important}.topbar .back{display:none}}
+
+    .main-col{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+    /* Top bar */
+    .topbar{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;flex-wrap:wrap}
+    .topbar .back{color:var(--muted);text-decoration:none;display:flex;align-items:center}
+    .topbar .back svg{width:18px;height:18px}
+    .topbar h1{font-size:0.9rem;font-weight:600;letter-spacing:0.5px}
+    .topbar .seg{display:flex;background:var(--bg);border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-left:auto}
+    .topbar .seg button{background:none;border:none;color:var(--muted);padding:0.35rem 0.75rem;font-size:0.7rem;font-weight:600;cursor:pointer;transition:all 0.15s;letter-spacing:0.3px;text-transform:uppercase}
+    .topbar .seg button.active{background:var(--accent);color:#fff}
+
+    /* Stats strip */
+    .stats-strip{display:flex;gap:0.5rem;padding:0.6rem 1rem;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;overflow-x:auto}
+    .stat-chip{display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.65rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:0.7rem;font-weight:600;white-space:nowrap;color:var(--muted)}
+    .stat-chip b{color:var(--text);font-variant-numeric:tabular-nums}
+    .stat-chip.pending b{color:var(--accent)}
+    .stat-chip.approved b{color:var(--green)}
+    .stat-chip.rejected b{color:var(--red)}
+    .stat-chip .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+    /* Filter bar (history) */
+    .filter-bar{display:none;gap:0.4rem;padding:0.5rem 1rem;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;overflow-x:auto;align-items:center}
+    .filter-bar.show{display:flex}
+    .filter-bar select,.filter-bar input{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:0.3rem 0.5rem;border-radius:6px;font-size:0.7rem;font-family:inherit;outline:none}
+    .filter-bar select:focus,.filter-bar input:focus{border-color:var(--accent)}
+    .filter-bar input{width:140px}
+    .filter-bar .clear-btn{background:none;border:none;color:var(--muted);font-size:0.7rem;cursor:pointer;padding:0.3rem 0.4rem;white-space:nowrap}
+    .filter-bar .clear-btn:hover{color:var(--accent)}
+
+    /* Swipe area */
+    .swipe-area{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:1rem;padding-bottom:calc(1rem + 70px + env(safe-area-inset-bottom,0))}
+    @media(min-width:768px){.swipe-area{padding-bottom:1rem}}
+
+    .card-stack{position:relative;width:100%;max-width:400px;height:100%;max-height:520px}
+
+    .card{position:absolute;inset:0;background:var(--surface);border:1px solid var(--border2);border-radius:16px;display:flex;flex-direction:column;cursor:grab;will-change:transform;transition:transform 0.35s cubic-bezier(0.22,1,0.36,1),opacity 0.35s;box-shadow:0 4px 24px rgba(0,0,0,0.3);z-index:3;overflow:hidden}
+    .card:active{cursor:grabbing}
+    .card.dragging{transition:none}
+    .card.swiped-right{transform:translateX(120%) rotate(15deg);opacity:0;pointer-events:none}
+    .card.swiped-left{transform:translateX(-120%) rotate(-15deg);opacity:0;pointer-events:none}
+    .card.swiped-up{transform:translateY(-100%) scale(0.9);opacity:0;pointer-events:none}
+    .card:nth-child(2){transform:scale(0.97) translateY(6px);z-index:2;pointer-events:none}
+    .card:nth-child(3){transform:scale(0.94) translateY(12px);z-index:1;pointer-events:none}
+    .card:nth-child(n+4){display:none}
+
+    .card-top{padding:1.1rem 1.25rem 0.75rem;flex-shrink:0;display:flex;align-items:center;gap:0.6rem}
+    .card-top .avi{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;flex-shrink:0}
+    .card-top .meta{flex:1;min-width:0}
+    .card-top .meta .name{font-size:0.8rem;font-weight:600;color:var(--text)}
+    .card-top .meta .sub{font-size:0.65rem;color:var(--muted);margin-top:1px}
+    .card-top .pill{padding:0.2rem 0.55rem;border-radius:5px;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px}
+
+    /* Task link */
+    .card-task{margin:0 1.25rem 0.5rem;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;gap:0.4rem;font-size:0.7rem;color:var(--muted);cursor:pointer;transition:border-color 0.15s}
+    .card-task:hover{border-color:var(--accent)}
+    .card-task svg{width:14px;height:14px;flex-shrink:0;color:var(--accent)}
+    .card-task .task-title{color:var(--text);font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+    .card-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.75rem 1.25rem 1rem;font-size:0.92rem;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;color:#ccc}
+    .card-body .target{margin-top:0.75rem;font-size:0.75rem;color:var(--muted)}
+    .card-body .target b{color:var(--text);font-weight:500}
+    .card-body .char-count{margin-top:0.5rem;font-size:0.65rem;color:var(--muted);font-variant-numeric:tabular-nums}
+    .card-body .char-count.warn{color:var(--yellow)}
+    .card-body .char-count.over{color:var(--red)}
+
+    /* Swipe feedback overlays */
+    .card .overlay{position:absolute;inset:0;border-radius:16px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.1s;pointer-events:none;z-index:5}
+    .card .overlay.approve{background:rgba(34,197,94,0.06)}
+    .card .overlay.reject{background:rgba(239,68,68,0.06)}
+    .card .overlay .circle{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+    .card .overlay.approve .circle{border:3px solid var(--green);color:var(--green)}
+    .card .overlay.reject .circle{border:3px solid var(--red);color:var(--red)}
+    .card .overlay .circle svg{width:36px;height:36px}
+
+    /* Action hint */
+    .action-hint{display:flex;justify-content:center;gap:3rem;padding:0.75rem 0 0;flex-shrink:0;opacity:0.4}
+    .action-hint span{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);display:flex;align-items:center;gap:0.3rem}
+    .action-hint svg{width:14px;height:14px}
+
+    /* Empty state */
+    .empty{text-align:center;color:var(--muted);padding:3rem 1rem}
+    .empty .icon{font-size:3rem;margin-bottom:0.75rem;opacity:0.5}
+    .empty h2{font-size:1.2rem;margin-bottom:0.3rem;color:var(--text);font-weight:600}
+    .empty p{font-size:0.85rem}
+
+    /* ---- Edit mode: dual option (inline OR chat) ---- */
+    .card.editing .card-body{display:none}
+    .card.editing .card-top{display:none}
+    .card.editing .card-task{display:none}
+    .card.editing .overlay{display:none}
+    .card .edit-inline{display:none;flex:1;flex-direction:column;overflow:hidden}
+    .card.editing .edit-inline{display:flex}
+    .edit-inline .edit-head{display:flex;align-items:center;gap:0.5rem;padding:0.85rem 1rem;flex-shrink:0;border-bottom:1px solid var(--border)}
+    .edit-inline .edit-head .avi{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:#fff}
+    .edit-inline .edit-head span{font-size:0.8rem;color:var(--muted)}
+    .edit-inline .edit-head .pill{padding:0.15rem 0.4rem;border-radius:4px;font-size:0.55rem;font-weight:700;text-transform:uppercase}
+
+    /* Edit mode tabs */
+    .edit-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+    .edit-tabs button{flex:1;background:none;border:none;color:var(--muted);padding:0.5rem;font-size:0.72rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
+    .edit-tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+    .edit-tabs button:hover{color:var(--text)}
+
+    /* Inline edit panel */
+    .edit-panel-inline{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .edit-panel-inline textarea{flex:1;background:transparent;border:none;color:var(--text);padding:0.85rem 1rem;font-size:0.92rem;font-family:inherit;line-height:1.6;outline:none;resize:none;-webkit-overflow-scrolling:touch}
+    .edit-panel-inline .edit-btns{display:flex;gap:0.5rem;padding:0.65rem 1rem;border-top:1px solid var(--border);flex-shrink:0}
+    .edit-panel-inline .edit-btns button{flex:1;padding:0.55rem;border-radius:10px;font-size:0.8rem;font-weight:600;cursor:pointer;border:none;transition:all 0.12s}
+    .edit-panel-inline .edit-btns .cancel{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+    .edit-panel-inline .edit-btns .send{background:var(--accent);color:#fff}
+    .edit-panel-inline .edit-btns .send:active{transform:scale(0.97)}
+
+    /* Chat edit panel */
+    .edit-panel-chat{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .chat-messages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.75rem 1rem}
+    .chat-msg{margin-bottom:0.6rem;max-width:85%}
+    .chat-msg.agent{margin-right:auto}
+    .chat-msg.user{margin-left:auto}
+    .chat-msg .bubble{padding:0.5rem 0.75rem;border-radius:12px;font-size:0.82rem;line-height:1.5;white-space:pre-wrap;word-wrap:break-word}
+    .chat-msg.agent .bubble{background:var(--surface2);color:var(--text);border-bottom-left-radius:4px}
+    .chat-msg.user .bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+    .chat-msg .sender{font-size:0.6rem;color:var(--muted);margin-bottom:2px;font-weight:600}
+    .chat-input-row{display:flex;gap:0.4rem;padding:0.5rem 0.75rem;border-top:1px solid var(--border);flex-shrink:0;align-items:flex-end}
+    .chat-input-row textarea{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:0.5rem 0.65rem;border-radius:10px;font-size:0.82rem;font-family:inherit;line-height:1.4;outline:none;resize:none;max-height:80px;min-height:36px}
+    .chat-input-row textarea:focus{border-color:var(--accent)}
+    .chat-input-row button{width:36px;height:36px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.12s}
+    .chat-input-row .send-msg{background:var(--accent);color:#fff}
+    .chat-input-row .send-msg:active{transform:scale(0.95)}
+    .chat-input-row .approve-btn{background:var(--green);color:#fff}
+    .chat-input-row .approve-btn:active{transform:scale(0.95)}
+    .chat-cancel{display:flex;gap:0.5rem;padding:0.4rem 0.75rem;border-top:1px solid var(--border);flex-shrink:0}
+    .chat-cancel button{flex:1;padding:0.45rem;border-radius:10px;font-size:0.75rem;font-weight:600;cursor:pointer;border:none}
+    .chat-cancel .cancel{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+    .chat-cancel .approve-final{background:var(--green);color:#fff}
+    .chat-cancel .approve-final:active{transform:scale(0.97)}
+
+    /* Reject modal */
+    .reject-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
+    .reject-modal-bg.show{display:flex}
+    .reject-modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:380px;padding:1.25rem;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+    .reject-modal h3{font-size:0.9rem;margin-bottom:0.75rem;font-weight:600}
+    .reject-modal textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:0.6rem;border-radius:10px;font-size:0.82rem;font-family:inherit;line-height:1.5;outline:none;resize:none;height:80px}
+    .reject-modal textarea:focus{border-color:var(--accent)}
+    .reject-modal .hint{font-size:0.65rem;color:var(--muted);margin:0.4rem 0 0.75rem}
+    .reject-modal .btns{display:flex;gap:0.5rem}
+    .reject-modal .btns button{flex:1;padding:0.5rem;border-radius:10px;font-size:0.8rem;font-weight:600;cursor:pointer;border:none}
+    .reject-modal .btns .skip{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+    .reject-modal .btns .reject{background:var(--red);color:#fff}
+
+    /* History */
+    .history-view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0.75rem;padding-bottom:calc(70px + env(safe-area-inset-bottom,0));display:none}
+    @media(min-width:768px){.history-view{padding-bottom:0.75rem}}
+    .h-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;margin-bottom:0.5rem;cursor:pointer;transition:border-color 0.15s}
+    .h-item:hover{border-color:var(--border2)}
+    .h-item.approved{border-left:3px solid var(--green)}
+    .h-item.rejected{border-left:3px solid var(--red)}
+    .h-item.expanded .h-body{-webkit-line-clamp:unset;display:block}
+    .h-item.expanded .h-detail{display:block}
+    .h-top{display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem}
+    .h-top .avi{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;color:#fff}
+    .h-top .name{font-size:0.75rem;font-weight:600}
+    .h-top .pill{padding:0.12rem 0.35rem;border-radius:4px;font-size:0.55rem;font-weight:700;text-transform:uppercase}
+    .h-top .status{margin-left:auto;font-size:0.65rem;font-weight:600}
+    .h-top .status.approved{color:var(--green)}
+    .h-top .status.rejected{color:var(--red)}
+    .h-body{font-size:0.8rem;line-height:1.45;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:0.3rem;white-space:pre-wrap}
+    .h-detail{display:none;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);font-size:0.75rem}
+    .h-detail .diff-label{font-size:0.65rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:0.25rem}
+    .h-detail .diff-block{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0.5rem 0.65rem;margin-bottom:0.5rem;white-space:pre-wrap;line-height:1.45;color:#aaa}
+    .h-detail .feedback-block{color:var(--yellow);font-style:italic;margin-top:0.3rem}
+    .h-foot{font-size:0.6rem;color:#555}
+
+    /* Tab bar */
+    .tab-bar{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0);z-index:100}
+    .tab-bar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;text-decoration:none;color:var(--muted);font-size:0.65rem;font-weight:500}
+    .tab-bar a.active{color:var(--accent)}
+    .tab-bar a svg{width:20px;height:20px}
+
+    /* Notification badge pulse */
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,69,0,0.4)}70%{box-shadow:0 0 0 8px rgba(255,69,0,0)}100%{box-shadow:0 0 0 0 rgba(255,69,0,0)}}
+    .pulse-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite;display:none}
+    .pulse-dot.show{display:inline-block}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar"></aside>
+
+  <div class="main-col">
+    <!-- Top bar -->
+    <div class="topbar">
+      <a href="/" class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></a>
+      <h1>Approvals</h1>
+      <div class="pulse-dot" id="newDot"></div>
+      <div class="seg">
+        <button id="segQ" class="active">Queue</button>
+        <button id="segH">History</button>
+      </div>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="stats-strip" id="statsStrip">
+      <div class="stat-chip pending"><div class="dot" style="background:var(--accent)"></div>Pending <b id="statPending">0</b></div>
+      <div class="stat-chip approved"><div class="dot" style="background:var(--green)"></div>Today <b id="statApproved">0</b></div>
+      <div class="stat-chip rejected"><div class="dot" style="background:var(--red)"></div>Rejected <b id="statRejected">0</b></div>
+    </div>
+
+    <!-- Filter bar (history only) -->
+    <div class="filter-bar" id="filterBar">
+      <select id="fAgent"><option value="">All agents</option><option value="echo">Echo</option><option value="atlas">Atlas</option><option value="forge">Forge</option><option value="haven">Haven</option><option value="morgan">Morgan</option><option value="scout">Scout</option></select>
+      <select id="fType"><option value="">All types</option><option value="tweet">Tweet</option><option value="linkedin">LinkedIn</option><option value="email">Email</option><option value="outreach">Outreach</option><option value="other">Other</option></select>
+      <select id="fStatus"><option value="">All statuses</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select>
+      <input type="text" id="fSearch" placeholder="Search content...">
+      <button class="clear-btn" id="fClear">Clear</button>
+    </div>
+
+    <!-- Queue view -->
+    <div class="swipe-area" id="queueView">
+      <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:400px;height:100%;max-height:560px">
+        <div class="card-stack" id="stack" style="flex:1;width:100%;position:relative"></div>
+        <div class="action-hint" id="hint">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Reject</span>
+          <span>Edit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>
+          <span>Approve <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- History view -->
+    <div class="history-view" id="historyView"></div>
+  </div>
+
+  <nav class="tab-bar"></nav>
+  <script src="/nav.js"></script>
+</div>
+
+<!-- Reject feedback modal -->
+<div class="reject-modal-bg" id="rejectModal">
+  <div class="reject-modal">
+    <h3>Rejection feedback</h3>
+    <textarea id="rejectFeedback" placeholder="Why was this rejected? (helps the agent learn)"></textarea>
+    <div class="hint">Optional — skip if no feedback needed</div>
+    <div class="btns">
+      <button class="skip" onclick="confirmReject('')">Skip</button>
+      <button class="reject" onclick="confirmReject(document.getElementById('rejectFeedback').value)">Reject</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CONVEX_URL='https://befitting-opossum-812.convex.cloud';
+const CHAT_BASE='/chat'; // chat page URL for agent sessions
+
+async function convexQuery(name,args={}){
+  const r=await fetch(`${CONVEX_URL}/api/query`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:name,args:args,format:'json'})});
+  return(await r.json()).value;
+}
+async function convexMutation(name,args={}){
+  const r=await fetch(`${CONVEX_URL}/api/mutation`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:name,args:args,format:'json'})});
+  return(await r.json()).value;
+}
+
+const AGENTS={
+  echo:{color:'#3b82f6',letter:'E'},atlas:{color:'#f59e0b',letter:'A'},
+  forge:{color:'#8b5cf6',letter:'F'},haven:{color:'#22c55e',letter:'H'},
+  morgan:{color:'#FF4500',letter:'M'},scout:{color:'#ec4899',letter:'S'}
+};
+function ag(id){return AGENTS[(id||'').toLowerCase()]||{color:'#555',letter:'?'}}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):''}
+function timeAgo(d){
+  var s=Math.floor((Date.now()-new Date(d).getTime())/1000);
+  if(s<60)return'just now';if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';
+}
+function isToday(ts){var d=new Date(ts),n=new Date();return d.toDateString()===n.toDateString()}
+
+// Character limits per type
+const CHAR_LIMITS={tweet:280,linkedin:3000};
+
+var items=[],idx=0,editId=null,pendingRejectId=null;
+var dragEl=null,sx=0,sy=0,cx=0,cy=0,dragging=false;
+var prevCount=0;
+var chatMessages={}; // per-approval chat threads (local only for now)
+
+// ---- Stats ----
+async function loadStats(){
+  try{
+    var all=await convexQuery('approvals:list',{});
+    if(!all)all=[];
+    var pending=all.filter(a=>a.status==='pending').length;
+    var approvedToday=all.filter(a=>a.status==='approved'&&a.reviewedAt&&isToday(a.reviewedAt)).length;
+    var rejectedToday=all.filter(a=>a.status==='rejected'&&a.reviewedAt&&isToday(a.reviewedAt)).length;
+    document.getElementById('statPending').textContent=pending;
+    document.getElementById('statApproved').textContent=approvedToday;
+    document.getElementById('statRejected').textContent=rejectedToday;
+    // Pulse dot if new items arrived
+    if(pending>prevCount&&prevCount>0){
+      document.getElementById('newDot').classList.add('show');
+      setTimeout(()=>document.getElementById('newDot').classList.remove('show'),5000);
+    }
+    prevCount=pending;
+  }catch(e){console.error(e)}
+}
+
+// ---- Load queue ----
+async function load(){
+  if(editId)return;
+  try{
+    var raw=await convexQuery('approvals:listPending');
+    items=(raw||[]).map(it=>({...it,id:it._id}));
+    // Sort: high urgency first, then normal, then low
+    var urg={high:0,normal:1,low:2};
+    items.sort((a,b)=>(urg[a.urgency]||1)-(urg[b.urgency]||1));
+    idx=0;
+    render();
+    loadStats();
+  }catch(e){console.error(e)}
+}
+
+function charCountHtml(content,type){
+  var limit=CHAR_LIMITS[type];
+  if(!limit)return'';
+  var len=content.length;
+  var cls=len>limit?'over':len>limit*0.9?'warn':'';
+  return'<div class="char-count '+cls+'">'+len+' / '+limit+'</div>';
+}
+
+function render(){
+  var el=document.getElementById('stack');
+  var hint=document.getElementById('hint');
+  if(idx>=items.length){
+    el.innerHTML='<div class="empty"><div class="icon">--</div><h2>All clear</h2><p>Nothing to review right now</p></div>';
+    hint.style.display='none';return;
+  }
+  hint.style.display='flex';
+  var vis=items.slice(idx,idx+3);
+  el.innerHTML=vis.map(function(it,i){
+    var a=ag(it.agentId);
+    var urgStyle=it.urgency==='high'?'background:rgba(239,68,68,0.15);color:#ef4444':it.urgency==='normal'?'background:rgba(245,158,11,0.15);color:#f59e0b':'background:rgba(102,102,102,0.15);color:#999';
+    return'<div class="card" data-id="'+it.id+'" data-i="'+i+'">'
+      +'<div class="overlay approve"><div class="circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div></div>'
+      +'<div class="overlay reject"><div class="circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></div></div>'
+      +'<div class="card-top">'
+        +'<div class="avi" style="background:'+a.color+'">'+a.letter+'</div>'
+        +'<div class="meta"><div class="name">'+cap(it.agentId)+'</div>'
+        +'<div class="sub">'+timeAgo(it.createdAt)+(it.target?' &middot; '+esc(it.target):'')+'</div></div>'
+        +'<span class="pill" style="'+urgStyle+'">'+it.urgency+'</span>'
+        +'<span class="pill" style="background:'+pillBg(it.type)+';color:'+pillColor(it.type)+'">'+it.type+'</span>'
+      +'</div>'
+      +(it.taskId?'<div class="card-task" onclick="openTask(\''+esc(it.taskId)+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span class="task-title">Linked task</span></div>':'')
+      +'<div class="card-body">'
+        +'<div style="font-size:0.75rem;color:var(--accent);font-weight:600;margin-bottom:0.5rem">'+esc(it.action)+'</div>'
+        +esc(it.content)
+        +(it.context?'<div class="target" style="margin-top:0.75rem;font-size:0.75rem;color:var(--muted)"><b>Context:</b> '+esc(it.context)+'</div>':'')
+        +charCountHtml(it.content,it.type)
+      +'</div>'
+      // Edit inline section
+      +'<div class="edit-inline">'
+        +'<div class="edit-head">'
+          +'<div class="avi" style="background:'+a.color+'">'+a.letter+'</div>'
+          +'<span>'+cap(it.agentId)+' &middot; '+it.type+'</span>'
+        +'</div>'
+        +'<div class="edit-tabs">'
+          +'<button class="active" onclick="switchEditTab(this,\'inline\',\''+it.id+'\')">Edit inline</button>'
+          +'<button onclick="switchEditTab(this,\'chat\',\''+it.id+'\')">Chat with '+cap(it.agentId)+'</button>'
+        +'</div>'
+        // Inline edit panel
+        +'<div class="edit-panel-inline" data-panel="inline">'
+          +'<textarea class="edit-ta">'+esc(it.content)+'</textarea>'
+          +'<div class="edit-btns">'
+            +'<button class="cancel" onclick="cancelEdit()">Cancel</button>'
+            +'<button class="send" onclick="submitEdit(\''+it.id+'\')">Approve edited</button>'
+          +'</div>'
+        +'</div>'
+        // Chat edit panel
+        +'<div class="edit-panel-chat" data-panel="chat" style="display:none">'
+          +'<div class="chat-messages" id="chatMsgs-'+it.id+'">'
+            +'<div class="chat-msg agent"><div class="sender">'+cap(it.agentId)+'</div><div class="bubble">'+esc(it.content)+'</div></div>'
+          +'</div>'
+          +'<div class="chat-input-row">'
+            +'<textarea id="chatInput-'+it.id+'" rows="1" placeholder="Ask '+cap(it.agentId)+' to revise..." onkeydown="chatKeydown(event,\''+it.id+'\')"></textarea>'
+            +'<button class="send-msg" onclick="sendChatMsg(\''+it.id+'\')" title="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button>'
+          +'</div>'
+          +'<div class="chat-cancel">'
+            +'<button class="cancel" onclick="cancelEdit()">Cancel</button>'
+            +'<button class="approve-final" onclick="approveChatEdit(\''+it.id+'\')">Approve latest</button>'
+          +'</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+  var top=el.querySelector('.card');
+  if(top)bind(top);
+}
+
+// ---- Edit tab switching ----
+function switchEditTab(btn,tab,id){
+  var card=btn.closest('.card');
+  card.querySelectorAll('.edit-tabs button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  card.querySelector('[data-panel="inline"]').style.display=tab==='inline'?'flex':'none';
+  card.querySelector('[data-panel="chat"]').style.display=tab==='chat'?'flex':'none';
+  if(tab==='chat'){
+    var input=document.getElementById('chatInput-'+id);
+    if(input)setTimeout(()=>input.focus(),50);
+    // Scroll chat to bottom
+    var msgs=document.getElementById('chatMsgs-'+id);
+    if(msgs)msgs.scrollTop=msgs.scrollHeight;
+  }
+}
+
+// ---- Chat in edit mode ----
+function sendChatMsg(id){
+  var input=document.getElementById('chatInput-'+id);
+  var txt=input.value.trim();
+  if(!txt)return;
+  input.value='';
+  var msgs=document.getElementById('chatMsgs-'+id);
+  // Add user message
+  msgs.innerHTML+='<div class="chat-msg user"><div class="sender">You</div><div class="bubble">'+esc(txt)+'</div></div>';
+  msgs.scrollTop=msgs.scrollHeight;
+  // Store for tracking
+  if(!chatMessages[id])chatMessages[id]=[];
+  chatMessages[id].push({role:'user',text:txt});
+  // Send to agent session and get response
+  sendToAgent(id,txt);
+}
+function chatKeydown(e,id){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChatMsg(id);}
+}
+
+async function sendToAgent(approvalId,userMsg){
+  // Find the approval item to get agentId
+  var item=items.find(it=>it.id===approvalId);
+  if(!item)return;
+  var msgs=document.getElementById('chatMsgs-'+approvalId);
+  // Show typing indicator
+  var typingEl=document.createElement('div');
+  typingEl.className='chat-msg agent';
+  typingEl.innerHTML='<div class="sender">'+cap(item.agentId)+'</div><div class="bubble" style="color:var(--muted)">typing...</div>';
+  msgs.appendChild(typingEl);
+  msgs.scrollTop=msgs.scrollHeight;
+
+  try{
+    // Use OpenClaw sessions_send via the hub API to talk to the agent
+    // For now, we'll use a direct fetch to the gateway
+    var sessionKey=getAgentSessionKey(item.agentId);
+    var prompt='[Approval revision request for: '+item.action+']\nOriginal content:\n'+item.content+'\n\nNoah says: '+userMsg+'\n\nPlease provide a revised version. Reply with ONLY the revised content, no explanation.';
+    var res=await fetch('/api/sessions/send',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sessionKey:sessionKey,message:prompt,timeoutSeconds:30})
+    });
+    var data=await res.json();
+    // Remove typing indicator
+    typingEl.remove();
+    var reply=data.reply||data.message||'(no response)';
+    msgs.innerHTML+='<div class="chat-msg agent"><div class="sender">'+cap(item.agentId)+'</div><div class="bubble">'+esc(reply)+'</div></div>';
+    msgs.scrollTop=msgs.scrollHeight;
+    if(!chatMessages[approvalId])chatMessages[approvalId]=[];
+    chatMessages[approvalId].push({role:'agent',text:reply});
+  }catch(e){
+    typingEl.remove();
+    msgs.innerHTML+='<div class="chat-msg agent"><div class="sender">System</div><div class="bubble" style="color:var(--red)">Failed to reach '+cap(item.agentId)+'. Try inline edit instead.</div></div>';
+    msgs.scrollTop=msgs.scrollHeight;
+    console.error(e);
+  }
+}
+
+function getAgentSessionKey(agentId){
+  var map={
+    morgan:'agent:main:slack:channel:c0aecgm60ue',
+    atlas:'agent:main:slack:channel:c0ae86uqujx',
+    forge:'agent:main:slack:channel:c0aecgmhv62',
+    echo:'agent:main:slack:channel:c0aeejdpcje',
+    haven:'agent:main:slack:channel:c0aej6strha'
+  };
+  return map[(agentId||'').toLowerCase()]||'';
+}
+
+async function approveChatEdit(id){
+  // Get the last agent message as the edited content
+  var thread=chatMessages[id]||[];
+  var lastAgent=null;
+  for(var i=thread.length-1;i>=0;i--){
+    if(thread[i].role==='agent'){lastAgent=thread[i].text;break;}
+  }
+  if(!lastAgent){
+    // Fall back to original
+    var item=items.find(it=>it.id===id);
+    lastAgent=item?item.content:'';
+  }
+  try{
+    await convexMutation('approvals:review',{id:id,status:'approved',reviewedBy:'noah',editedContent:lastAgent});
+    editId=null;chatMessages[id]=[];load();
+  }catch(e){console.error(e)}
+}
+
+function openTask(taskId){
+  window.location.href='/missions?task='+taskId;
+}
+
+// ---- Drag / Swipe ----
+function bind(card){
+  card.addEventListener('mousedown',dstart);
+  card.addEventListener('touchstart',dstart,{passive:true});
+}
+function dstart(e){
+  if(e.target.closest('button')||e.target.closest('textarea')||e.target.closest('select')||editId)return;
+  dragEl=e.currentTarget;dragEl.classList.add('dragging');
+  var t=e.touches?e.touches[0]:e;sx=t.clientX;sy=t.clientY;dragging=true;
+}
+document.addEventListener('mousemove',dmove);
+document.addEventListener('touchmove',dmove,{passive:false});
+function dmove(e){
+  if(!dragging||!dragEl)return;
+  if(e.cancelable)e.preventDefault();
+  var t=e.touches?e.touches[0]:e;
+  cx=t.clientX-sx;cy=t.clientY-sy;
+  dragEl.style.transform='translate('+cx+'px,'+cy+'px) rotate('+cx*0.08+'deg)';
+  var oa=dragEl.querySelector('.overlay.approve');
+  var or2=dragEl.querySelector('.overlay.reject');
+  oa.style.opacity=cx>30?Math.min((cx-30)/100,0.9):0;
+  or2.style.opacity=cx<-30?Math.min((-cx-30)/100,0.9):0;
+}
+document.addEventListener('mouseup',dend);
+document.addEventListener('touchend',dend);
+function dend(){
+  if(!dragging||!dragEl)return;
+  dragging=false;
+  var oa=dragEl.querySelector('.overlay.approve');
+  var or2=dragEl.querySelector('.overlay.reject');
+  if(cx>100){swipe('right');}
+  else if(cx<-100){swipe('left');}
+  else if(cy<-80){openEdit(dragEl.dataset.id);reset();}
+  else{reset();}
+  function reset(){
+    if(!dragEl)return;
+    dragEl.classList.remove('dragging');
+    dragEl.style.transform='';oa.style.opacity=0;or2.style.opacity=0;
+    dragEl=null;cx=0;cy=0;
+  }
+}
+
+async function swipe(dir){
+  var card=dragEl||document.querySelector('#stack .card');
+  if(!card)return;
+  var id=card.dataset.id;
+  card.classList.add('swiped-'+dir);
+  dragEl=null;cx=0;cy=0;
+
+  if(dir==='left'){
+    // Show reject feedback modal
+    pendingRejectId=id;
+    document.getElementById('rejectFeedback').value='';
+    document.getElementById('rejectModal').classList.add('show');
+    return;
+  }
+  // Approve
+  try{
+    await convexMutation('approvals:review',{id:id,status:'approved',reviewedBy:'noah'});
+  }catch(e){console.error(e)}
+  setTimeout(()=>{idx++;if(idx>=items.length)load();else render();},350);
+}
+
+// ---- Reject with feedback ----
+async function confirmReject(feedback){
+  document.getElementById('rejectModal').classList.remove('show');
+  var id=pendingRejectId;
+  if(!id)return;
+  pendingRejectId=null;
+  try{
+    var args={id:id,status:'rejected',reviewedBy:'noah'};
+    if(feedback&&feedback.trim())args.feedback=feedback.trim();
+    await convexMutation('approvals:review',args);
+  }catch(e){console.error(e)}
+  setTimeout(()=>{idx++;if(idx>=items.length)load();else render();},100);
+}
+
+// Close modal on bg click
+document.getElementById('rejectModal').addEventListener('click',function(e){
+  if(e.target===this){this.classList.remove('show');pendingRejectId=null;load();}
+});
+
+// ---- Inline Edit ----
+function openEdit(id){
+  var card=document.querySelector('#stack .card[data-id="'+id+'"]');
+  if(!card)return;
+  card.classList.add('editing');
+  editId=id;
+  var ta=card.querySelector('.edit-ta');
+  if(ta)setTimeout(()=>ta.focus(),50);
+}
+function cancelEdit(){
+  var card=document.querySelector('#stack .card.editing');
+  if(card)card.classList.remove('editing');
+  editId=null;
+}
+async function submitEdit(id){
+  var card=document.querySelector('#stack .card[data-id="'+id+'"]');
+  if(!card)return;
+  var ta=card.querySelector('.edit-ta');
+  var txt=ta?ta.value.trim():'';
+  if(!txt)return;
+  try{
+    await convexMutation('approvals:review',{id:id,status:'approved',reviewedBy:'noah',editedContent:txt});
+    editId=null;load();
+  }catch(e){console.error(e)}
+}
+
+function pillBg(t){return{tweet:'#1da1f218',linkedin:'#0077b518',email:'rgba(139,92,246,0.12)',outreach:'rgba(236,72,153,0.12)'}[t]||'var(--accent-dim)'}
+function pillColor(t){return{tweet:'#1da1f2',linkedin:'#0a66c2',email:'#a78bfa',outreach:'#f472b6'}[t]||'var(--accent)'}
+
+// ---- History ----
+var historyData=[];
+async function loadHistory(){
+  try{
+    var all=await convexQuery('approvals:list',{});
+    historyData=(all||[]).filter(a=>a.status==='approved'||a.status==='rejected');
+    renderHistory();
+  }catch(e){console.error(e)}
+}
+function renderHistory(){
+  var h=filterHistory(historyData);
+  var el=document.getElementById('historyView');
+  if(!h.length){el.innerHTML='<div class="empty" style="padding:3rem"><div class="icon">--</div><h2>'+(historyData.length?'No matches':'No history yet')+'</h2><p>'+(historyData.length?'Try different filters':'Reviewed items appear here')+'</p></div>';return;}
+  el.innerHTML=h.map(function(it){
+    var a=ag(it.agentId);
+    var hasEdited=it.editedContent&&it.editedContent!==it.content;
+    var hasFeedback=it.feedback&&it.feedback.trim();
+    return'<div class="h-item '+it.status+'" onclick="this.classList.toggle(\'expanded\')">'
+      +'<div class="h-top">'
+        +'<div class="avi" style="background:'+a.color+'">'+a.letter+'</div>'
+        +'<span class="name">'+cap(it.agentId)+'</span>'
+        +'<span class="pill" style="background:'+pillBg(it.type)+';color:'+pillColor(it.type)+'">'+it.type+'</span>'
+        +'<span class="status '+it.status+'">'+it.status+(hasEdited?' (edited)':'')+'</span>'
+      +'</div>'
+      +'<div class="h-body">'+esc(it.editedContent||it.content)+'</div>'
+      +'<div class="h-detail">'
+        +(hasEdited?'<div class="diff-label">Original</div><div class="diff-block">'+esc(it.content)+'</div><div class="diff-label">Approved version</div><div class="diff-block" style="color:var(--green)">'+esc(it.editedContent)+'</div>':'')
+        +(hasFeedback?'<div class="feedback-block">Feedback: '+esc(it.feedback)+'</div>':'')
+        +(!hasEdited&&!hasFeedback?'<div style="color:var(--muted);font-size:0.7rem">No edits or feedback</div>':'')
+      +'</div>'
+      +'<div class="h-foot">'+esc(it.action)+' &middot; '+timeAgo(it.reviewedAt||it.createdAt)+'</div>'
+    +'</div>';
+  }).join('');
+}
+function filterHistory(data){
+  var agent=document.getElementById('fAgent').value;
+  var type=document.getElementById('fType').value;
+  var status=document.getElementById('fStatus').value;
+  var search=document.getElementById('fSearch').value.toLowerCase().trim();
+  return data.filter(function(it){
+    if(agent&&it.agentId!==agent)return false;
+    if(type&&it.type!==type)return false;
+    if(status&&it.status!==status)return false;
+    if(search&&!(it.content||'').toLowerCase().includes(search)&&!(it.editedContent||'').toLowerCase().includes(search)&&!(it.action||'').toLowerCase().includes(search))return false;
+    return true;
+  });
+}
+
+// Filter events
+['fAgent','fType','fStatus'].forEach(id=>{
+  document.getElementById(id).addEventListener('change',renderHistory);
+});
+document.getElementById('fSearch').addEventListener('input',renderHistory);
+document.getElementById('fClear').addEventListener('click',function(){
+  document.getElementById('fAgent').value='';
+  document.getElementById('fType').value='';
+  document.getElementById('fStatus').value='';
+  document.getElementById('fSearch').value='';
+  renderHistory();
+});
+
+// ---- Segments ----
+document.getElementById('segQ').onclick=function(){
+  this.classList.add('active');
+  document.getElementById('segH').classList.remove('active');
+  document.getElementById('queueView').style.display='flex';
+  document.getElementById('historyView').style.display='none';
+  document.getElementById('filterBar').classList.remove('show');
+  load();
+};
+document.getElementById('segH').onclick=function(){
+  this.classList.add('active');
+  document.getElementById('segQ').classList.remove('active');
+  document.getElementById('queueView').style.display='none';
+  document.getElementById('historyView').style.display='block';
+  document.getElementById('filterBar').classList.add('show');
+  loadHistory();
+};
+
+// ---- Keyboard ----
+document.addEventListener('keydown',function(e){
+  if(editId)return;
+  if(document.getElementById('rejectModal').classList.contains('show')){
+    if(e.key==='Escape'){document.getElementById('rejectModal').classList.remove('show');pendingRejectId=null;load();}
+    return;
+  }
+  if(document.getElementById('historyView').style.display!=='none')return;
+  var top=document.querySelector('#stack .card');
+  if(!top)return;
+  if(e.key==='ArrowRight'){e.preventDefault();dragEl=top;swipe('right');}
+  else if(e.key==='ArrowLeft'){e.preventDefault();dragEl=top;swipe('left');}
+  else if(e.key==='ArrowUp'){e.preventDefault();openEdit(top.dataset.id);}
+});
+
+// ---- Init ----
+load();
+setInterval(load,10000);
+</script>
+</body>
+</html>

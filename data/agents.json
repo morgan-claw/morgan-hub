@@ -1,0 +1,8 @@
+[
+  {"id":"morgan","name":"Morgan","role":"Orchestrator","emoji":"M","color":"#FF4500","level":"lead","sessionKey":"agent:main:main","status":"active"},
+  {"id":"atlas","name":"Atlas","role":"Operations","emoji":"A","color":"#3b82f6","level":"lead","sessionKey":"agent:ops:main","status":"idle"},
+  {"id":"forge","name":"Forge","role":"Engineering","emoji":"F","color":"#8b5cf6","level":"specialist","sessionKey":"agent:tech:main","status":"idle"},
+  {"id":"echo","name":"Echo","role":"Content","emoji":"E","color":"#ec4899","level":"specialist","sessionKey":"agent:content:main","status":"idle"},
+  {"id":"haven","name":"Haven","role":"Personal","emoji":"H","color":"#22c55e","level":"specialist","sessionKey":"agent:personal:main","status":"idle"},
+  {"id":"scout","name":"Scout","role":"Research","emoji":"S","color":"#f59e0b","level":"specialist","sessionKey":"agent:research:main","status":"idle"}
+]

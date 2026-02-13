@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mission Control — Morgan Hub</title>
+  <style>
+    :root{--bg:#0a0a0a;--surface:#141414;--surface2:#1a1a1a;--border:#262626;--border2:#333;--text:#e5e5e5;--muted:#737373;--accent:#FF4500;--accent-dim:#FF450020;--green:#22c55e;--yellow:#f59e0b;--blue:#3b82f6;--purple:#8b5cf6;--pink:#ec4899}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden}
+
+    /* Sidebar */
+    .sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+    .sidebar .brand{display:flex;align-items:center;gap:0.6rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border)}
+    .sidebar .brand .mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;color:#fff}
+    .sidebar .brand span{font-weight:600;font-size:1rem}
+    .sidebar nav{padding:0.5rem 0}
+    .sidebar nav a{display:flex;align-items:center;gap:0.6rem;padding:0.55rem 1.25rem;color:var(--muted);text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.12s,background 0.12s}
+    .sidebar nav a:hover{color:var(--text);background:var(--surface2)}
+    .sidebar nav a.active{color:var(--accent);background:var(--accent-dim)}
+    .sidebar nav a svg{width:18px;height:18px;flex-shrink:0}
+
+    /* Agent panel in sidebar */
+    .agent-panel{flex:1;overflow-y:auto;padding:0.75rem;border-top:1px solid var(--border)}
+    .agent-panel h3{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:0.5rem;padding:0 0.5rem;display:flex;align-items:center;gap:0.4rem}
+    .agent-panel h3 .count{background:var(--border);border-radius:4px;padding:0 0.4rem;font-size:0.65rem}
+    .ag{display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.5rem;border-radius:8px;cursor:default;transition:background 0.12s}
+    .ag:hover{background:var(--surface2)}
+    .ag .avi{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:#fff;flex-shrink:0}
+    .ag .info{flex:1;min-width:0}
+    .ag .aname{font-size:0.8rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ag .arole{font-size:0.65rem;color:var(--muted)}
+    .ag .adot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .ag .adot.active{background:var(--green)}
+    .ag .adot.idle{background:var(--muted)}
+    .ag .level{font-size:0.55rem;text-transform:uppercase;letter-spacing:0.3px;padding:1px 4px;border-radius:3px;font-weight:600;flex-shrink:0}
+    .ag .level.lead{background:#FF450030;color:var(--accent)}
+    .ag .level.specialist{background:#3b82f620;color:var(--blue)}
+
+    /* Main area */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+    /* Top bar */
+    .topbar{display:flex;align-items:center;gap:1rem;padding:0.75rem 1.25rem;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+    .topbar h1{font-size:1.1rem;font-weight:600;font-family:'SF Mono',SFMono-Regular,Consolas,monospace;text-transform:uppercase;letter-spacing:1px}
+    .topbar .stats{display:flex;gap:1.5rem;margin-left:auto}
+    .topbar .stat{text-align:center}
+    .topbar .stat .sv{font-size:1.1rem;font-weight:700;font-family:monospace}
+    .topbar .stat .sl{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px}
+    .topbar .online{display:flex;align-items:center;gap:0.3rem;font-size:0.75rem;color:var(--green)}
+    .topbar .online::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
+    .topbar .clock{font-family:monospace;font-size:0.85rem;color:var(--muted)}
+    .topbar .add-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:0.4rem 0.9rem;font-size:0.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.3rem;transition:background 0.12s}
+    .topbar .add-btn:hover{background:#e03e00}
+
+    /* Content: Kanban + Feed */
+    .content{flex:1;display:flex;overflow:hidden}
+
+    /* Kanban */
+    .kanban{flex:1;display:flex;gap:0.5rem;padding:0.75rem;overflow-x:auto}
+    .col{flex:1;min-width:200px;max-width:300px;display:flex;flex-direction:column;background:var(--surface);border-radius:10px;border:1px solid var(--border);overflow:hidden}
+    .col-head{padding:0.6rem 0.75rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.4rem;flex-shrink:0}
+    .col-head .dot{width:8px;height:8px;border-radius:50%}
+    .col-head .cname{font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+    .col-head .ccount{font-size:0.65rem;color:var(--muted);margin-left:auto;background:var(--bg);padding:0 0.4rem;border-radius:4px}
+    .col-body{flex:1;overflow-y:auto;padding:0.5rem;display:flex;flex-direction:column;gap:0.4rem}
+
+    /* Task cards */
+    .task{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.6rem 0.7rem;cursor:pointer;transition:border-color 0.12s}
+    .task:hover{border-color:var(--accent)}
+    .task .ttitle{font-size:0.8rem;font-weight:500;margin-bottom:0.3rem;line-height:1.3}
+    .task .tmeta{display:flex;align-items:center;gap:0.3rem;flex-wrap:wrap}
+    .task .tassignee{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;color:#fff}
+    .task .tpriority{font-size:0.6rem;padding:1px 5px;border-radius:3px;font-weight:500}
+    .task .tpriority.high{background:#ef444430;color:#ef4444}
+    .task .tpriority.normal{background:#3b82f620;color:var(--blue)}
+    .task .tpriority.low{background:#22c55e20;color:var(--green)}
+    .task .tcomments{font-size:0.6rem;color:var(--muted);margin-left:auto;display:flex;align-items:center;gap:2px}
+
+    /* Activity feed */
+    .feed{width:300px;flex-shrink:0;border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
+    .feed-head{padding:0.6rem 0.75rem;border-bottom:1px solid var(--border);font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:0.4rem}
+    .feed-body{flex:1;overflow-y:auto;padding:0.5rem}
+    .act{display:flex;gap:0.5rem;padding:0.4rem 0.25rem;border-bottom:1px solid var(--border)}
+    .act:last-child{border-bottom:none}
+    .act .aavi{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;color:#fff;flex-shrink:0;margin-top:2px}
+    .act .abody{flex:1;min-width:0}
+    .act .atxt{font-size:0.75rem;line-height:1.4;color:var(--text)}
+    .act .atxt strong{color:var(--accent);font-weight:600}
+    .act .atime{font-size:0.6rem;color:var(--muted);margin-top:1px}
+
+    /* Modal */
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center}
+    .modal-bg.show{display:flex}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:90%;max-width:500px;max-height:80vh;overflow-y:auto;padding:1.5rem}
+    .modal h2{font-size:1rem;font-weight:600;margin-bottom:1rem}
+    .modal label{display:block;font-size:0.75rem;color:var(--muted);margin-bottom:0.25rem;text-transform:uppercase;letter-spacing:0.3px}
+    .modal input,.modal textarea,.modal select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:0.5rem 0.7rem;font-size:0.85rem;font-family:inherit;outline:none;margin-bottom:0.75rem}
+    .modal input:focus,.modal textarea:focus,.modal select:focus{border-color:var(--accent)}
+    .modal textarea{min-height:80px;resize:vertical}
+    .modal .assignee-grid{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.75rem}
+    .modal .assignee-chip{display:flex;align-items:center;gap:0.3rem;padding:0.3rem 0.6rem;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-size:0.75rem;transition:all 0.12s}
+    .modal .assignee-chip.sel{border-color:var(--accent);background:var(--accent-dim)}
+    .modal .assignee-chip .chip-dot{width:14px;height:14px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.5rem;font-weight:700;color:#fff}
+    .modal .btn-row{display:flex;gap:0.5rem;justify-content:flex-end;margin-top:0.5rem}
+    .modal .btn{padding:0.45rem 1rem;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;border:none;transition:background 0.12s}
+    .modal .btn.primary{background:var(--accent);color:#fff}
+    .modal .btn.primary:hover{background:#e03e00}
+    .modal .btn.ghost{background:none;color:var(--muted);border:1px solid var(--border)}
+    .modal .btn.ghost:hover{color:var(--text)}
+
+    /* Task detail modal */
+    .detail-meta{display:flex;gap:0.5rem;margin-bottom:0.75rem;flex-wrap:wrap}
+    .detail-meta select{width:auto;margin-bottom:0}
+    .thread{margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.5rem}
+    .thread h3{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:0.4rem}
+    .thread .tmsg{display:flex;gap:0.4rem;padding:0.35rem 0;border-bottom:1px solid var(--border)}
+    .thread .tmsg:last-child{border-bottom:none}
+    .thread .tmsg .tavi{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.5rem;font-weight:700;color:#fff;flex-shrink:0;margin-top:2px}
+    .thread .tmsg .tbody{flex:1;font-size:0.8rem;line-height:1.4}
+    .thread .tmsg .ttime{font-size:0.6rem;color:var(--muted)}
+    .thread .reply-row{display:flex;gap:0.3rem;margin-top:0.5rem}
+    .thread .reply-row input{flex:1;margin-bottom:0}
+    .thread .reply-row .btn{padding:0.4rem 0.7rem}
+
+    @media(max-width:900px){
+      .sidebar{display:none}
+      .feed{display:none}
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand"><div class="mark">M</div><span>Morgan Hub</span></div>
+    <nav>
+      <a href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Dashboard</a>
+      <a href="/missions.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> Missions</a>
+      <a href="/chat.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Chat</a>
+    </nav>
+    <div class="agent-panel">
+      <h3>Agents <span class="count" id="agentCount">0</span></h3>
+      <div id="agentList"></div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <h1>Mission Control</h1>
+      <div class="stats">
+        <div class="stat"><div class="sv" id="statAgents">0</div><div class="sl">Agents</div></div>
+        <div class="stat"><div class="sv" id="statTasks">0</div><div class="sl">Tasks</div></div>
+      </div>
+      <span class="clock" id="clock"></span>
+      <span class="online">ONLINE</span>
+      <button class="add-btn" id="addBtn">+ New Task</button>
+    </div>
+    <div class="content">
+      <div class="kanban" id="kanban"></div>
+      <div class="feed">
+        <div class="feed-head">Activity Feed</div>
+        <div class="feed-body" id="feedBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Task Modal -->
+  <div class="modal-bg" id="newTaskModal">
+    <div class="modal">
+      <h2>New Task</h2>
+      <label>Title</label>
+      <input id="ntTitle" placeholder="What needs to be done?">
+      <label>Description</label>
+      <textarea id="ntDesc" placeholder="Details, context, links..."></textarea>
+      <label>Priority</label>
+      <select id="ntPriority"><option value="normal">Normal</option><option value="high">High</option><option value="low">Low</option></select>
+      <label>Assign To</label>
+      <div class="assignee-grid" id="ntAssignees"></div>
+      <div class="btn-row">
+        <button class="btn ghost" onclick="closeModal('newTaskModal')">Cancel</button>
+        <button class="btn primary" id="ntSubmit">Create Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task Detail Modal -->
+  <div class="modal-bg" id="detailModal">
+    <div class="modal" id="detailContent"></div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/convex@latest/dist/browser-umd.js"></script>
+<script>
+const { ConvexHttpClient } = window.Convex;
+const client = new ConvexHttpClient('https://befitting-opossum-812.convex.cloud');
+
+var agents=[],tasks=[],activities=[];
+var COLS=[
+  {id:'inbox',name:'Inbox',color:'var(--muted)'},
+  {id:'assigned',name:'Assigned',color:'var(--blue)'},
+  {id:'in_progress',name:'In Progress',color:'var(--yellow)'},
+  {id:'review',name:'Review',color:'var(--purple)'},
+  {id:'done',name:'Done',color:'var(--green)'}
+];
+
+// Find agent by name (since Convex uses _id, we'll look up by name)
+function agentByName(name){
+  return agents.find(function(a){return a.name.toLowerCase()===name.toLowerCase()})||{name:name,emoji:'?',color:'#666'};
+}
+
+function timeAgo(ts){
+  var s=Math.floor((Date.now()-ts)/1000);
+  if(s<60)return 'now';
+  if(s<3600)return Math.floor(s/60)+'m';
+  if(s<86400)return Math.floor(s/3600)+'h';
+  return Math.floor(s/86400)+'d';
+}
+
+// ---- Load data (polling for now, can be upgraded to websocket subscriptions) ----
+async function loadData(){
+  try{
+    agents=await client.query('agents:list');
+    tasks=await client.query('tasks:list');
+    activities=await client.query('activities:list',{limit:50});
+    render();
+  }catch(e){
+    console.error('Failed to load data:',e);
+  }
+}
+
+// ---- Render ----
+function render(){
+  // Stats
+  document.getElementById('statAgents').textContent=agents.length;
+  document.getElementById('statTasks').textContent=tasks.length;
+  document.getElementById('agentCount').textContent=agents.length;
+
+  // Agent list
+  var al=document.getElementById('agentList');
+  al.innerHTML=agents.map(function(a){
+    return '<div class="ag"><div class="avi" style="background:'+a.color+'">'+a.emoji+'</div>'
+      +'<div class="info"><div class="aname">'+a.name+'</div><div class="arole">'+a.role+'</div></div>'
+      +'<span class="level '+(a.level||'specialist')+'">'+(a.level||'spc')+'</span>'
+      +'<div class="adot '+(a.status||'idle')+'"></div></div>';
+  }).join('');
+
+  // Kanban
+  var kb=document.getElementById('kanban');
+  kb.innerHTML=COLS.map(function(col){
+    var ct=tasks.filter(function(t){return t.status===col.id});
+    return '<div class="col"><div class="col-head"><div class="dot" style="background:'+col.color+'"></div>'
+      +'<span class="cname">'+col.name+'</span><span class="ccount">'+ct.length+'</span></div>'
+      +'<div class="col-body">'+ct.map(function(t){return taskCard(t)}).join('')+'</div></div>';
+  }).join('');
+
+  // Feed
+  var fb=document.getElementById('feedBody');
+  fb.innerHTML=activities.map(function(a){
+    var ag=agentByName(a.agentId);
+    return '<div class="act"><div class="aavi" style="background:'+ag.color+'">'+ag.emoji+'</div>'
+      +'<div class="abody"><div class="atxt"><strong>'+ag.name+'</strong> '+esc(a.message)+'</div>'
+      +'<div class="atime">'+timeAgo(a.createdAt)+'</div></div></div>';
+  }).join('')||'<div style="color:var(--muted);font-size:0.8rem;padding:1rem;text-align:center">No activity yet</div>';
+
+  // Assignee chips in new task modal
+  var ac=document.getElementById('ntAssignees');
+  ac.innerHTML=agents.map(function(a){
+    return '<div class="assignee-chip" data-name="'+a.name.toLowerCase()+'" onclick="toggleAssignee(this)">'
+      +'<div class="chip-dot" style="background:'+a.color+'">'+a.emoji+'</div>'+a.name+'</div>';
+  }).join('');
+}
+
+function taskCard(t){
+  var assignees=t.assigneeIds.map(function(name){
+    var a=agentByName(name);
+    return '<div class="tassignee" style="background:'+a.color+'" title="'+a.name+'">'+a.emoji+'</div>';
+  }).join('');
+  return '<div class="task" onclick="openTask(\''+t._id+'\')">'
+    +'<div class="ttitle">'+esc(t.title)+'</div>'
+    +'<div class="tmeta">'+assignees
+    +'<span class="tpriority '+(t.priority||'normal')+'">'+(t.priority||'normal')+'</span>'
+    +'</div></div>';
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ---- Modals ----
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+document.getElementById('addBtn').onclick=function(){
+  document.getElementById('newTaskModal').classList.add('show');
+  document.getElementById('ntTitle').focus();
+};
+document.querySelectorAll('.modal-bg').forEach(function(el){
+  el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('show')});
+});
+
+function toggleAssignee(el){el.classList.toggle('sel')}
+
+document.getElementById('ntSubmit').onclick=async function(){
+  var title=document.getElementById('ntTitle').value.trim();
+  if(!title)return;
+  var desc=document.getElementById('ntDesc').value.trim();
+  var priority=document.getElementById('ntPriority').value;
+  var assigneeIds=[];
+  document.querySelectorAll('#ntAssignees .sel').forEach(function(el){
+    assigneeIds.push(el.dataset.name);
+  });
+  
+  try{
+    await client.mutation('tasks:create',{
+      title:title,
+      description:desc,
+      priority:priority,
+      assigneeIds:assigneeIds,
+      status:assigneeIds.length?'assigned':'inbox',
+      createdBy:'noah'
+    });
+    closeModal('newTaskModal');
+    document.getElementById('ntTitle').value='';
+    document.getElementById('ntDesc').value='';
+    document.querySelectorAll('#ntAssignees .sel').forEach(function(el){el.classList.remove('sel')});
+    await loadData();
+  }catch(e){
+    console.error('Failed to create task:',e);
+    alert('Failed to create task');
+  }
+};
+
+// ---- Task detail ----
+async function openTask(id){
+  var t=tasks.find(function(x){return x._id===id});
+  if(!t)return;
+  
+  try{
+    var msgs=await client.query('messages:listByTask',{taskId:id});
+    var dc=document.getElementById('detailContent');
+    var assignees=t.assigneeIds.map(function(name){
+      var a=agentByName(name);
+      return '<div class="tassignee" style="background:'+a.color+'" title="'+a.name+'">'+a.emoji+'</div>';
+    }).join('');
+    
+    dc.innerHTML='<h2>'+esc(t.title)+'</h2>'
+      +'<div class="detail-meta">'
+      +'<select id="taskStatus" data-task-id="'+id+'" onchange="updateTaskStatus(this)">'
+      +COLS.map(function(c){return '<option value="'+c.id+'"'+(t.status===c.id?' selected':'')+'>'+c.name+'</option>'}).join('')
+      +'</select>'
+      +'<span class="tpriority '+(t.priority||'normal')+'">'+(t.priority||'normal')+'</span>'
+      +assignees+'</div>'
+      +(t.description?'<p style="font-size:0.85rem;color:var(--muted);line-height:1.5;margin-bottom:0.75rem">'+esc(t.description)+'</p>':'')
+      +'<div class="thread"><h3>Thread</h3>'
+      +msgs.map(function(m){
+        var a=agentByName(m.fromAgentId);
+        return '<div class="tmsg"><div class="tavi" style="background:'+a.color+'">'+a.emoji+'</div>'
+          +'<div class="tbody">'+esc(m.content)+'<div class="ttime">'+timeAgo(m.createdAt)+'</div></div></div>';
+      }).join('')
+      +'<div class="reply-row"><input id="replyInput" data-task-id="'+id+'" placeholder="Add a comment...">'
+      +'<button class="btn primary" onclick="postComment(\''+id+'\')">Send</button></div></div>'
+      +'<div class="btn-row" style="margin-top:1rem">'
+      +'<button class="btn ghost" onclick="deleteTask(\''+id+'\')">Delete</button>'
+      +'<button class="btn ghost" onclick="closeModal(\'detailModal\')">Close</button></div>';
+    
+    document.getElementById('detailModal').classList.add('show');
+  }catch(e){
+    console.error('Failed to load task details:',e);
+  }
+}
+
+async function updateTaskStatus(sel){
+  var id=sel.dataset.taskId;
+  var status=sel.value;
+  try{
+    await client.mutation('tasks:update',{
+      id:id,
+      status:status,
+      updatedBy:'noah'
+    });
+    await loadData();
+  }catch(e){
+    console.error('Failed to update task:',e);
+  }
+}
+
+async function postComment(taskId){
+  var inp=document.getElementById('replyInput');
+  var text=inp.value.trim();
+  if(!text)return;
+  try{
+    await client.mutation('messages:create',{
+      taskId:taskId,
+      content:text,
+      fromAgentId:'noah'
+    });
+    inp.value='';
+    await openTask(taskId);
+    await loadData();
+  }catch(e){
+    console.error('Failed to post comment:',e);
+  }
+}
+
+async function deleteTask(id){
+  if(!confirm('Delete this task?'))return;
+  try{
+    await client.mutation('tasks:remove',{
+      id:id,
+      deletedBy:'noah'
+    });
+    closeModal('detailModal');
+    await loadData();
+  }catch(e){
+    console.error('Failed to delete task:',e);
+  }
+}
+
+// ---- Clock ----
+function updateClock(){
+  var d=new Date();
+  document.getElementById('clock').textContent=d.toLocaleTimeString('en-US',{timeZone:'America/Toronto',hour12:false})
+    +' '+d.toLocaleDateString('en-US',{timeZone:'America/Toronto',weekday:'short',month:'short',day:'numeric'}).toUpperCase();
+}
+setInterval(updateClock,1000);
+updateClock();
+
+// ---- Initialize and poll ----
+loadData();
+setInterval(loadData,5000); // Poll every 5 seconds (can be upgraded to real-time subscriptions)
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+[
+  {
+    "id": "t001",
+    "title": "Review ProClawed landing page v2",
+    "description": "Noah needs to review the landing page built overnight. Red accent, speed angle, premium feel. Files in projects/proclawed/. Check pricing tiers: Audit $750, Deploy $2.5-5K, Configure $5-15K, Manage $500-2K/mo.",
+    "status": "review",
+    "priority": "high",
+    "assigneeIds": ["echo", "forge"],
+    "createdBy": "morgan",
+    "createdAt": "2026-02-12T06:00:00.000Z",
+    "updatedAt": "2026-02-12T14:00:00.000Z"
+  },
+  {
+    "id": "t002",
+    "title": "Fill out LinkedIn Engagement segments (5x20 people)",
+    "description": "Build 5 segments of 20 people each for daily LinkedIn engagement. 20-30 min daily rhythm. Target: 5-7 post comments + 20-25 outreach messages/week.",
+    "status": "assigned",
+    "priority": "high",
+    "assigneeIds": ["atlas"],
+    "createdBy": "noah",
+    "createdAt": "2026-02-12T10:00:00.000Z",
+    "updatedAt": "2026-02-12T10:00:00.000Z"
+  },
+  {
+    "id": "t003",
+    "title": "ProClawed content strategy — first 30 days",
+    "description": "Draft content calendar for ProClawed launch. LinkedIn posts, Twitter threads, case studies. Echo handles strategy, Forge handles technical content.",
+    "status": "in_progress",
+    "priority": "normal",
+    "assigneeIds": ["echo", "forge"],
+    "createdBy": "morgan",
+    "createdAt": "2026-02-12T08:00:00.000Z",
+    "updatedAt": "2026-02-12T12:00:00.000Z"
+  },
+  {
+    "id": "t004",
+    "title": "Set up Gmail API access for Morgan",
+    "description": "Programmatic email access for Morgan. OAuth2 flow, refresh tokens, scripts for send/read. Credential storage in .secrets.env.",
+    "status": "done",
+    "priority": "normal",
+    "assigneeIds": ["morgan"],
+    "createdBy": "noah",
+    "createdAt": "2026-02-12T09:00:00.000Z",
+    "updatedAt": "2026-02-12T13:00:00.000Z"
+  },
+  {
+    "id": "t005",
+    "title": "Morgan Hub — Mission Control system",
+    "description": "Build the shared task management system. Dashboard, chat, kanban board, activity feed, agent integration. Private on Tailscale.",
+    "status": "in_progress",
+    "priority": "high",
+    "assigneeIds": ["morgan"],
+    "createdBy": "noah",
+    "createdAt": "2026-02-12T13:00:00.000Z",
+    "updatedAt": "2026-02-12T14:30:00.000Z"
+  },
+  {
+    "id": "t006",
+    "title": "Haven cron job proposals — review 13 items",
+    "description": "Haven proposed 13 cron jobs in #life for habits, meal prep, health tracking. Noah needs to review and approve/reject each.",
+    "status": "review",
+    "priority": "normal",
+    "assigneeIds": ["haven"],
+    "createdBy": "haven",
+    "createdAt": "2026-02-11T20:00:00.000Z",
+    "updatedAt": "2026-02-12T10:00:00.000Z"
+  },
+  {
+    "id": "t007",
+    "title": "Research teaching opportunities at Toronto post-secondaries",
+    "description": "Noah interested in paid teaching/sessional roles. Research OCAD, George Brown, Sheridan, U of T continuing studies. Focus on design, tech, AI curriculum.",
+    "status": "inbox",
+    "priority": "low",
+    "assigneeIds": [],
+    "createdBy": "noah",
+    "createdAt": "2026-02-12T14:00:00.000Z",
+    "updatedAt": "2026-02-12T14:00:00.000Z"
+  },
+  {
+    "id": "t008",
+    "title": "@proclawed Twitter account — grow following",
+    "description": "18 accounts followed today from Noah's following list. Continue organic growth. Engage with AI/SaaS community. No automated posting without approval.",
+    "status": "done",
+    "priority": "normal",
+    "assigneeIds": ["morgan"],
+    "createdBy": "morgan",
+    "createdAt": "2026-02-12T12:00:00.000Z",
+    "updatedAt": "2026-02-12T13:30:00.000Z"
+  }
+]

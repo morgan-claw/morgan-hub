@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Morgan Hub</title>
   <style>
     :root {
       --bg: #0a0a0a;
       --surface: #141414;
+      --surface2: #1a1a1a;
       --border: #262626;
       --text: #e5e5e5;
       --muted: #737373;
       --accent: #FF4500;
-      --accent-dim: #FF450033;
+      --accent-dim: #FF450020;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -20,144 +21,285 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 2rem;
+      min-height: 100dvh;
     }
-    .container { max-width: 900px; margin: 0 auto; }
-    header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
+
+    /* ---- Layout ---- */
+    .shell { display: flex; min-height: 100vh; min-height: 100dvh; }
+
+    /* ---- Sidebar (desktop) ---- */
+    .sidebar {
+      display: none;
+      width: 220px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 0;
+      flex-direction: column;
+    }
+    .sidebar .brand {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0 1.25rem 1.25rem;
       border-bottom: 1px solid var(--border);
+      margin-bottom: 0.75rem;
     }
-    .logo {
-      width: 40px; height: 40px;
+    .sidebar .brand .mark {
+      width: 28px; height: 28px;
       background: var(--accent);
-      border-radius: 10px;
+      border-radius: 7px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem;
+      font-weight: 800; font-size: 0.85rem; color: #fff;
     }
-    h1 { font-size: 1.5rem; font-weight: 600; }
-    h1 span { color: var(--muted); font-weight: 400; font-size: 0.9rem; margin-left: 0.5rem; }
-    .timestamp { color: var(--muted); font-size: 0.8rem; margin-left: auto; }
-    
+    .sidebar .brand span { font-weight: 600; font-size: 1rem; }
+    .sidebar a {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.55rem 1.25rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: color 0.12s, background 0.12s;
+    }
+    .sidebar a:hover { color: var(--text); background: var(--surface2); }
+    .sidebar a.active { color: var(--accent); background: var(--accent-dim); }
+    .sidebar a svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* ---- Bottom Tab Bar (mobile) ---- */
+    .tab-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      z-index: 100;
+    }
+    .tab-bar a {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 10px 0 8px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .tab-bar a.active { color: var(--accent); }
+    .tab-bar a svg { width: 22px; height: 22px; }
+
+    /* ---- Main Content ---- */
+    .page {
+      flex: 1;
+      padding: 1rem 1rem calc(70px + env(safe-area-inset-bottom, 0));
+      max-width: 700px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.5rem 0 1rem;
+    }
+    .header .mark-mobile {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.85rem; color: #fff;
+    }
+    .header h1 { font-size: 1.2rem; font-weight: 600; }
+    .header .sub { color: var(--muted); font-size: 0.75rem; margin-left: auto; }
+
+    /* ---- Status Row ---- */
+    .status-row {
+      display: flex; gap: 0.5rem; margin-bottom: 1rem;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+    }
+    .status-pill {
+      flex: 1; min-width: 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+    }
+    .status-pill .val {
+      font-size: 1.3rem; font-weight: 700; color: var(--accent);
+    }
+    .status-pill .lbl {
+      font-size: 0.6rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .status-pill.online .val { color: #22c55e; }
+
+    /* ---- Cards ---- */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
+      padding: 1rem 1.1rem;
+      margin-bottom: 0.75rem;
     }
     .card h2 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      font-size: 0.85rem; font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
-    .card p { color: var(--muted); line-height: 1.6; }
-    .badge {
-      display: inline-block;
-      padding: 0.2rem 0.6rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 500;
+    .card p, .card li {
+      color: var(--muted); font-size: 0.85rem; line-height: 1.5;
     }
-    .badge-live { background: #22c55e22; color: #22c55e; }
-    .badge-pending { background: #f59e0b22; color: #f59e0b; }
-    
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
-    
-    .stat {
-      text-align: center;
-      padding: 1.25rem;
-    }
-    .stat .value {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-    .stat .label {
-      color: var(--muted);
-      font-size: 0.85rem;
-      margin-top: 0.25rem;
-    }
-    
-    #content { margin-top: 1.5rem; }
-    
-    .empty-state {
-      text-align: center;
-      padding: 4rem 2rem;
-      color: var(--muted);
-    }
-    .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
-    .empty-state h3 { color: var(--text); margin-bottom: 0.5rem; }
+    .card ul { list-style: none; padding: 0; }
+    .card li { padding: 0.35rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+    .card li:last-child { border-bottom: none; }
+    .card li .label { color: var(--text); font-weight: 500; }
+    .card li .val { color: var(--muted); text-align: right; }
 
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    /* ---- Agent List ---- */
+    .agents { display: flex; flex-direction: column; }
+    .agent {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .agent:last-child { border-bottom: none; }
+    .agent .avi {
+      width: 30px; height: 30px;
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: #fff;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    .agent .avi.atlas { background: #3b82f6; }
+    .agent .avi.forge { background: #8b5cf6; }
+    .agent .avi.echo { background: #ec4899; }
+    .agent .avi.haven { background: #22c55e; }
+    .agent .avi.scout { background: #f59e0b; }
+    .agent .info { flex: 1; }
+    .agent .name { font-weight: 500; font-size: 0.85rem; }
+    .agent .role { color: var(--muted); font-size: 0.72rem; }
+    .agent .dot-live {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #22c55e; flex-shrink: 0;
+    }
 
-    @media (max-width: 600px) {
-      body { padding: 1rem; }
-      .grid { grid-template-columns: 1fr; }
+    /* ---- Desktop ---- */
+    @media (min-width: 768px) {
+      .sidebar { display: flex; }
+      .tab-bar { display: none; }
+      .header .mark-mobile { display: none; }
+      .page {
+        padding: 2rem 2.5rem;
+        max-width: 800px;
+      }
+      .status-row { gap: 0.75rem; }
+      .status-pill { padding: 1rem; }
+      .status-pill .val { font-size: 1.5rem; }
+      .card { padding: 1.25rem 1.5rem; }
+    }
+    @media (min-width: 1100px) {
+      .page { max-width: 900px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="logo">🧠</div>
-      <h1>Morgan Hub <span>Dashboard</span></h1>
-      <div class="timestamp" id="updated"></div>
-    </header>
+  <div class="shell">
+    <aside class="sidebar"></aside>
 
-    <div class="grid">
-      <div class="card stat">
-        <div class="value">✓</div>
-        <div class="label">System Online</div>
+    <!-- Content -->
+    <div class="page">
+      <div class="header">
+        <div class="mark-mobile">M</div>
+        <h1>Dashboard</h1>
+        <div class="sub" id="updated"></div>
       </div>
-      <div class="card stat">
-        <div class="value">5</div>
-        <div class="label">Agents Active</div>
-      </div>
-      <div class="card stat">
-        <div class="value">∞</div>
-        <div class="label">Autonomy Level</div>
-      </div>
-    </div>
 
-    <div id="content">
+      <div class="status-row">
+        <div class="status-pill online">
+          <div class="val">ON</div>
+          <div class="lbl">System</div>
+        </div>
+        <div class="status-pill">
+          <div class="val">6</div>
+          <div class="lbl">Agents</div>
+        </div>
+        <div class="status-pill">
+          <div class="val">6</div>
+          <div class="lbl">Cron Jobs</div>
+        </div>
+        <div class="status-pill">
+          <div class="val">TSN</div>
+          <div class="lbl">Network</div>
+        </div>
+      </div>
+
       <div class="card">
-        <h2>📡 About This Hub</h2>
+        <h2>Agents</h2>
+        <div class="agents">
+          <div class="agent">
+            <div class="avi">M</div>
+            <div class="info"><div class="name">Morgan</div><div class="role">Orchestrator</div></div>
+            <div class="dot-live"></div>
+          </div>
+          <div class="agent">
+            <div class="avi atlas">A</div>
+            <div class="info"><div class="name">Atlas</div><div class="role">Operations</div></div>
+            <div class="dot-live"></div>
+          </div>
+          <div class="agent">
+            <div class="avi forge">F</div>
+            <div class="info"><div class="name">Forge</div><div class="role">Engineering</div></div>
+            <div class="dot-live"></div>
+          </div>
+          <div class="agent">
+            <div class="avi echo">E</div>
+            <div class="info"><div class="name">Echo</div><div class="role">Content</div></div>
+            <div class="dot-live"></div>
+          </div>
+          <div class="agent">
+            <div class="avi haven">H</div>
+            <div class="info"><div class="name">Haven</div><div class="role">Personal</div></div>
+            <div class="dot-live"></div>
+          </div>
+          <div class="agent">
+            <div class="avi scout">S</div>
+            <div class="info"><div class="name">Scout</div><div class="role">Research</div></div>
+            <div class="dot-live"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>System</h2>
+        <ul>
+          <li><span class="label">Gateway</span><span class="val">desktop-reimhlv-1</span></li>
+          <li><span class="label">Channels</span><span class="val">Discord / Slack / Web</span></li>
+          <li><span class="label">Vault</span><span class="val">Obsidian (synced)</span></li>
+          <li><span class="label">Network</span><span class="val">Tailscale (private)</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>About</h2>
         <p>
-          This is Morgan's communication dashboard. When you ask me to research something, 
-          build a report, create a tool, or visualize data — I'll deploy it here as a live page 
-          you can open on any device. No files to dig through, no copy-pasting. Just a link.
+          Private command center for the agent swarm. Reports, tools, and dashboards deploy here.
+          Accessible from any device on the tailnet.
         </p>
-      </div>
-
-      <div class="card">
-        <h2>🔧 How It Works</h2>
-        <p>
-          I push updates to this site via GitHub → Vercel. New pages appear instantly. 
-          Each task gets its own page or section. Everything is versioned and persistent.
-        </p>
-      </div>
-
-      <div class="card">
-        <h2>📋 Recent Deployments</h2>
-        <p>No deployments yet — this is the first one. Future updates will be listed here.</p>
       </div>
     </div>
   </div>
 
+  <!-- Mobile tab bar -->
+  <nav class="tab-bar"></nav>
+  <script src="/nav.js"></script>
+
   <script>
-    document.getElementById('updated').textContent = 
-      'Updated: ' + new Date().toLocaleString('en-US', { 
-        timeZone: 'America/Toronto', 
-        dateStyle: 'medium', 
-        timeStyle: 'short' 
+    document.getElementById('updated').textContent =
+      new Date().toLocaleString('en-US', {
+        timeZone: 'America/Toronto',
+        month: 'short', day: 'numeric',
+        hour: 'numeric', minute: '2-digit'
       });
   </script>
 </body>
