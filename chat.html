@@ -231,9 +231,8 @@
 
 <script>
   // ---- Config ----
-  var GW = location.hostname === 'localhost' || location.hostname === '127.0.0.1'
-    ? 'ws://127.0.0.1:18789'
-    : 'wss://desktop-reimhlv-1.tail801a90.ts.net';
+  // WS goes through server.js proxy at /ws — auth handled server-side
+  var GW = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
   var GW_URL = location.origin;
   var DKEY='mhub-dev2', AKEY='mhub-auth2';
 
@@ -255,14 +254,19 @@
   function toHex(b){var s='';for(var i=0;i<b.length;i++)s+=b[i].toString(16).padStart(2,'0');return s}
 
   // ---- Auth ----
-  function getAuth(){try{return JSON.parse(localStorage.getItem(AKEY))}catch(e){return null}}
+  // Over Tailscale: skip auth screen entirely — Tailscale identity headers handle it.
+  // Localhost: show password prompt as fallback.
+  var isTailscale = location.hostname.indexOf('.ts.net') >= 0;
+  function getAuth(){
+    if(isTailscale) return {}; // empty auth — Tailscale headers do the work
+    try{return JSON.parse(localStorage.getItem(AKEY))}catch(e){return null}
+  }
   function setAuth(a){localStorage.setItem(AKEY,JSON.stringify(a))}
-  var savedAuth=getAuth();
-  if(savedAuth){authScreen.classList.add('hidden')}
+  if(isTailscale || getAuth()){authScreen.classList.add('hidden')}
   authBtn.onclick=function(){
     var pw=pwInput.value.trim();
     if(!pw){authErr.textContent='Please enter a password';return}
-    setAuth({password:pw});authScreen.classList.add('hidden');authErr.textContent='';startConnect();
+    setAuth({token:pw,password:pw});authScreen.classList.add('hidden');authErr.textContent='';startConnect();
   };
   pwInput.addEventListener('keydown',function(e){if(e.key==='Enter')authBtn.click()});
 
@@ -332,19 +336,22 @@
   function sendConnect(params){
     rpc('connect',params).then(function(res){
       ok=true;backoff=800;setSt('ok','connected');
-      rpc('chat.subscribe',{sessionKey:sk}).catch(function(){});
-      loadHistory();
+      historyRetries=0;loadHistory();
       if(!sessLoaded)loadSessions();
       updateHeaderName();
     }).catch(function(e){
       var m=String(e.message||e);
       if(m.indexOf('pairing')>=0){setSt('wait','pairing required');addMsg('system','Pairing required — ask Morgan to approve, then refresh.');}
-      else{setSt('','failed');addMsg('system','Auth failed: '+m);localStorage.removeItem(AKEY);authScreen.classList.remove('hidden');}
+      else{setSt('','failed');addMsg('system','Auth failed: '+m);localStorage.removeItem(AKEY);if(!isTailscale)authScreen.classList.remove('hidden');}
     });
   }
 
+  var historyRetries=0;
   function loadHistory(){
+    var targetSk=sk;
     rpc('chat.history',{sessionKey:sk,limit:80}).then(function(r){
+      historyRetries=0;
+      if(targetSk!==sk)return; // session changed while loading
       if(r&&r.messages){
         var imgEls=[];msgs.querySelectorAll('.m.has-img').forEach(function(el){imgEls.push(el)});
         while(msgs.firstChild!==typingEl)msgs.removeChild(msgs.firstChild);
@@ -355,7 +362,10 @@
         });
         imgEls.forEach(function(el){msgs.insertBefore(el,typingEl)});
       }
-    }).catch(function(e){console.warn('history fail',e)});
+    }).catch(function(e){
+      console.warn('history fail',e);
+      if(historyRetries<3){historyRetries++;setTimeout(function(){if(targetSk===sk)loadHistory()},1500)}
+    });
   }
 
   // ---- Session sidebar ----
@@ -444,14 +454,13 @@
       item.onclick=()=>{
         const key=item.dataset.key;
         if(key===sk)return;
-        // Unsubscribe old, switch
-        rpc('chat.unsubscribe',{sessionKey:sk}).catch(()=>{});
         sk=key;
         // Clear and reload
         while(msgs.firstChild!==typingEl)msgs.removeChild(msgs.firstChild);
         stream=null;
-        rpc('chat.subscribe',{sessionKey:sk}).catch(()=>{});
-        loadHistory();
+        historyRetries=0;
+        if(ok)loadHistory();
+        else addMsg('system','Reconnecting — history will load automatically...');
         renderSessions();
         updateHeaderName();
         // Close mobile sidebar
@@ -488,11 +497,9 @@
   function createNewSession(){
     const ts=Date.now();
     const newKey='webchat:'+ts;
-    rpc('chat.unsubscribe',{sessionKey:sk}).catch(()=>{});
     sk=newKey;
     while(msgs.firstChild!==typingEl)msgs.removeChild(msgs.firstChild);
     stream=null;
-    rpc('chat.subscribe',{sessionKey:sk}).catch(()=>{});
     sessions.unshift({sessionKey:newKey,label:'New Chat',updatedAtMs:ts});
     renderSessions();
     updateHeaderName();
@@ -568,7 +575,7 @@
     if(ws&&ws.readyState<=1)return;
     ok=false;nonce=null;setSt('','connecting...');
     ws=new WebSocket(GW);
-    ws.onopen=function(){doConnect()};
+    ws.onopen=function(){setSt('','waiting for challenge...')};
     ws.onmessage=function(e){onMsg(String(e.data||''))};
     ws.onclose=function(ev){
       ok=false;setSt('','reconnecting...');
@@ -613,7 +620,10 @@
   // ---- Send ----
   function send(){
     var t=inp.value.trim();var file=pendingFile;
-    if((!t&&!file)||!ok)return;
+    if(!t&&!file)return;
+    // Fall back to HTTP if WS is not connected
+    if(!ok&&t&&!file){sendHTTP(t);inp.value='';inp.style.height='auto';btn.disabled=false;return}
+    if(!ok)return;
     if(file)addImgMsg('user',file.dataUrl,t||null);else addMsg('user',t);
     inp.value='';inp.style.height='auto';btn.disabled=true;
     pendingFile=null;fileIn.value='';preview.classList.remove('show');
@@ -662,9 +672,60 @@
   vBtn.addEventListener('click',function(){syncVerbose(!verbose)});
   vBtn2.addEventListener('click',function(){syncVerbose(!verbose)});
 
+  // ---- HTTP fallback for history ----
+  async function loadHistoryHTTP(){
+    try{
+      const r=await fetch(GW_URL+'/api/gw',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({tool:'sessions_history',args:{sessionKey:sk,limit:80}})
+      });
+      if(!r.ok)return;
+      const data=await r.json();
+      let inner=data;
+      if(data.ok&&data.result?.content?.[0]?.text){
+        try{inner=JSON.parse(data.result.content[0].text)}catch{}
+      }
+      var messages=inner.messages||inner.result?.messages||[];
+      if(messages.length){
+        while(msgs.firstChild!==typingEl)msgs.removeChild(msgs.firstChild);
+        messages.forEach(function(m){
+          var t=txt(m.content);
+          if(!t||t==='NO_REPLY'||t==='HEARTBEAT_OK'||t.indexOf('Read HEARTBEAT.md')===0)return;
+          addMsg(m.role,t);
+        });
+      }
+    }catch(e){console.warn('HTTP history fail',e)}
+  }
+
+  // ---- HTTP fallback for sending ----
+  async function sendHTTP(text,imageData){
+    addMsg('user',text);
+    typingEl.classList.add('show');msgs.scrollTop=msgs.scrollHeight;
+    try{
+      var args={sessionKey:sk,message:text};
+      if(imageData)args.images=[{data:imageData}];
+      const r=await fetch(GW_URL+'/api/gw',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({tool:'sessions_send',args:args})
+      });
+      typingEl.classList.remove('show');
+      // Reload history to see the response
+      setTimeout(loadHistoryHTTP, 2000);
+      setTimeout(loadHistoryHTTP, 5000);
+      setTimeout(loadHistoryHTTP, 10000);
+    }catch(e){
+      typingEl.classList.remove('show');
+      addMsg('system','Send failed: '+e.message);
+    }
+  }
+
   // ---- Init ----
   function startConnect(){loadEd(function(){wsConnect()})}
-  if(savedAuth)startConnect();
+  // Always load sessions immediately via HTTP (don't wait for WS)
+  loadSessions();
+  loadHistoryHTTP();
+  // Also try WS for real-time streaming
+  if(isTailscale || getAuth())startConnect();
 </script>
 </body>
 </html>
