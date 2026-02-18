@@ -79,20 +79,6 @@
     /* Calendar area (center) */
     .calendar-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;background:var(--bg)}
 
-    /* Activity feed (right) */
-    .feed{width:300px;flex-shrink:0;border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
-    .feed-head{padding:0.6rem 0.75rem;border-bottom:1px solid var(--border);font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:0.4rem}
-    .feed-body{flex:1;overflow-y:auto;padding:0.5rem}
-    .run-feed-item{display:flex;gap:0.5rem;padding:0.4rem 0.25rem;border-bottom:1px solid var(--border)}
-    .run-feed-item:last-child{border-bottom:none}
-    .run-feed-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:6px}
-    .run-feed-dot.ok{background:var(--green)}
-    .run-feed-dot.error{background:var(--red)}
-    .run-feed-body{flex:1;min-width:0}
-    .run-feed-name{font-size:0.75rem;line-height:1.4;color:var(--text);font-weight:500}
-    .run-feed-time{font-size:0.6rem;color:var(--muted);margin-top:1px}
-    .run-feed-dur{font-size:0.6rem;color:var(--muted);flex-shrink:0;font-variant-numeric:tabular-nums;margin-top:4px}
-
     /* Modal */
     .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center}
     .modal-bg.show{display:flex}
@@ -275,7 +261,6 @@
     }
     @media(max-width:767px){
       .job-panel{display:none}
-      .feed{display:none}
       .mobile-jobs-btn{display:flex}
       .content{padding-bottom:70px}
     }
@@ -333,10 +318,6 @@
       <div class="calendar-area" id="calendar-area">
         <div class="loading" id="cal-loading">Loading schedule...</div>
       </div>
-      <div class="feed">
-        <div class="feed-head">Run History</div>
-        <div class="feed-body" id="feedBody"></div>
-      </div>
     </div>
   </div>
 
@@ -392,8 +373,6 @@
 
     let jobs = [], view = 'week', cursor = new Date(), selectedJobId = null, activeTab = 'info';
     let hiddenJobIds = JSON.parse(localStorage.getItem('mhub-hidden-jobs') || '[]');
-    let allRuns = []; // aggregated runs for feed
-
     const $ = id => document.getElementById(id);
     function saveHidden() { localStorage.setItem('mhub-hidden-jobs', JSON.stringify(hiddenJobIds)); }
     function isJobVisible(id) { return !hiddenJobIds.includes(id); }
@@ -498,40 +477,6 @@
       $('statEnabled').textContent = jobs.filter(j => j.enabled).length;
       const nextMs = jobs.filter(j => j.enabled && j.state?.nextRunAtMs).map(j => j.state.nextRunAtMs).sort((a,b)=>a-b)[0];
       $('statNext').textContent = nextMs ? relativeTime(nextMs) : '—';
-    }
-
-    // ============ RUN HISTORY FEED ============
-    async function loadRunFeed() {
-      const runs = [];
-      for (const job of jobs.slice(0, 20)) {
-        try {
-          const jr = await fetchRuns(job.id);
-          (jr || []).slice(0, 5).forEach(r => runs.push({ ...r, jobName: job.name || 'Unnamed', jobId: job.id }));
-        } catch {}
-      }
-      runs.sort((a, b) => (b.runAtMs || b.ts || b.startedAtMs || 0) - (a.runAtMs || a.ts || a.startedAtMs || 0));
-      allRuns = runs.slice(0, 30);
-      renderFeed();
-    }
-    function renderFeed() {
-      const fb = $('feedBody');
-      if (!allRuns.length) {
-        fb.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;padding:1rem;text-align:center">No run history yet</div>';
-        return;
-      }
-      fb.innerHTML = allRuns.map(r => {
-        const ok = r.status !== 'error';
-        const t = r.runAtMs || r.ts || r.startedAtMs;
-        const dur = r.durationMs != null ? (r.durationMs < 1000 ? r.durationMs + 'ms' : (r.durationMs / 1000).toFixed(1) + 's') : '';
-        return `<div class="run-feed-item">
-          <div class="run-feed-dot ${ok ? 'ok' : 'error'}"></div>
-          <div class="run-feed-body">
-            <div class="run-feed-name">${esc(r.jobName)}</div>
-            <div class="run-feed-time">${esc(fmtDate(t))}${r.error ? ' · <span style="color:var(--red)">' + esc(r.error.slice(0, 60)) + '</span>' : ''}</div>
-          </div>
-          ${dur ? `<div class="run-feed-dur">${dur}</div>` : ''}
-        </div>`;
-      }).join('');
     }
 
     // ============ JOB LIST ============
@@ -778,8 +723,6 @@
       if (weekColWidth) return weekColWidth;
       // Auto: fit 7 days in available calendar area width
       const calArea = $('calendar-area');
-      const jobPanel = document.querySelector('.job-panel');
-      const feed = document.querySelector('.feed');
       const availW = calArea ? calArea.clientWidth : 800;
       return Math.max(WEEK_COL_MIN, Math.floor((availW - 48) / 7)); // 48 = time column
     }
@@ -1157,7 +1100,6 @@
       updateStats();
       renderJobList();
       renderCalendar();
-      loadRunFeed();
     }
     refresh();
     setInterval(refresh, 60000);
