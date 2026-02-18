@@ -419,7 +419,7 @@
       return data.result || data;
     }
     async function fetchJobs() { try { const d = await gwCall('cron', { action: 'list', includeDisabled: true }); return d.jobs || (Array.isArray(d) ? d : []); } catch { return []; } }
-    async function fetchRuns(jobId) { try { const d = await gwCall('cron', { action: 'runs', jobId }); return d.runs || d || []; } catch { return []; } }
+    async function fetchRuns(jobId) { try { const d = await gwCall('cron', { action: 'runs', jobId }); return d.entries || d.runs || d || []; } catch { return []; } }
     async function runJobNow(jobId) { try { await gwCall('cron', { action: 'run', jobId }); return true; } catch { return false; } }
     async function updateJob(jobId, patch) { try { await gwCall('cron', { action: 'update', jobId, patch }); return true; } catch(e) { console.error(e); return false; } }
     async function deleteJob(jobId) { try { await gwCall('cron', { action: 'remove', jobId }); return true; } catch { return false; } }
@@ -509,7 +509,7 @@
           (jr || []).slice(0, 5).forEach(r => runs.push({ ...r, jobName: job.name || 'Unnamed', jobId: job.id }));
         } catch {}
       }
-      runs.sort((a, b) => (b.startedAtMs || b.triggeredAtMs || 0) - (a.startedAtMs || a.triggeredAtMs || 0));
+      runs.sort((a, b) => (b.runAtMs || b.ts || b.startedAtMs || 0) - (a.runAtMs || a.ts || a.startedAtMs || 0));
       allRuns = runs.slice(0, 30);
       renderFeed();
     }
@@ -521,7 +521,7 @@
       }
       fb.innerHTML = allRuns.map(r => {
         const ok = r.status !== 'error';
-        const t = r.startedAtMs || r.triggeredAtMs;
+        const t = r.runAtMs || r.ts || r.startedAtMs;
         const dur = r.durationMs != null ? (r.durationMs < 1000 ? r.durationMs + 'ms' : (r.durationMs / 1000).toFixed(1) + 's') : '';
         return `<div class="run-feed-item">
           <div class="run-feed-dot ${ok ? 'ok' : 'error'}"></div>
