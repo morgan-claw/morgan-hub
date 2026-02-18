@@ -85,106 +85,64 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Hevy fitness API — calls mcporter CLI directly
+  // Hevy fitness API — direct REST calls (no CLI spawning)
+  const HEVY_API_KEY = 'c9317013-3db9-4abe-b499-eaa5b35a1309';
+  const HEVY_BASE = 'https://api.hevyapp.com/v1';
+  
   if (url.pathname.startsWith('/api/hevy/')) {
     const route = url.pathname.replace('/api/hevy/', '');
-    const toolMap = {
-      'workouts': 'hevy.get_workouts',
-      'all-workouts': 'hevy.get_all_workouts',
-      'routines': 'hevy.get_all_routines',
-      'workout-count': 'hevy.get_workout_count',
-      'trends': 'hevy.analyze_workout_trends',
-      'exercises': 'hevy.get_exercise_templates',
+    const routeMap = {
+      'workouts': '/workouts',
+      'routines': '/routines',
+      'exercises': '/exercise_templates',
+      'workout-count': '/workout_count',
     };
-    const tool = toolMap[route];
-    if (!tool) { res.writeHead(404, { 'Content-Type': 'application/json' }); res.end('{"error":"unknown route"}'); return; }
+    const apiPath = routeMap[route];
+    if (!apiPath) { res.writeHead(404, { 'Content-Type': 'application/json' }); res.end('{"error":"unknown route"}'); return; }
 
-    const params = {};
-    for (const [k, v] of url.searchParams) params[k] = isNaN(v) ? v : Number(v);
-    const spawnArgs = ['call', tool, '--json'];
-    if (Object.keys(params).length) spawnArgs.push('--args', JSON.stringify(params));
-
-    const { spawn } = require('child_process');
-    const mcporterCli = path.join(process.env.APPDATA || '', 'npm', 'node_modules', 'mcporter', 'dist', 'cli.js');
-    const child = spawn(process.execPath, [mcporterCli, ...spawnArgs], {
-      cwd: path.resolve(__dirname, '..', '..'),
-      windowsHide: true,
-      stdio: ['ignore', 'pipe', 'pipe']
-    });
-    let out = '', errOut = '';
-    child.stdout.on('data', d => out += d);
-    child.stderr.on('data', d => errOut += d);
-    child.on('close', code => {
-      if (code !== 0) {
-        console.error('[hevy]', errOut);
-        res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-        res.end(JSON.stringify({ error: errOut.trim() || `exit ${code}` }));
-        return;
-      }
-      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      try { JSON.parse(out); res.end(out); }
-      catch { res.end(JSON.stringify({ raw: out.trim() })); }
-    });
-    child.on('error', e => {
+    try {
+      const params = new URLSearchParams();
+      for (const [k, v] of url.searchParams) params.set(k, v);
+      const hevyUrl = `${HEVY_BASE}${apiPath}${params.toString() ? '?' + params : ''}`;
+      const hevyRes = await fetch(hevyUrl, { headers: { 'api-key': HEVY_API_KEY, 'Accept': 'application/json' } });
+      const data = await hevyRes.text();
+      res.writeHead(hevyRes.status, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.end(data);
+    } catch (e) {
       res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
       res.end(JSON.stringify({ error: e.message }));
-    });
+    }
     return;
   }
 
-  // Direct fitness API using mcporter (since /api/gw proxy is having issues)
+  // Legacy /api/fitness route — redirect to /api/hevy
   if (url.pathname === '/api/fitness') {
-    if (req.method === 'GET') {
-      try {
-        const { spawn } = require('child_process');
-        const { searchParams } = url;
-        const endpoint = searchParams.get('endpoint') || 'hevy.get_workouts';
-        const page = searchParams.get('page') || '1';
-        const pageSize = searchParams.get('pageSize') || '10';
-        
-        console.log(`[fitness] Calling ${endpoint} with page=${page}, pageSize=${pageSize}`);
-        
-        const mcporter = spawn('npx', ['mcporter', 'call', endpoint, `page=${page}`, `pageSize=${pageSize}`], {
-          cwd: 'C:\\Users\\openc\\.openclaw\\workspace',
-          stdio: ['pipe', 'pipe', 'pipe']
-        });
-        
-        let output = '';
-        let error = '';
-        
-        mcporter.stdout.on('data', (data) => {
-          output += data.toString();
-        });
-        
-        mcporter.stderr.on('data', (data) => {
-          error += data.toString();
-        });
-        
-        mcporter.on('close', (code) => {
-          if (code === 0 && output.trim()) {
-            try {
-              const result = JSON.parse(output.trim());
-              res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-              res.end(JSON.stringify(result));
-            } catch (parseError) {
-              console.error('[fitness] JSON parse error:', parseError);
-              res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-              res.end(JSON.stringify({ error: 'Invalid JSON response from mcporter' }));
-            }
-          } else {
-            console.error('[fitness] mcporter error:', error, 'code:', code);
-            res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-            res.end(JSON.stringify({ error: error || 'mcporter call failed' }));
-          }
-        });
-        
-      } catch (e) {
-        console.error('[fitness] API error:', e);
-        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-        res.end(JSON.stringify({ error: e.message }));
-      }
-      return;
+    const endpoint = url.searchParams.get('endpoint') || 'hevy.get_workouts';
+    const page = url.searchParams.get('page') || '1';
+    const pageSize = url.searchParams.get('pageSize') || '10';
+    // Map mcporter tool names to Hevy REST endpoints
+    const endpointMap = {
+      'hevy.get_workouts': '/workouts',
+      'hevy.get_all_workouts': '/workouts',
+      'hevy.get_routines': '/routines',
+      'hevy.get_all_routines': '/routines',
+      'hevy.get_exercise_templates': '/exercise_templates',
+      'hevy.get_workout_count': '/workout_count',
+    };
+    const apiPath = endpointMap[endpoint] || '/workouts';
+    try {
+      const hevyUrl = `${HEVY_BASE}${apiPath}?page=${page}&pageSize=${pageSize}`;
+      console.log(`[fitness] ${endpoint} → ${hevyUrl}`);
+      const hevyRes = await fetch(hevyUrl, { headers: { 'api-key': HEVY_API_KEY, 'Accept': 'application/json' } });
+      const data = await hevyRes.text();
+      res.writeHead(hevyRes.status, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.end(data);
+    } catch (e) {
+      console.error('[fitness] API error:', e.message);
+      res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.end(JSON.stringify({ error: e.message }));
     }
+    return;
   }
 
   // Vault-DB API — direct SQLite access for habits etc.
