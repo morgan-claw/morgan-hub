@@ -312,6 +312,11 @@
       <button class="today-btn" id="today-btn">Today</button>
       <button class="nav-btn" id="next-btn">&#8250;</button>
       <span class="date-label" id="date-label"></span>
+      <div id="zoom-controls" style="display:none;align-items:center;gap:0.25rem;margin-left:auto">
+        <button class="nav-btn" id="zoom-out" title="Zoom out (see more days)" style="font-size:1rem;font-weight:700">−</button>
+        <span id="zoom-label" style="font-size:0.65rem;color:var(--muted);min-width:32px;text-align:center">7d</span>
+        <button class="nav-btn" id="zoom-in" title="Zoom in (see fewer days)" style="font-size:1rem;font-weight:700">+</button>
+      </div>
       <button class="mobile-jobs-btn" id="mobile-jobs-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Jobs
@@ -764,6 +769,42 @@
     const WEEK_DAYS_BUFFER = 35;
     const WEEK_DAYS_BEFORE = 14;
     let weekRenderedStart = null;
+    let weekColWidth = parseInt(localStorage.getItem('mhub-week-col-width')) || null; // null = auto-calculate to fit 7 days
+    const WEEK_COL_MIN = 60;
+    const WEEK_COL_MAX = 300;
+    const WEEK_COL_STEP = 20;
+
+    function getWeekColWidth() {
+      if (weekColWidth) return weekColWidth;
+      // Auto: fit 7 days in available calendar area width
+      const calArea = $('calendar-area');
+      const jobPanel = document.querySelector('.job-panel');
+      const feed = document.querySelector('.feed');
+      const availW = calArea ? calArea.clientWidth : 800;
+      return Math.max(WEEK_COL_MIN, Math.floor((availW - 48) / 7)); // 48 = time column
+    }
+    function updateZoomLabel() {
+      const w = getWeekColWidth();
+      const calArea = $('calendar-area');
+      const availW = calArea ? calArea.clientWidth - 48 : 700;
+      const visibleDays = Math.round(availW / w);
+      $('zoom-label').textContent = visibleDays + 'd';
+    }
+    function zoomWeek(delta) {
+      const current = getWeekColWidth();
+      const newW = Math.max(WEEK_COL_MIN, Math.min(WEEK_COL_MAX, current + delta));
+      weekColWidth = newW;
+      localStorage.setItem('mhub-week-col-width', newW);
+      updateZoomLabel();
+      // Re-render preserving scroll position
+      const wrap = document.querySelector('.week-wrap');
+      const scrollRatio = wrap ? wrap.scrollLeft / (wrap.scrollWidth - wrap.clientWidth || 1) : 0.5;
+      renderWeekView($('calendar-area'));
+      const newWrap = document.querySelector('.week-wrap');
+      if (newWrap) {
+        newWrap.scrollLeft = scrollRatio * (newWrap.scrollWidth - newWrap.clientWidth);
+      }
+    }
 
     function renderWeekView(area) {
       const now = new Date();
@@ -779,7 +820,8 @@
       for (let i = 0; i < WEEK_DAYS_BUFFER; i++) { const d = new Date(rangeStart); d.setDate(rangeStart.getDate() + i); days.push(d); }
       const dn = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
       const nir = now >= rangeStart && now <= rangeEnd;
-      const colDef = `48px repeat(${WEEK_DAYS_BUFFER}, minmax(120px, 120px))`;
+      const cw = getWeekColWidth();
+      const colDef = `48px repeat(${WEEK_DAYS_BUFFER}, ${cw}px)`;
       let h = `<div class="week-wrap"><div class="week-grid" style="grid-template-columns: ${colDef}">`;
       h += '<div class="week-header-corner"></div>';
       days.forEach(d => {
@@ -837,6 +879,7 @@
         if (timeCells[targetHour]) wrap.scrollTop = timeCells[targetHour].offsetTop - 10;
         // Wire up scroll handler for date label + infinite scroll
         wrap.addEventListener('scroll', onWeekScroll, { passive: true });
+        updateZoomLabel();
       }
     }
 
@@ -964,7 +1007,7 @@
     function navPrev() {
       if (view === 'week') {
         const wrap = document.querySelector('.week-wrap');
-        if (wrap) { wrap.scrollBy({ left: -120 * 7, behavior: 'smooth' }); return; }
+        if (wrap) { wrap.scrollBy({ left: -getWeekColWidth() * 7, behavior: 'smooth' }); return; }
       }
       if (view === 'month') cursor.setMonth(cursor.getMonth() - 1);
       else cursor.setDate(cursor.getDate() - 1);
@@ -973,7 +1016,7 @@
     function navNext() {
       if (view === 'week') {
         const wrap = document.querySelector('.week-wrap');
-        if (wrap) { wrap.scrollBy({ left: 120 * 7, behavior: 'smooth' }); return; }
+        if (wrap) { wrap.scrollBy({ left: getWeekColWidth() * 7, behavior: 'smooth' }); return; }
       }
       if (view === 'month') cursor.setMonth(cursor.getMonth() + 1);
       else cursor.setDate(cursor.getDate() + 1);
@@ -1004,7 +1047,19 @@
       }
       renderCalendar();
     };
-    document.querySelectorAll('.view-toggle button').forEach(btn => { btn.onclick = () => { document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active')); btn.classList.add('active'); view = btn.dataset.view; renderCalendar(); }; });
+    document.querySelectorAll('.view-toggle button').forEach(btn => { btn.onclick = () => { document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active')); btn.classList.add('active'); view = btn.dataset.view; $('zoom-controls').style.display = view === 'week' ? 'flex' : 'none'; renderCalendar(); }; });
+
+    // Zoom controls
+    $('zoom-out').onclick = () => zoomWeek(-WEEK_COL_STEP);
+    $('zoom-in').onclick = () => zoomWeek(WEEK_COL_STEP);
+    // Ctrl+scroll to zoom week view
+    document.addEventListener('wheel', e => {
+      if (view !== 'week' || !e.ctrlKey) return;
+      e.preventDefault();
+      zoomWeek(e.deltaY < 0 ? WEEK_COL_STEP : -WEEK_COL_STEP);
+    }, { passive: false });
+    // Show zoom controls on initial load (week is default)
+    $('zoom-controls').style.display = 'flex';
 
     // Week scroll handler (updates date label on scroll)
     function onWeekScroll() {
