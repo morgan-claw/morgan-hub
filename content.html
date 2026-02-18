@@ -683,7 +683,7 @@ function renderWeek(){
     const d=new Date(start);d.setDate(d.getDate()+i);
     const ds=dateStr(d);
     const isToday=ds===today;
-    hdrHtml+=`<div class="week-header-day${isToday?' today'}">${DAYS_SHORT[d.getDay()]}<span class="wh-num">${d.getDate()}</span></div>`;
+    hdrHtml+=`<div class="week-header-day${isToday?' today':''}">${DAYS_SHORT[d.getDay()]}<span class="wh-num">${d.getDate()}</span></div>`;
     const pieces=byDate[ds]||[];
     let cards='';
     pieces.forEach(p=>{
