@@ -5,242 +5,235 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Fitness — Morgan Hub</title>
   <style>
-    :root{--bg:#0a0a0a;--surface:#111;--surface2:#151515;--border:rgba(255,255,255,0.06);--text:rgba(255,255,255,0.88);--muted:rgba(255,255,255,0.45);--dim:rgba(255,255,255,0.25);--accent:#FF4500;--accent-glow:rgba(255,100,40,0.06);--accent-line:rgba(255,100,40,0.12);--accent-sheen:rgba(255,100,40,0.03);--glass:rgba(255,255,255,0.03);--glass-hover:rgba(255,255,255,0.05);--glass-border:rgba(255,255,255,0.06);--green:#22c55e;--yellow:#f59e0b;--blue:#3b82f6;--purple:#8b5cf6;--red:#ef4444;--depth-sm:0 1px 4px rgba(0,0,0,0.3);--depth-md:0 2px 12px rgba(0,0,0,0.35)}
+    :root{--bg:#0a0a0a;--surface:#111;--glass:rgba(255,255,255,0.03);--glass-hover:rgba(255,255,255,0.05);--glass-border:rgba(255,255,255,0.06);--accent:#FF4500;--accent-glow:rgba(255,100,40,0.06);--accent-line:rgba(255,100,40,0.12);--text:rgba(255,255,255,0.88);--muted:rgba(255,255,255,0.45);--dim:rgba(255,255,255,0.25);--green:#22c55e;--yellow:#f59e0b;--blue:#3b82f6;--purple:#8b5cf6;--red:#ef4444;--depth-sm:0 1px 4px rgba(0,0,0,0.3)}
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:'Satoshi',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:linear-gradient(180deg,#0e0b09 0%,#0a0a0a 6%,#0a0a0a 100%);background-attachment:fixed;color:var(--text);height:100vh;display:flex;overflow:hidden}
 
-    /* Sidebar */
-    .sidebar{display:none;width:220px;flex-shrink:0;background:rgba(14,14,14,0.75);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-right:1px solid var(--glass-border);padding:1.5rem 0;flex-direction:column}
-    .sidebar .brand{display:flex;align-items:center;gap:0.6rem;padding:0 1.25rem 1.25rem;margin-bottom:0.25rem;white-space:nowrap;overflow:hidden}
+    .sidebar{display:none;width:220px;flex-shrink:0;background:rgba(14,14,14,0.75);backdrop-filter:blur(24px);border-right:1px solid var(--glass-border);padding:1.5rem 0;flex-direction:column}
+    .sidebar .brand{display:flex;align-items:center;gap:0.6rem;padding:0 1.25rem 1.25rem;margin-bottom:0.25rem}
     .sidebar .brand .mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;color:#fff;font-family:'Doto',monospace;box-shadow:0 0 10px rgba(255,80,20,0.12)}
     .sidebar .brand span{font-weight:600;font-size:1rem;font-family:'Doto',monospace}
     .sidebar a{display:flex;align-items:center;gap:0.6rem;padding:0.55rem 1.25rem;color:var(--muted);text-decoration:none;font-size:0.85rem;font-weight:500;transition:all 0.15s;border-radius:6px;margin:1px 10px;border:1px solid transparent}
     .sidebar a:hover{color:var(--text);background:var(--glass)}
-    .sidebar a.active{color:var(--text);background:rgba(255,100,40,0.05);border:1px solid rgba(255,100,40,0.12)}
+    .sidebar a.active{color:var(--text);background:rgba(255,100,40,0.05);border-color:rgba(255,100,40,0.12)}
     .sidebar a svg{width:18px;height:18px;flex-shrink:0}
 
-    /* Main */
     .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 
     /* Top bar */
     .topbar{display:flex;align-items:center;gap:0.75rem;padding:0.6rem 1rem;border-bottom:1px solid rgba(255,255,255,0.03);flex-shrink:0}
     .topbar h1{font-size:0.9rem;font-weight:600;font-family:'Doto','SF Mono',monospace;text-transform:uppercase;letter-spacing:1.5px}
-    .topbar .pills{display:flex;gap:0.5rem;margin-left:auto}
-    .topbar .pill{background:var(--glass);border:1px solid transparent;border-radius:8px;padding:0.45rem 0.65rem;text-align:center;position:relative;overflow:hidden;transition:all 0.2s}
-    .topbar .pill::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,120,50,0.08),transparent);pointer-events:none}
-    .topbar .pill:hover{border-color:var(--accent-line);box-shadow:0 0 8px var(--accent-glow)}
-    .topbar .pill .pv{font-size:1rem;font-weight:700;font-family:'Doto',monospace;font-variant-numeric:tabular-nums}
-    .topbar .pill .pl{font-size:0.5rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.6px;margin-top:1px}
+    .topbar .spacer{flex:1}
     .topbar .clock{font-family:'Doto',monospace;font-size:0.75rem;color:var(--dim)}
     .topbar .online{display:flex;align-items:center;gap:0.3rem;font-size:0.68rem;color:var(--green)}
-    .topbar .online::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse-subtle 2.5s ease-in-out infinite}
-    @keyframes pulse-subtle{0%,100%{box-shadow:0 0 3px rgba(34,197,94,0.3)}50%{box-shadow:0 0 7px rgba(34,197,94,0.5)}}
-    .topbar .refresh-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:var(--text);border-radius:8px;padding:0.35rem 0.75rem;font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.15s;box-shadow:var(--depth-sm)}
+    .topbar .online::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2.5s ease-in-out infinite}
+    @keyframes pulse{0%,100%{box-shadow:0 0 3px rgba(34,197,94,0.3)}50%{box-shadow:0 0 7px rgba(34,197,94,0.5)}}
+    .topbar .refresh-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:var(--text);border-radius:8px;padding:0.35rem 0.75rem;font-size:0.72rem;font-weight:600;cursor:pointer;transition:all 0.15s;box-shadow:var(--depth-sm)}
     .topbar .refresh-btn:hover{border-color:var(--accent-line);box-shadow:var(--depth-sm),0 0 10px var(--accent-glow)}
-    .topbar .refresh-btn:active{transform:scale(0.97)}
     .topbar .refresh-btn:disabled{opacity:0.4;cursor:not-allowed}
 
-    /* Dashboard */
-    .dashboard{flex:1;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:1.25rem;animation:fadeIn 0.25s ease-out}
+    /* Dashboard scroll area */
+    .dash{flex:1;overflow-y:auto;padding:1.25rem;animation:fadeIn 0.25s ease-out}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    @media(min-width:768px){.dashboard{padding:1.5rem 2rem}}
+    @media(min-width:768px){.dash{padding:1.5rem 2rem}}
 
-    /* Section heads */
-    .sh{font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--dim);display:flex;align-items:center;gap:0.75rem}
-    .sh::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.04)}
+    /* ── Metric strip ── */
+    .metric-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem;margin-bottom:1.25rem}
+    @media(max-width:700px){.metric-strip{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:480px){.metric-strip{grid-template-columns:repeat(2,1fr)}}
+    .ms{background:var(--glass);border:1px solid transparent;border-radius:10px;padding:0.7rem 0.75rem;position:relative;overflow:hidden;transition:all 0.2s}
+    .ms::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,120,50,0.08),transparent);pointer-events:none}
+    .ms:hover{background:var(--glass-hover);border-color:var(--accent-line);box-shadow:0 0 12px var(--accent-glow)}
+    .ms-val{font-size:1.35rem;font-weight:800;font-family:'Doto',monospace;font-variant-numeric:tabular-nums;line-height:1}
+    .ms-lbl{font-size:0.5rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.6px;margin-top:0.2rem;font-weight:600}
+    .ms-sub{font-size:0.55rem;margin-top:0.15rem;font-weight:500}
+    .t-up{color:var(--green)}.t-dn{color:var(--red)}.t-fl{color:var(--dim)}
 
-    /* Glass panel base */
-    .gpanel{background:var(--glass);border:1px solid transparent;border-radius:10px;padding:0.85rem 1rem;position:relative;overflow:hidden;transition:all 0.2s}
-    .gpanel::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,120,50,0.08),transparent);pointer-events:none;border-radius:1px}
-    .gpanel:hover{background:var(--glass-hover);border-color:var(--accent-line);box-shadow:0 0 12px var(--accent-glow)}
-    .gpanel-title{font-size:0.55rem;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--dim);margin-bottom:0.6rem}
+    /* ── Bento grid ── */
+    .bento{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto;gap:0.75rem;margin-bottom:1.25rem}
+    @media(max-width:700px){.bento{grid-template-columns:1fr}}
+    .bento .wide{grid-column:1/-1}
 
-    /* Consistency row */
-    .consist-row{display:flex;gap:0.75rem;flex-wrap:wrap}
-    .consist-ring{display:flex;align-items:center;gap:1rem;flex:1;min-width:260px}
-    .ring-wrap{width:72px;height:72px;position:relative;flex-shrink:0}
+    /* ── Glass card ── */
+    .gc{background:var(--glass);border:1px solid transparent;border-radius:10px;padding:1rem 1.1rem;position:relative;overflow:hidden;transition:all 0.2s}
+    .gc::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,120,50,0.08),transparent);pointer-events:none;border-radius:1px}
+    .gc:hover{background:var(--glass-hover);border-color:var(--accent-line);box-shadow:0 0 12px var(--accent-glow)}
+    .gc-title{font-size:0.55rem;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--dim);margin-bottom:0.75rem}
+
+    /* ── Consistency card (ring + heatmap) ── */
+    .consist-inner{display:flex;gap:1.25rem;align-items:flex-start}
+    .ring-block{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:0.4rem}
+    .ring-wrap{width:80px;height:80px;position:relative}
     .ring-wrap svg{position:absolute;inset:0;transform:rotate(-90deg)}
-    .ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;font-family:'Doto',monospace}
-    .ring-info{flex:1}
-    .ring-label{font-size:0.55rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px}
-    .ring-detail{font-size:0.72rem;color:var(--muted);margin-top:0.15rem;line-height:1.4}
+    .ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;font-family:'Doto',monospace}
+    .ring-sub{font-size:0.5rem;color:var(--dim);text-align:center;line-height:1.3;max-width:90px}
+    .freq-block{flex:1;min-width:0}
+    .freq-label{font-size:0.5rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:0.5rem}
+    .freq-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+    .fd{aspect-ratio:1;border-radius:3px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);transition:all 0.15s;position:relative}
+    .fd.hit{background:var(--accent);border-color:rgba(255,100,40,0.3);box-shadow:0 0 6px rgba(255,100,40,0.15)}
+    .fd.today{outline:2px solid var(--green);outline-offset:1px}
+    .fd:hover{transform:scale(1.2);z-index:2}
+    .fd:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(20,20,20,0.95);border:1px solid var(--glass-border);padding:3px 8px;border-radius:6px;font-size:0.5rem;white-space:nowrap;color:var(--text);z-index:10;backdrop-filter:blur(8px)}
+    .freq-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px}
+    .freq-weekdays span{font-size:0.42rem;color:var(--dim);text-align:center;font-weight:600;text-transform:uppercase}
+    .consist-stats{font-size:0.65rem;color:var(--muted);margin-top:0.6rem;line-height:1.5}
+    .consist-stats strong{color:var(--text);font-family:'Doto',monospace}
 
-    /* Frequency grid */
-    .freq-panel{flex:1.4;min-width:300px}
-    .freq-grid{display:flex;gap:3px;flex-wrap:wrap}
-    .freq-day{width:16px;height:16px;border-radius:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);position:relative;transition:all 0.15s}
-    .freq-day.hit{background:var(--accent);border-color:rgba(255,100,40,0.3);box-shadow:0 0 6px rgba(255,100,40,0.15)}
-    .freq-day.today{outline:2px solid var(--green);outline-offset:1px}
-    .freq-day:hover{transform:scale(1.3);z-index:2}
-    .freq-day:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(20,20,20,0.95);border:1px solid var(--glass-border);padding:3px 8px;border-radius:6px;font-size:0.55rem;white-space:nowrap;color:var(--text);z-index:10;backdrop-filter:blur(8px)}
+    /* ── Volume chart ── */
+    .vol-bars{display:flex;align-items:flex-end;gap:0.5rem;height:100px;padding-bottom:20px;position:relative}
+    .vb{flex:1;border-radius:4px 4px 0 0;min-height:3px;position:relative;cursor:pointer;transition:all 0.2s}
+    .vb:hover{filter:brightness(1.2)}
+    .vb::after{content:attr(data-label);position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:0.48rem;color:var(--dim);white-space:nowrap;font-family:'Doto',monospace}
+    .vb .tip{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:0.58rem;color:var(--text);font-weight:600;font-family:'Doto',monospace;white-space:nowrap;opacity:0;transition:opacity 0.15s}
+    .vb:hover .tip{opacity:1}
+    .vb.cur{background:var(--green);box-shadow:0 0 10px rgba(34,197,94,0.2)}
+    .vb.prev{background:var(--accent);box-shadow:0 0 6px rgba(255,100,40,0.1)}
 
-    /* Hero stats */
-    .hero-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.5rem}
-    .hero-stat{text-align:center;padding:0.75rem 0.5rem}
-    .hero-val{font-size:1.5rem;font-weight:800;font-family:'Doto',monospace;font-variant-numeric:tabular-nums;line-height:1}
-    .hero-val.c-accent{color:var(--accent)}.hero-val.c-green{color:var(--green)}.hero-val.c-blue{color:var(--blue)}.hero-val.c-purple{color:var(--purple)}.hero-val.c-yellow{color:var(--yellow)}
-    .hero-lbl{font-size:0.5rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.6px;margin-top:0.2rem}
-    .hero-sub{font-size:0.55rem;margin-top:0.2rem;font-weight:500}
-    .trend-up{color:var(--green)}.trend-down{color:var(--red)}.trend-flat{color:var(--dim)}
+    /* ── Muscle bars ── */
+    .mr{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.45rem}
+    .mr-name{width:62px;flex-shrink:0;color:var(--muted);font-weight:500;font-size:0.65rem}
+    .mr-track{flex:1;height:5px;background:rgba(255,255,255,0.04);border-radius:3px;overflow:hidden}
+    .mr-fill{height:100%;border-radius:3px;transition:width 0.4s ease}
+    .mr-ct{font-family:'Doto',monospace;font-size:0.62rem;width:24px;text-align:right;font-weight:600;color:var(--text)}
 
-    /* Volume chart */
-    .vol-bars{display:flex;align-items:flex-end;gap:0.5rem;height:110px;padding-bottom:20px;position:relative}
-    .vol-bar{flex:1;max-width:60px;border-radius:4px 4px 0 0;min-height:3px;position:relative;cursor:pointer;transition:all 0.2s;background:rgba(255,255,255,0.08)}
-    .vol-bar:hover{transform:scaleY(1.03);transform-origin:bottom}
-    .vol-bar::after{content:attr(data-label);position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:0.5rem;color:var(--dim);white-space:nowrap;font-family:'Doto',monospace}
-    .vol-bar .tip{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:var(--text);font-weight:600;font-family:'Doto',monospace;white-space:nowrap;opacity:0;transition:opacity 0.15s}
-    .vol-bar:hover .tip{opacity:1}
-    .vol-bar.current{background:var(--green);box-shadow:0 0 10px rgba(34,197,94,0.2)}
-    .vol-bar.past{background:var(--accent);box-shadow:0 0 6px rgba(255,100,40,0.1)}
+    /* ── PR rows ── */
+    .pr{display:flex;align-items:center;padding:0.35rem 0;font-size:0.72rem;border-bottom:1px solid rgba(255,255,255,0.025)}
+    .pr:last-child{border-bottom:none}
+    .pr-rank{width:18px;font-family:'Doto',monospace;font-size:0.55rem;color:var(--dim);font-weight:600}
+    .pr-name{flex:1;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .pr-val{color:var(--accent);font-family:'Doto',monospace;font-weight:700;margin-left:0.5rem;flex-shrink:0}
+    .pr-date{font-size:0.5rem;color:var(--dim);margin-left:0.4rem;flex-shrink:0}
+    .pr-new{background:rgba(255,100,40,0.1);color:var(--accent);font-size:0.48rem;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:0.3rem;letter-spacing:0.3px}
 
-    /* Two-column */
-    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
-    @media(max-width:700px){.two-col{grid-template-columns:1fr}}
+    /* ── Section divider ── */
+    .sdiv{font-size:0.55rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--dim);display:flex;align-items:center;gap:0.75rem;margin:0.5rem 0 0.75rem}
+    .sdiv::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.04)}
 
-    /* Muscle bars */
-    .muscle-row{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.45rem;font-size:0.72rem}
-    .muscle-name{width:68px;flex-shrink:0;color:var(--muted);font-weight:500;font-size:0.68rem}
-    .muscle-track{flex:1;height:5px;background:rgba(255,255,255,0.04);border-radius:3px;overflow:hidden}
-    .muscle-fill{height:100%;border-radius:3px;transition:width 0.4s ease}
-    .muscle-ct{font-family:'Doto',monospace;font-size:0.65rem;width:28px;text-align:right;font-weight:600;color:var(--text)}
-
-    /* PR rows */
-    .pr-row{display:flex;align-items:center;justify-content:space-between;padding:0.4rem 0;font-size:0.72rem;border-bottom:1px solid rgba(255,255,255,0.025)}
-    .pr-row:last-child{border-bottom:none}
-    .pr-name{color:var(--text);font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .pr-val{color:var(--accent);font-family:'Doto',monospace;font-weight:700;flex-shrink:0;margin-left:0.5rem}
-    .pr-date{font-size:0.55rem;color:var(--dim);margin-left:0.4rem;flex-shrink:0}
-    .pr-new{background:rgba(255,100,40,0.1);color:var(--accent);font-size:0.5rem;font-weight:600;padding:1px 5px;border-radius:4px;margin-left:0.3rem;letter-spacing:0.3px}
-
-    /* Scroll lists */
-    .scroll-list{max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:0.4rem;padding-right:0.25rem}
+    /* ── Workout/routine lists ── */
+    .scroll-list{max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:0.4rem}
     .scroll-list::-webkit-scrollbar{width:4px}
     .scroll-list::-webkit-scrollbar-track{background:transparent}
     .scroll-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:2px}
-    .scroll-list::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.1)}
 
-    /* Workout cards */
-    .wcard{background:var(--glass);border:1px solid rgba(255,255,255,0.03);border-radius:10px;padding:0.6rem 0.75rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
-    .wcard::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,120,50,0.06),transparent);pointer-events:none}
-    .wcard:hover{background:var(--glass-hover);border-color:var(--accent-line);box-shadow:0 0 12px var(--accent-glow);transform:translateY(-1px)}
-    .wcard:active{transform:translateY(0) scale(0.995)}
-    .wcard-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.15rem}
-    .wcard-title{font-size:0.78rem;font-weight:500;line-height:1.3}
-    .wcard-date{font-size:0.6rem;color:var(--dim);font-family:'Doto',monospace}
-    .wcard-tags{display:flex;gap:0.25rem;flex-wrap:wrap;margin-top:0.2rem}
-    .wcard-tag{font-size:0.55rem;padding:1px 6px;border-radius:4px;font-weight:500}
-    .wcard-tag.dur{background:rgba(59,130,246,0.08);color:var(--blue)}
-    .wcard-tag.vol{background:rgba(255,100,40,0.08);color:var(--accent)}
-    .wcard-tag.ex{background:rgba(34,197,94,0.08);color:var(--green)}
-    .wcard-exercises{display:none;margin-top:0.45rem;padding-top:0.45rem;border-top:1px solid rgba(255,255,255,0.04)}
-    .wcard.expanded .wcard-exercises{display:block}
-    .ex-row{display:flex;align-items:baseline;justify-content:space-between;padding:0.15rem 0;font-size:0.68rem}
-    .ex-row:not(:last-child){border-bottom:1px solid rgba(255,255,255,0.02)}
-    .ex-name{color:var(--text);font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .ex-detail{color:var(--dim);font-family:'Doto',monospace;font-size:0.62rem;flex-shrink:0;margin-left:0.5rem}
+    .wc{background:var(--glass);border:1px solid rgba(255,255,255,0.03);border-radius:10px;padding:0.55rem 0.7rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+    .wc::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,120,50,0.05),transparent);pointer-events:none}
+    .wc:hover{background:var(--glass-hover);border-color:var(--accent-line);box-shadow:0 0 12px var(--accent-glow);transform:translateY(-1px)}
+    .wc:active{transform:translateY(0) scale(0.995)}
+    .wc-head{display:flex;align-items:center;justify-content:space-between}
+    .wc-title{font-size:0.76rem;font-weight:500}
+    .wc-date{font-size:0.58rem;color:var(--dim);font-family:'Doto',monospace}
+    .wc-tags{display:flex;gap:0.2rem;flex-wrap:wrap;margin-top:0.15rem}
+    .wc-tag{font-size:0.52rem;padding:1px 5px;border-radius:4px;font-weight:500}
+    .wc-tag.dur{background:rgba(59,130,246,0.08);color:var(--blue)}
+    .wc-tag.vol{background:rgba(255,100,40,0.08);color:var(--accent)}
+    .wc-tag.ex{background:rgba(34,197,94,0.08);color:var(--green)}
+    .wc-exercises{display:none;margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid rgba(255,255,255,0.04)}
+    .wc.expanded .wc-exercises{display:block}
+    .exr{display:flex;align-items:baseline;justify-content:space-between;padding:0.12rem 0;font-size:0.65rem}
+    .exr:not(:last-child){border-bottom:1px solid rgba(255,255,255,0.02)}
+    .exr-n{color:var(--text);font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .exr-d{color:var(--dim);font-family:'Doto',monospace;font-size:0.6rem;flex-shrink:0;margin-left:0.5rem}
 
-    /* Routine cards */
-    .rcard{background:var(--glass);border:1px solid rgba(255,255,255,0.03);border-radius:10px;padding:0.6rem 0.75rem;transition:all 0.2s;position:relative;overflow:hidden}
-    .rcard::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,120,50,0.06),transparent);pointer-events:none}
-    .rcard:hover{background:var(--glass-hover);border-color:var(--accent-line);box-shadow:0 0 12px var(--accent-glow);transform:translateY(-1px)}
-    .rcard-name{font-size:0.78rem;font-weight:500;margin-bottom:0.2rem}
-    .rcard-exs{font-size:0.62rem;color:var(--muted);line-height:1.45}
+    .rc{background:var(--glass);border:1px solid rgba(255,255,255,0.03);border-radius:10px;padding:0.55rem 0.7rem;transition:all 0.2s;position:relative;overflow:hidden}
+    .rc::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,120,50,0.05),transparent);pointer-events:none}
+    .rc:hover{background:var(--glass-hover);border-color:var(--accent-line);box-shadow:0 0 12px var(--accent-glow);transform:translateY(-1px)}
+    .rc-name{font-size:0.76rem;font-weight:500;margin-bottom:0.15rem}
+    .rc-exs{font-size:0.6rem;color:var(--muted);line-height:1.4}
 
-    /* Empty/Error/Loading */
-    .empty-state{text-align:center;padding:2.5rem;color:var(--dim);font-size:0.78rem}
+    .lists-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
+    @media(max-width:700px){.lists-grid{grid-template-columns:1fr}}
+    .list-col{display:flex;flex-direction:column}
+    .list-col-title{font-size:0.55rem;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--dim);margin-bottom:0.5rem}
+
+    .empty-state{text-align:center;padding:3rem;color:var(--dim);font-size:0.78rem}
     .error-state{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);color:var(--red);border-radius:10px;padding:0.7rem;text-align:center;font-size:0.78rem}
     .loading-spinner{width:24px;height:24px;border:2px solid rgba(255,255,255,0.06);border-top:2px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 0.5rem}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* Mobile nav */
-    .tab-bar{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(14,14,14,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--glass-border);border-radius:16px;margin:0 10px 10px;box-shadow:0 4px 24px rgba(0,0,0,0.45);z-index:100;padding-bottom:env(safe-area-inset-bottom,0)}
+    .tab-bar{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(14,14,14,0.85);backdrop-filter:blur(24px);border:1px solid var(--glass-border);border-radius:16px;margin:0 10px 10px;box-shadow:0 4px 24px rgba(0,0,0,0.45);z-index:100;padding-bottom:env(safe-area-inset-bottom,0)}
     .tab-bar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;text-decoration:none;color:var(--dim);font-size:0.7rem;font-weight:500;transition:color 0.15s}
-    .tab-bar a:hover{color:var(--muted)}
     .tab-bar a.active{color:var(--text)}
     .tab-bar a svg{width:22px;height:22px}
 
     @media(min-width:768px){.sidebar{display:flex}.tab-bar{display:none}}
-    @media(max-width:767px){.dashboard{padding-bottom:80px}}
-    @media(max-width:600px){
-      .topbar{flex-wrap:wrap;gap:0.5rem}
-      .topbar .pills{gap:0.3rem}
-      .hero-grid{grid-template-columns:repeat(2,1fr)}
-    }
+    @media(max-width:767px){.dash{padding-bottom:80px}}
+    @media(max-width:600px){.topbar{flex-wrap:wrap;gap:0.5rem}}
   </style>
   <link rel="stylesheet" href="/theme.css">
 </head>
 <body>
   <aside class="sidebar"></aside>
-
   <div class="main">
     <div class="topbar">
       <h1>Fitness</h1>
-      <div class="pills">
-        <div class="pill"><div class="pv" id="statTotal">-</div><div class="pl">Workouts</div></div>
-        <div class="pill"><div class="pv" id="statWeek">-</div><div class="pl">This Week</div></div>
-        <div class="pill"><div class="pv" id="statStreak">-</div><div class="pl">Streak</div></div>
-      </div>
+      <div class="spacer"></div>
       <span class="clock" id="clock"></span>
       <span class="online">ONLINE</span>
       <button class="refresh-btn" id="refreshBtn">Refresh</button>
     </div>
 
-    <div class="dashboard">
+    <div class="dash">
       <div id="errorContainer"></div>
       <div id="loadingState" class="empty-state"><div class="loading-spinner"></div>Loading from Hevy...</div>
 
       <div id="dashContent" style="display:none">
+        <!-- Metric strip -->
+        <div class="metric-strip" id="metricStrip"></div>
 
-        <!-- Consistency -->
-        <div class="sh">Consistency</div>
-        <div class="consist-row">
-          <div class="gpanel consist-ring" style="flex:1;min-width:260px">
-            <div class="ring-wrap">
-              <svg width="72" height="72" viewBox="0 0 72 72"><circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="5"/><circle id="ringCircle" cx="36" cy="36" r="30" fill="none" stroke="var(--green)" stroke-width="5" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="188.5"/></svg>
-              <span class="ring-val" id="consistencyVal">-</span>
-            </div>
-            <div class="ring-info">
-              <div class="ring-label">Weekly Consistency (4wk)</div>
-              <div class="ring-detail" id="consistencyDetail">-</div>
+        <!-- Bento grid -->
+        <div class="bento">
+          <!-- Consistency (wide) -->
+          <div class="gc wide" id="consistCard">
+            <div class="gc-title">Consistency</div>
+            <div class="consist-inner">
+              <div class="ring-block">
+                <div class="ring-wrap">
+                  <svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="5"/><circle id="ringC" cx="40" cy="40" r="34" fill="none" stroke="var(--green)" stroke-width="5" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
+                  <span class="ring-val" id="ringVal">-</span>
+                </div>
+                <div class="ring-sub" id="ringSub">-</div>
+              </div>
+              <div class="freq-block">
+                <div class="freq-label">Last 28 Days</div>
+                <div class="freq-weekdays"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+                <div class="freq-grid" id="freqGrid"></div>
+                <div class="consist-stats" id="consistStats"></div>
+              </div>
             </div>
           </div>
-          <div class="gpanel freq-panel" style="flex:1.4;min-width:300px">
-            <div class="gpanel-title">Last 28 Days</div>
-            <div class="freq-grid" id="freqGrid"></div>
+
+          <!-- Volume trend -->
+          <div class="gc wide">
+            <div class="gc-title">Volume Trend — 8 Weeks</div>
+            <div class="vol-bars" id="volChart"></div>
           </div>
-        </div>
 
-        <!-- Progress -->
-        <div class="sh">Progress</div>
-        <div class="hero-grid" id="heroStats"></div>
-
-        <!-- Volume -->
-        <div class="sh">Volume Trend</div>
-        <div class="gpanel">
-          <div class="gpanel-title" style="text-align:center">Weekly Total Volume (kg) — 8 Weeks</div>
-          <div class="vol-bars" id="volChart"></div>
-        </div>
-
-        <!-- Strength -->
-        <div class="sh">Strength & Balance</div>
-        <div class="two-col">
-          <div class="gpanel">
-            <div class="gpanel-title">Muscle Group Focus (Recent 10)</div>
+          <!-- Muscle balance -->
+          <div class="gc">
+            <div class="gc-title">Muscle Balance (Recent 10)</div>
             <div id="musclePanel"></div>
           </div>
-          <div class="gpanel">
-            <div class="gpanel-title">Personal Records</div>
+
+          <!-- PRs -->
+          <div class="gc">
+            <div class="gc-title">Personal Records</div>
             <div id="prPanel"></div>
           </div>
         </div>
 
-        <!-- Workouts -->
-        <div class="sh">Recent Workouts</div>
-        <div class="scroll-list" id="workoutsList"></div>
-
-        <!-- Routines -->
-        <div class="sh">Routines</div>
-        <div class="scroll-list" id="routinesList"></div>
+        <!-- Workouts + Routines side by side -->
+        <div class="sdiv">History & Routines</div>
+        <div class="lists-grid">
+          <div class="list-col">
+            <div class="list-col-title">Recent Workouts</div>
+            <div class="scroll-list" id="workoutsList"></div>
+          </div>
+          <div class="list-col">
+            <div class="list-col-title">Saved Routines</div>
+            <div class="scroll-list" id="routinesList"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -255,71 +248,41 @@
   setInterval(updateClock,1000);updateClock();
 
   function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
-  function getWeekStart(d){var dt=new Date(d);dt.setHours(0,0,0,0);var day=dt.getDay();dt.setDate(dt.getDate()-(day===0?6:day-1));return dt}
-  function fmtWeight(kg){var lbs=kg*2.20462;return lbs>=100?Math.round(lbs)+'lb':lbs.toFixed(1)+'lb'}
-  function fmtDur(s,e){if(!s||!e)return'-';var m=Math.round((new Date(e)-new Date(s))/60000);return m>=60?Math.floor(m/60)+'h'+m%60+'m':m+'m'}
-  function calcVol(w){var v=0;(w.exercises||[]).forEach(function(ex){(ex.sets||[]).forEach(function(s){if(s.reps&&s.weight_kg)v+=s.reps*s.weight_kg})});return v}
-  function fmtVol(v){return v>=10000?(v/1000).toFixed(0)+'k':v>=1000?(v/1000).toFixed(1)+'k':v.toString()}
+  function ws(d){var dt=new Date(d);dt.setHours(0,0,0,0);var day=dt.getDay();dt.setDate(dt.getDate()-(day===0?6:day-1));return dt}
+  function fmtW(kg){var lbs=kg*2.20462;return lbs>=100?Math.round(lbs)+'lb':lbs.toFixed(1)+'lb'}
+  function fmtD(s,e){if(!s||!e)return'-';var m=Math.round((new Date(e)-new Date(s))/60000);return m>=60?Math.floor(m/60)+'h'+m%60+'m':m+'m'}
+  function calcV(w){var v=0;(w.exercises||[]).forEach(function(ex){(ex.sets||[]).forEach(function(s){if(s.reps&&s.weight_kg)v+=s.reps*s.weight_kg})});return v}
+  function fmtV(v){return v>=10000?(v/1000).toFixed(0)+'k':v>=1000?(v/1000).toFixed(1)+'k':v.toString()}
 
-  var state={workouts:[],routines:[],loaded:false,loading:false};
+  var S={workouts:[],routines:[],loaded:false,loading:false};
 
-  async function callHevyAPI(tool,params){
-    var routeMap={'hevy.get_workouts':'workouts','hevy.get_routines':'routines'};
-    var route=routeMap[tool]||'workouts';
-    var query=new URLSearchParams(params||{});
-    var r=await fetch('/api/hevy/'+route+'?'+query);
-    if(!r.ok)throw new Error('HTTP '+r.status+': '+await r.text());
+  async function api(tool,params){
+    var map={'w':'workouts','r':'routines'};
+    var route=map[tool]||'workouts';
+    var q=new URLSearchParams(params||{});
+    var r=await fetch('/api/hevy/'+route+'?'+q);
+    if(!r.ok)throw new Error('HTTP '+r.status);
     return await r.json();
   }
 
-  var MUSCLE_MAP={'squat':['Quads','Glutes'],'bench':['Chest','Triceps'],'deadlift':['Back','Hamstrings'],'press':['Shoulders','Triceps'],'row':['Back','Biceps'],'curl':['Biceps'],'pull':['Back','Biceps'],'pulldown':['Back','Biceps'],'fly':['Chest'],'raise':['Shoulders'],'extension':['Triceps'],'lunge':['Quads','Glutes'],'calf':['Calves'],'shrug':['Traps'],'dip':['Chest','Triceps'],'lat':['Back'],'incline':['Chest','Shoulders'],'hammer':['Biceps'],'skull':['Triceps']};
+  var MM={'squat':['Quads','Glutes'],'bench':['Chest','Triceps'],'deadlift':['Back','Hamstrings'],'press':['Shoulders','Triceps'],'row':['Back','Biceps'],'curl':['Biceps'],'pull':['Back','Biceps'],'pulldown':['Back','Biceps'],'fly':['Chest'],'raise':['Shoulders'],'extension':['Triceps'],'lunge':['Quads','Glutes'],'calf':['Calves'],'shrug':['Traps'],'dip':['Chest','Triceps'],'lat':['Back'],'incline':['Chest','Shoulders'],'hammer':['Biceps'],'skull':['Triceps']};
   var MC={'Chest':'#ef4444','Back':'#3b82f6','Quads':'#22c55e','Shoulders':'#f59e0b','Biceps':'#8b5cf6','Triceps':'#ec4899','Glutes':'#14b8a6','Hamstrings':'#06b6d4','Calves':'#84cc16','Traps':'#f97316'};
 
-  function getMuscles(workouts){
-    var g={};
-    workouts.forEach(function(w){(w.exercises||[]).forEach(function(ex){
-      var t=ex.title.toLowerCase();
-      Object.keys(MUSCLE_MAP).forEach(function(k){if(t.includes(k))MUSCLE_MAP[k].forEach(function(m){g[m]=(g[m]||0)+(ex.sets?ex.sets.length:0)})});
-    })});
-    return Object.entries(g).sort(function(a,b){return b[1]-a[1]});
-  }
+  function getMuscles(ww){var g={};ww.forEach(function(w){(w.exercises||[]).forEach(function(ex){var t=ex.title.toLowerCase();Object.keys(MM).forEach(function(k){if(t.includes(k))MM[k].forEach(function(m){g[m]=(g[m]||0)+(ex.sets?ex.sets.length:0)})})})});return Object.entries(g).sort(function(a,b){return b[1]-a[1]})}
 
-  function getPRs(){
-    var prs={};
-    state.workouts.forEach(function(w){(w.exercises||[]).forEach(function(ex){(ex.sets||[]).forEach(function(s){
-      if(s.reps&&s.weight_kg){if(!prs[ex.title]||s.weight_kg>prs[ex.title].weight)prs[ex.title]={weight:s.weight_kg,reps:s.reps,date:w.start_time}}
-    })})});
-    return Object.entries(prs).sort(function(a,b){return b[1].weight-a[1].weight});
-  }
+  function getPRs(){var prs={};S.workouts.forEach(function(w){(w.exercises||[]).forEach(function(ex){(ex.sets||[]).forEach(function(s){if(s.reps&&s.weight_kg){if(!prs[ex.title]||s.weight_kg>prs[ex.title].weight)prs[ex.title]={weight:s.weight_kg,reps:s.reps,date:w.start_time}}})})});return Object.entries(prs).sort(function(a,b){return b[1].weight-a[1].weight})}
 
-  function getWeeklyVolumes(){
-    var now=new Date(),ws=getWeekStart(now),weeks=[];
-    for(var i=7;i>=0;i--){
-      var s=new Date(ws);s.setDate(s.getDate()-i*7);
-      var e=new Date(s);e.setDate(e.getDate()+6);
-      var ww=state.workouts.filter(function(w){var d=new Date(w.start_time);return d>=s&&d<=e});
-      weeks.push({volume:ww.reduce(function(sum,w){return sum+calcVol(w)},0),label:s.toLocaleDateString('en-US',{month:'short',day:'numeric'}),count:ww.length,isCurrent:i===0});
-    }
-    return weeks;
-  }
+  function getWeekVols(){var now=new Date(),wk=ws(now),weeks=[];for(var i=7;i>=0;i--){var s=new Date(wk);s.setDate(s.getDate()-i*7);var e=new Date(s);e.setDate(e.getDate()+6);var ww=S.workouts.filter(function(w){var d=new Date(w.start_time);return d>=s&&d<=e});weeks.push({vol:ww.reduce(function(sum,w){return sum+calcV(w)},0),label:s.toLocaleDateString('en-US',{month:'short',day:'numeric'}),count:ww.length,cur:i===0})}return weeks}
 
   window.loadData=async function(){
-    if(state.loading)return;
-    state.loading=true;
-    var btn=document.getElementById('refreshBtn');
-    btn.textContent='Loading...';btn.disabled=true;
+    if(S.loading)return;S.loading=true;
+    var btn=document.getElementById('refreshBtn');btn.textContent='Loading...';btn.disabled=true;
     document.getElementById('errorContainer').innerHTML='';
     try{
-      var [w1,w2,w3,rt]=await Promise.all([
-        callHevyAPI('hevy.get_workouts',{page:1,pageSize:10}),
-        callHevyAPI('hevy.get_workouts',{page:2,pageSize:10}),
-        callHevyAPI('hevy.get_workouts',{page:3,pageSize:10}),
-        callHevyAPI('hevy.get_routines',{page:1,pageSize:10})
-      ]);
-      state.workouts=[...(w1.workouts||[]),...(w2.workouts||[]),...(w3.workouts||[])];
-      state.routines=rt.routines||[];
-      state.loaded=true;state.loading=false;
-      btn.textContent='Refresh';btn.disabled=false;
+      var [w1,w2,w3,rt]=await Promise.all([api('w',{page:1,pageSize:10}),api('w',{page:2,pageSize:10}),api('w',{page:3,pageSize:10}),api('r',{page:1,pageSize:10})]);
+      S.workouts=[...(w1.workouts||[]),...(w2.workouts||[]),...(w3.workouts||[])];
+      S.routines=rt.routines||[];
+      S.loaded=true;S.loading=false;btn.textContent='Refresh';btn.disabled=false;
       document.getElementById('loadingState').style.display='none';
       document.getElementById('dashContent').style.display='';
       renderAll();
@@ -327,155 +290,140 @@
       console.error(e);
       document.getElementById('errorContainer').innerHTML='<div class="error-state">Failed to load: '+esc(e.message)+'</div>';
       document.getElementById('loadingState').style.display='none';
-      state.loading=false;btn.textContent='Retry';btn.disabled=false;
+      S.loading=false;btn.textContent='Retry';btn.disabled=false;
     }
   };
   document.getElementById('refreshBtn').onclick=loadData;
 
-  function renderAll(){
-    if(!state.loaded)return;
-    renderTopStats();renderConsistency();renderFreqGrid();renderHeroStats();renderVolChart();renderMuscles();renderPRs();renderWorkouts();renderRoutines();
-  }
+  function renderAll(){if(!S.loaded)return;renderMetrics();renderConsist();renderVol();renderMuscles();renderPRs();renderWorkouts();renderRoutines()}
 
-  function renderTopStats(){
-    var ws=state.workouts;if(!ws.length)return;
-    var now=new Date(),weekStart=getWeekStart(now);
-    var thisWeek=ws.filter(function(w){return new Date(w.start_time)>=weekStart});
-    var streak=0,check=new Date(weekStart);
-    for(var i=0;i<12;i++){
-      var s=new Date(check),e=new Date(check);e.setDate(e.getDate()+6);
-      if(ws.some(function(w){var d=new Date(w.start_time);return d>=s&&d<=e}))streak++;else break;
-      check.setDate(check.getDate()-7);
-    }
-    document.getElementById('statTotal').textContent=ws.length;
-    document.getElementById('statWeek').textContent=thisWeek.length;
-    document.getElementById('statStreak').textContent=streak+'w';
-  }
+  function renderMetrics(){
+    var ww=S.workouts;if(!ww.length)return;
+    var now=new Date(),wkS=ws(now),mS=new Date(now.getFullYear(),now.getMonth(),1);
+    var tw=ww.filter(function(w){return new Date(w.start_time)>=wkS});
+    var pwS=new Date(wkS);pwS.setDate(pwS.getDate()-7);
+    var pw=ww.filter(function(w){var d=new Date(w.start_time);return d>=pwS&&d<wkS});
+    var tm=ww.filter(function(w){return new Date(w.start_time)>=mS});
+    var wVol=tw.reduce(function(s,w){return s+calcV(w)},0);
+    var pVol=pw.reduce(function(s,w){return s+calcV(w)},0);
+    var vDiff=pVol?Math.round((wVol-pVol)/pVol*100):0;
+    var wDiff=tw.length-pw.length;
+    var streak=0,chk=new Date(wkS);
+    for(var i=0;i<12;i++){var s=new Date(chk),e=new Date(chk);e.setDate(e.getDate()+6);if(ww.some(function(w){var d=new Date(w.start_time);return d>=s&&d<=e}))streak++;else break;chk.setDate(chk.getDate()-7)}
+    var avgD=Math.round(ww.reduce(function(s,w){return w.start_time&&w.end_time?s+(new Date(w.end_time)-new Date(w.start_time))/60000:s},0)/ww.length);
 
-  function renderConsistency(){
-    var ws=state.workouts;if(!ws.length)return;
-    var TARGET=4,now=new Date(),weekStart=getWeekStart(now),weeksData=[];
-    for(var i=0;i<4;i++){
-      var s=new Date(weekStart);s.setDate(s.getDate()-i*7);
-      var e=new Date(s);e.setDate(e.getDate()+6);
-      weeksData.push(ws.filter(function(w){var d=new Date(w.start_time);return d>=s&&d<=e}).length);
-    }
-    var avg=weeksData.reduce(function(a,b){return a+b},0)/4;
-    var pct=Math.min(100,Math.round(avg/TARGET*100));
-    var circ=2*Math.PI*30;
-    document.getElementById('ringCircle').style.strokeDashoffset=circ-circ*pct/100;
-    document.getElementById('ringCircle').style.stroke=pct>=80?'var(--green)':pct>=50?'var(--yellow)':'var(--red)';
-    document.getElementById('consistencyVal').textContent=pct+'%';
-    document.getElementById('consistencyDetail').textContent=avg.toFixed(1)+' sessions/wk avg (target: '+TARGET+') · '+weeksData.map(function(c){return c+'×'}).join(' ');
-  }
+    function t(d){return d>0?'t-up':d<0?'t-dn':'t-fl'}
+    function sgn(d){return d>0?'+'+d:d}
 
-  function renderFreqGrid(){
-    var ws=state.workouts,grid=document.getElementById('freqGrid');
-    var today=new Date();today.setHours(0,0,0,0);
-    var todayStr=today.toISOString().slice(0,10),cells=[];
-    for(var i=27;i>=0;i--){
-      var d=new Date(today);d.setDate(d.getDate()-i);
-      var dk=d.toISOString().slice(0,10);
-      var hit=ws.some(function(w){return w.start_time&&w.start_time.slice(0,10)===dk});
-      var dayName=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-      cells.push('<div class="freq-day'+(hit?' hit':'')+(dk===todayStr?' today':'')+'" data-tip="'+dayName+(hit?' ✓':'')+'"></div>');
-    }
-    grid.innerHTML=cells.join('');
-  }
-
-  function renderHeroStats(){
-    var ws=state.workouts;if(!ws.length)return;
-    var now=new Date(),weekStart=getWeekStart(now),monthStart=new Date(now.getFullYear(),now.getMonth(),1);
-    var thisWeek=ws.filter(function(w){return new Date(w.start_time)>=weekStart});
-    var prevWeekStart=new Date(weekStart);prevWeekStart.setDate(prevWeekStart.getDate()-7);
-    var prevWeek=ws.filter(function(w){var d=new Date(w.start_time);return d>=prevWeekStart&&d<weekStart});
-    var thisMonth=ws.filter(function(w){return new Date(w.start_time)>=monthStart});
-    var weekVol=thisWeek.reduce(function(s,w){return s+calcVol(w)},0);
-    var prevVol=prevWeek.reduce(function(s,w){return s+calcVol(w)},0);
-    var volDiff=prevVol?Math.round((weekVol-prevVol)/prevVol*100):0;
-    var totalVol=ws.reduce(function(s,w){return s+calcVol(w)},0);
-    var avgDur=Math.round(ws.reduce(function(s,w){return w.start_time&&w.end_time?s+(new Date(w.end_time)-new Date(w.start_time))/60000:s},0)/ws.length);
-    var avgEx=Math.round(ws.reduce(function(s,w){return s+(w.exercises?w.exercises.length:0)},0)/ws.length);
-    var weekDiff=thisWeek.length-prevWeek.length;
-
-    function trend(d){return d>0?'trend-up':d<0?'trend-down':'trend-flat'}
-    function sign(d){return d>0?'+'+d:d}
-
-    document.getElementById('heroStats').innerHTML=[
-      {v:thisWeek.length,c:'c-green',l:'This Week',s:'<span class="'+trend(weekDiff)+'">'+sign(weekDiff)+' vs last</span>'},
-      {v:fmtVol(weekVol)+'kg',c:'c-accent',l:'Week Volume',s:'<span class="'+trend(volDiff)+'">'+sign(volDiff)+'%</span>'},
-      {v:thisMonth.length,c:'c-blue',l:'This Month',s:''},
-      {v:fmtVol(totalVol)+'kg',c:'c-purple',l:'Total Volume',s:''},
-      {v:avgDur+'m',c:'c-yellow',l:'Avg Duration',s:''},
-      {v:avgEx,c:'c-accent',l:'Avg Exercises',s:''}
-    ].map(function(s){
-      return '<div class="gpanel hero-stat"><div class="hero-val '+s.c+'">'+s.v+'</div><div class="hero-lbl">'+s.l+'</div>'+(s.s?'<div class="hero-sub">'+s.s+'</div>':'')+'</div>';
+    document.getElementById('metricStrip').innerHTML=[
+      {v:tw.length,l:'This Week',s:'<span class="'+t(wDiff)+'">'+sgn(wDiff)+' vs last</span>',c:'color:var(--green)'},
+      {v:fmtV(wVol)+'<small style="font-size:0.6em;opacity:0.5">kg</small>',l:'Week Volume',s:'<span class="'+t(vDiff)+'">'+sgn(vDiff)+'%</span>',c:'color:var(--accent)'},
+      {v:tm.length,l:'This Month',s:'',c:'color:var(--blue)'},
+      {v:streak+'<small style="font-size:0.6em;opacity:0.5">w</small>',l:'Streak',s:'',c:'color:var(--purple)'},
+      {v:avgD+'<small style="font-size:0.6em;opacity:0.5">m</small>',l:'Avg Duration',s:'',c:'color:var(--yellow)'}
+    ].map(function(m){
+      return '<div class="ms"><div class="ms-val" style="'+m.c+'">'+m.v+'</div><div class="ms-lbl">'+m.l+'</div>'+(m.s?'<div class="ms-sub">'+m.s+'</div>':'')+'</div>';
     }).join('');
   }
 
-  function renderVolChart(){
-    var weeks=getWeeklyVolumes();
-    var maxV=Math.max.apply(null,weeks.map(function(w){return w.volume}))||1;
+  function renderConsist(){
+    var ww=S.workouts;if(!ww.length)return;
+    var TARGET=4,now=new Date(),wkS=ws(now),wData=[];
+    for(var i=0;i<4;i++){var s=new Date(wkS);s.setDate(s.getDate()-i*7);var e=new Date(s);e.setDate(e.getDate()+6);wData.push(ww.filter(function(w){var d=new Date(w.start_time);return d>=s&&d<=e}).length)}
+    var avg=wData.reduce(function(a,b){return a+b},0)/4;
+    var pct=Math.min(100,Math.round(avg/TARGET*100));
+    var circ=2*Math.PI*34;
+    document.getElementById('ringC').style.strokeDashoffset=circ-circ*pct/100;
+    document.getElementById('ringC').style.stroke=pct>=80?'var(--green)':pct>=50?'var(--yellow)':'var(--red)';
+    document.getElementById('ringVal').textContent=pct+'%';
+    document.getElementById('ringSub').textContent=avg.toFixed(1)+'/'+TARGET+' per week';
+
+    // Freq grid — 28 days aligned to Mon-Sun rows
+    var today=new Date();today.setHours(0,0,0,0);
+    var todayStr=today.toISOString().slice(0,10);
+    // Find the Monday 4 weeks ago
+    var gridStart=new Date(today);gridStart.setDate(gridStart.getDate()-27);
+    // Align to Monday
+    var dayOff=gridStart.getDay();dayOff=dayOff===0?6:dayOff-1;
+    gridStart.setDate(gridStart.getDate()-dayOff);
+
+    var cells=[];
+    var gridEnd=new Date(gridStart);gridEnd.setDate(gridEnd.getDate()+28);
+    for(var d=new Date(gridStart);d<gridEnd;d.setDate(d.getDate()+1)){
+      var dk=d.toISOString().slice(0,10);
+      var hit=ww.some(function(w){return w.start_time&&w.start_time.slice(0,10)===dk});
+      var dn=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+      var isFuture=d>today;
+      cells.push('<div class="fd'+(hit?' hit':'')+(dk===todayStr?' today':'')+'" '+(isFuture?'style="opacity:0.2"':'')+' data-tip="'+dn+(hit?' ✓':'')+'"></div>');
+    }
+    document.getElementById('freqGrid').innerHTML=cells.join('');
+
+    // Stats
+    var totalDays=ww.filter(function(w){var d=new Date(w.start_time);d.setHours(0,0,0,0);return d>=gridStart&&d<=today}).length;
+    document.getElementById('consistStats').innerHTML='<strong>'+totalDays+'</strong> sessions in 4 weeks · <strong>'+wData.join(', ')+'</strong> per week (newest first)';
+  }
+
+  function renderVol(){
+    var weeks=getWeekVols();
+    var maxV=Math.max.apply(null,weeks.map(function(w){return w.vol}))||1;
     document.getElementById('volChart').innerHTML=weeks.map(function(w){
-      var h=Math.max(3,w.volume/maxV*90);
-      return '<div class="vol-bar '+(w.isCurrent?'current':'past')+'" style="height:'+h+'px" data-label="'+w.label+'"><span class="tip">'+fmtVol(w.volume)+'kg · '+w.count+'×</span></div>';
+      var h=Math.max(3,w.vol/maxV*80);
+      return '<div class="vb '+(w.cur?'cur':'prev')+'" style="height:'+h+'px" data-label="'+w.label+'"><span class="tip">'+fmtV(w.vol)+'kg · '+w.count+'×</span></div>';
     }).join('');
   }
 
   function renderMuscles(){
-    var muscles=getMuscles(state.workouts.slice(0,10)).slice(0,8);
+    var muscles=getMuscles(S.workouts.slice(0,10)).slice(0,8);
     var maxM=muscles.length?muscles[0][1]:1;
     document.getElementById('musclePanel').innerHTML=muscles.length?muscles.map(function(m){
-      var color=MC[m[0]]||'var(--accent)';
-      return '<div class="muscle-row"><span class="muscle-name">'+m[0]+'</span><div class="muscle-track"><div class="muscle-fill" style="width:'+Math.round(m[1]/maxM*100)+'%;background:'+color+';box-shadow:0 0 6px '+color+'30"></div></div><span class="muscle-ct">'+m[1]+'</span></div>';
-    }).join(''):'<div style="color:var(--dim);font-size:0.7rem">No data</div>';
+      var c=MC[m[0]]||'var(--accent)';
+      return '<div class="mr"><span class="mr-name">'+m[0]+'</span><div class="mr-track"><div class="mr-fill" style="width:'+Math.round(m[1]/maxM*100)+'%;background:'+c+';box-shadow:0 0 6px '+c+'30"></div></div><span class="mr-ct">'+m[1]+'</span></div>';
+    }).join(''):'<div style="color:var(--dim);font-size:0.68rem">No data yet</div>';
   }
 
   function renderPRs(){
     var prs=getPRs().slice(0,8);
-    document.getElementById('prPanel').innerHTML=prs.length?prs.map(function(p){
+    document.getElementById('prPanel').innerHTML=prs.length?prs.map(function(p,i){
       var dt=new Date(p[1].date).toLocaleDateString('en-US',{month:'short',day:'numeric'});
       var isNew=new Date(p[1].date)>new Date(Date.now()-7*86400000);
-      return '<div class="pr-row"><span class="pr-name">'+esc(p[0])+'</span><span class="pr-val">'+p[1].reps+'×'+fmtWeight(p[1].weight)+'</span><span class="pr-date">'+dt+'</span>'+(isNew?'<span class="pr-new">NEW</span>':'')+'</div>';
-    }).join(''):'<div style="color:var(--dim);font-size:0.7rem">No data</div>';
+      return '<div class="pr"><span class="pr-rank">'+(i+1)+'</span><span class="pr-name">'+esc(p[0])+'</span><span class="pr-val">'+p[1].reps+'×'+fmtW(p[1].weight)+'</span><span class="pr-date">'+dt+'</span>'+(isNew?'<span class="pr-new">NEW</span>':'')+'</div>';
+    }).join(''):'<div style="color:var(--dim);font-size:0.68rem">No data yet</div>';
   }
 
   function renderWorkouts(){
     var c=document.getElementById('workoutsList');
-    var ws=state.workouts.slice(0,15);
-    if(!ws.length){c.innerHTML='<div class="empty-state">No workouts</div>';return}
-    c.innerHTML=ws.map(function(w){
+    var ww=S.workouts.slice(0,12);
+    if(!ww.length){c.innerHTML='<div class="empty-state">No workouts</div>';return}
+    c.innerHTML=ww.map(function(w){
       var dt=new Date(w.start_time);
       var dateStr=dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();
-      var timeStr=dt.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-      var dur=fmtDur(w.start_time,w.end_time);
-      var exs=w.exercises||[];var vol=calcVol(w);
-      return '<div class="wcard" onclick="this.classList.toggle(\'expanded\')">'
-        +'<div class="wcard-head"><span class="wcard-title">'+esc(w.title)+'</span><span class="wcard-date">'+dateStr+' '+timeStr+'</span></div>'
-        +'<div class="wcard-tags">'
-        +'<span class="wcard-tag dur">'+dur+'</span>'
-        +'<span class="wcard-tag ex">'+exs.length+' exercises</span>'
-        +(vol?'<span class="wcard-tag vol">'+fmtVol(vol)+'kg</span>':'')
+      var dur=fmtD(w.start_time,w.end_time);
+      var exs=w.exercises||[];var vol=calcV(w);
+      return '<div class="wc" onclick="this.classList.toggle(\'expanded\')">'
+        +'<div class="wc-head"><span class="wc-title">'+esc(w.title)+'</span><span class="wc-date">'+dateStr+'</span></div>'
+        +'<div class="wc-tags">'
+        +'<span class="wc-tag dur">'+dur+'</span>'
+        +'<span class="wc-tag ex">'+exs.length+' ex</span>'
+        +(vol?'<span class="wc-tag vol">'+fmtV(vol)+'kg</span>':'')
         +'</div>'
-        +'<div class="wcard-exercises">'
+        +'<div class="wc-exercises">'
         +exs.map(function(ex){
           var sets=ex.sets||[];
           var best=sets.reduce(function(b,s){return s.weight_kg>b.w?{w:s.weight_kg,r:s.reps}:b},{w:0,r:0});
-          return '<div class="ex-row"><span class="ex-name">'+esc(ex.title)+'</span><span class="ex-detail">'+sets.length+'s'+(best.w?' · '+best.r+'×'+fmtWeight(best.w):'')+'</span></div>';
-        }).join('')
-        +'</div></div>';
+          return '<div class="exr"><span class="exr-n">'+esc(ex.title)+'</span><span class="exr-d">'+sets.length+'s'+(best.w?' · '+best.r+'×'+fmtW(best.w):'')+'</span></div>';
+        }).join('')+'</div></div>';
     }).join('');
   }
 
   function renderRoutines(){
     var c=document.getElementById('routinesList');
-    var rs=state.routines;
-    if(!rs.length){c.innerHTML='<div class="empty-state">No routines</div>';return}
+    var rs=S.routines;
+    if(!rs.length){c.innerHTML='<div style="color:var(--dim);font-size:0.68rem;padding:0.5rem">No routines</div>';return}
     c.innerHTML=rs.map(function(r){
       var exs=r.exercises||[];
-      var exList=exs.slice(0,5).map(function(e){return esc(e.title)}).join(' · ');
-      if(exs.length>5)exList+=' + '+(exs.length-5)+' more';
-      return '<div class="rcard"><div class="rcard-name">'+esc(r.title)+'</div><div class="rcard-exs">'+exList+'</div></div>';
+      var exList=exs.slice(0,4).map(function(e){return esc(e.title)}).join(' · ');
+      if(exs.length>4)exList+=' +' +(exs.length-4);
+      return '<div class="rc"><div class="rc-name">'+esc(r.title)+'</div><div class="rc-exs">'+exList+'</div></div>';
     }).join('');
   }
 
