@@ -626,6 +626,7 @@
         try{inner=JSON.parse(data.result.content[0].text)}catch{}
       }
       var fresh=inner.sessions||inner.result?.sessions||[];
+      console.log('[MHub] loadSessions: got',fresh.length,'sessions');
       // Merge: keep local live preview/timestamp if newer than API data
       var localMap={};
       sessions.forEach(function(s){var k=s.sessionKey||s.key;if(k)localMap[k]=s});
@@ -646,7 +647,7 @@
       sessLoaded=true;
       try{localStorage.setItem('mhub-sessions-cache',JSON.stringify(sessions))}catch{}
       renderSessions();
-    }catch(e){console.warn('sessions load fail',e)}
+    }catch(e){console.warn('[MHub] sessions load fail',e)}
   }
   // Refresh sessions periodically via HTTP (independent of WS)
   setInterval(function(){loadSessions()},30000);
