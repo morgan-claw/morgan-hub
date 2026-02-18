@@ -110,40 +110,44 @@
     .sdiv::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.04)}
 
     /* ── Workout/routine lists ── */
-    .scroll-list{max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:0.4rem}
-    .scroll-list::-webkit-scrollbar{width:4px}
-    .scroll-list::-webkit-scrollbar-track{background:transparent}
-    .scroll-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:2px}
+    /* (scroll handled by .list-card .scroll-inner) */
 
-    .wc{background:var(--glass);border:1px solid rgba(255,255,255,0.03);border-radius:10px;padding:0.55rem 0.7rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
-    .wc::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,120,50,0.05),transparent);pointer-events:none}
-    .wc:hover{background:var(--glass-hover);border-color:var(--accent-line);box-shadow:0 0 12px var(--accent-glow);transform:translateY(-1px)}
-    .wc:active{transform:translateY(0) scale(0.995)}
-    .wc-head{display:flex;align-items:center;justify-content:space-between}
-    .wc-title{font-size:0.76rem;font-weight:500}
-    .wc-date{font-size:0.58rem;color:var(--dim);font-family:'Doto',monospace}
-    .wc-tags{display:flex;gap:0.2rem;flex-wrap:wrap;margin-top:0.15rem}
-    .wc-tag{font-size:0.52rem;padding:1px 5px;border-radius:4px;font-weight:500}
-    .wc-tag.dur{background:rgba(59,130,246,0.08);color:var(--blue)}
-    .wc-tag.vol{background:rgba(255,100,40,0.08);color:var(--accent)}
-    .wc-tag.ex{background:rgba(34,197,94,0.08);color:var(--green)}
-    .wc-exercises{display:none;margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid rgba(255,255,255,0.04)}
+    /* Workout items */
+    .wc{display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0;border-bottom:1px solid rgba(255,255,255,0.025);cursor:pointer;transition:background 0.15s;border-radius:4px;margin:0 -0.3rem;padding-left:0.3rem;padding-right:0.3rem}
+    .wc:last-child{border-bottom:none}
+    .wc:hover{background:rgba(255,255,255,0.025)}
+    .wc-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;opacity:0.6}
+    .wc-body{flex:1;min-width:0}
+    .wc-head{display:flex;align-items:baseline;justify-content:space-between;gap:0.5rem}
+    .wc-title{font-size:0.72rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .wc-date{font-size:0.55rem;color:var(--dim);font-family:'Doto',monospace;flex-shrink:0}
+    .wc-meta{display:flex;gap:0.4rem;margin-top:0.1rem;font-size:0.52rem;color:var(--muted)}
+    .wc-meta span{display:flex;align-items:center;gap:0.15rem}
+    .wc-exercises{display:none;margin-top:0.35rem;padding-top:0.3rem;border-top:1px solid rgba(255,255,255,0.04);margin-left:-0.3rem;margin-right:-0.3rem;padding-left:0.3rem;padding-right:0.3rem}
     .wc.expanded .wc-exercises{display:block}
-    .exr{display:flex;align-items:baseline;justify-content:space-between;padding:0.12rem 0;font-size:0.65rem}
+    .exr{display:flex;align-items:baseline;justify-content:space-between;padding:0.1rem 0;font-size:0.62rem}
     .exr:not(:last-child){border-bottom:1px solid rgba(255,255,255,0.02)}
     .exr-n{color:var(--text);font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .exr-d{color:var(--dim);font-family:'Doto',monospace;font-size:0.6rem;flex-shrink:0;margin-left:0.5rem}
+    .exr-d{color:var(--dim);font-family:'Doto',monospace;font-size:0.58rem;flex-shrink:0;margin-left:0.5rem}
 
-    .rc{background:var(--glass);border:1px solid rgba(255,255,255,0.03);border-radius:10px;padding:0.55rem 0.7rem;transition:all 0.2s;position:relative;overflow:hidden}
-    .rc::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,120,50,0.05),transparent);pointer-events:none}
-    .rc:hover{background:var(--glass-hover);border-color:var(--accent-line);box-shadow:0 0 12px var(--accent-glow);transform:translateY(-1px)}
-    .rc-name{font-size:0.76rem;font-weight:500;margin-bottom:0.15rem}
-    .rc-exs{font-size:0.6rem;color:var(--muted);line-height:1.4}
+    /* Routine items */
+    .rc{display:flex;align-items:flex-start;gap:0.6rem;padding:0.45rem 0;border-bottom:1px solid rgba(255,255,255,0.025);transition:background 0.15s;border-radius:4px;margin:0 -0.3rem;padding-left:0.3rem;padding-right:0.3rem}
+    .rc:last-child{border-bottom:none}
+    .rc:hover{background:rgba(255,255,255,0.025)}
+    .rc-icon{width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;font-size:0.6rem;flex-shrink:0;color:var(--muted);margin-top:1px}
+    .rc-body{flex:1;min-width:0}
+    .rc-name{font-size:0.72rem;font-weight:500}
+    .rc-exs{font-size:0.55rem;color:var(--muted);line-height:1.35;margin-top:0.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .rc-ct{font-size:0.5rem;color:var(--dim);font-family:'Doto',monospace;flex-shrink:0;margin-top:2px}
 
+    /* List containers inside glass cards */
     .lists-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
     @media(max-width:700px){.lists-grid{grid-template-columns:1fr}}
-    .list-col{display:flex;flex-direction:column}
-    .list-col-title{font-size:0.55rem;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--dim);margin-bottom:0.5rem}
+    .list-card{max-height:320px;display:flex;flex-direction:column}
+    .list-card .scroll-inner{flex:1;overflow-y:auto;margin:0 -0.35rem;padding:0 0.35rem}
+    .list-card .scroll-inner::-webkit-scrollbar{width:3px}
+    .list-card .scroll-inner::-webkit-scrollbar-track{background:transparent}
+    .list-card .scroll-inner::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:2px}
 
     .empty-state{text-align:center;padding:3rem;color:var(--dim);font-size:0.78rem}
     .error-state{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);color:var(--red);border-radius:10px;padding:0.7rem;text-align:center;font-size:0.78rem}
@@ -225,13 +229,13 @@
         <!-- Workouts + Routines side by side -->
         <div class="sdiv">History & Routines</div>
         <div class="lists-grid">
-          <div class="list-col">
-            <div class="list-col-title">Recent Workouts</div>
-            <div class="scroll-list" id="workoutsList"></div>
+          <div class="gc list-card">
+            <div class="gc-title">Recent Workouts</div>
+            <div class="scroll-inner" id="workoutsList"></div>
           </div>
-          <div class="list-col">
-            <div class="list-col-title">Saved Routines</div>
-            <div class="scroll-list" id="routinesList"></div>
+          <div class="gc list-card">
+            <div class="gc-title">Saved Routines</div>
+            <div class="scroll-inner" id="routinesList"></div>
           </div>
         </div>
       </div>
@@ -399,18 +403,20 @@
       var dur=fmtD(w.start_time,w.end_time);
       var exs=w.exercises||[];var vol=calcV(w);
       return '<div class="wc" onclick="this.classList.toggle(\'expanded\')">'
+        +'<div class="wc-dot"></div>'
+        +'<div class="wc-body">'
         +'<div class="wc-head"><span class="wc-title">'+esc(w.title)+'</span><span class="wc-date">'+dateStr+'</span></div>'
-        +'<div class="wc-tags">'
-        +'<span class="wc-tag dur">'+dur+'</span>'
-        +'<span class="wc-tag ex">'+exs.length+' ex</span>'
-        +(vol?'<span class="wc-tag vol">'+fmtV(vol)+'kg</span>':'')
+        +'<div class="wc-meta">'
+        +'<span>'+dur+'</span>'
+        +'<span>'+exs.length+' exercises</span>'
+        +(vol?'<span>'+fmtV(vol)+'kg</span>':'')
         +'</div>'
         +'<div class="wc-exercises">'
         +exs.map(function(ex){
           var sets=ex.sets||[];
           var best=sets.reduce(function(b,s){return s.weight_kg>b.w?{w:s.weight_kg,r:s.reps}:b},{w:0,r:0});
           return '<div class="exr"><span class="exr-n">'+esc(ex.title)+'</span><span class="exr-d">'+sets.length+'s'+(best.w?' · '+best.r+'×'+fmtW(best.w):'')+'</span></div>';
-        }).join('')+'</div></div>';
+        }).join('')+'</div></div></div>';
     }).join('');
   }
 
@@ -420,9 +426,9 @@
     if(!rs.length){c.innerHTML='<div style="color:var(--dim);font-size:0.68rem;padding:0.5rem">No routines</div>';return}
     c.innerHTML=rs.map(function(r){
       var exs=r.exercises||[];
-      var exList=exs.slice(0,4).map(function(e){return esc(e.title)}).join(' · ');
-      if(exs.length>4)exList+=' +' +(exs.length-4);
-      return '<div class="rc"><div class="rc-name">'+esc(r.title)+'</div><div class="rc-exs">'+exList+'</div></div>';
+      var exList=exs.slice(0,3).map(function(e){return esc(e.title)}).join(' · ');
+      if(exs.length>3)exList+=' +' +(exs.length-3);
+      return '<div class="rc"><div class="rc-icon">'+exs.length+'</div><div class="rc-body"><div class="rc-name">'+esc(r.title)+'</div><div class="rc-exs">'+exList+'</div></div></div>';
     }).join('');
   }
 
