@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Goals & Habits — Morgan Hub</title>
+  <style>
+    :root {
+      --bg: #0d0d0d; --surface: #161616; --surface2: #1e1e1e; --surface3: #252525;
+      --border: #2a2a2a; --border-light: #333; --text: #e8e8e8; --muted: #666;
+      --accent: #FF4500; --accent-dim: #FF450020;
+      --green: #22c55e; --red: #ef4444; --yellow: #f59e0b; --blue: #3b82f6;
+      --purple: #8b5cf6; --pink: #ec4899; --cyan: #06b6d4;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; min-height: 100dvh; }
+    .shell { display: flex; min-height: 100vh; min-height: 100dvh; overflow: auto; }
+    .sidebar { display: none; width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); padding: 1.5rem 0; flex-direction: column; }
+    .sidebar .brand { display: flex; align-items: center; gap: 0.6rem; padding: 0 1.25rem 1.25rem; border-bottom: 1px solid var(--border); margin-bottom: 0.75rem; }
+    .sidebar .brand .mark { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: #fff; }
+    .sidebar .brand span { font-weight: 600; font-size: 1rem; }
+    .sidebar a { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 1.25rem; color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.12s, background 0.12s; }
+    .sidebar a:hover { color: var(--text); background: var(--surface2); }
+    .sidebar a.active { color: var(--accent); background: var(--accent-dim); }
+    .sidebar a svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding-bottom: env(safe-area-inset-bottom, 0); z-index: 100; }
+    .tab-bar a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 0 8px; text-decoration: none; color: var(--muted); font-size: 0.7rem; font-weight: 500; transition: color 0.15s; }
+    .tab-bar a.active { color: var(--accent); }
+    .tab-bar a svg { width: 22px; height: 22px; }
+    @media (min-width: 768px) { .sidebar { display: flex; } .tab-bar { display: none; } .page { padding-bottom: 1rem !important; } .header .mark-mobile { display: none; } }
+    .page { flex: 1; padding: 1rem 1rem calc(70px + env(safe-area-inset-bottom, 0)); max-width: 780px; margin: 0 auto; width: 100%; overflow-y: auto; max-height: 100vh; max-height: 100dvh; }
+    .header { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0 1rem; }
+    .header .mark-mobile { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: #fff; }
+    .header h1 { font-size: 1.2rem; font-weight: 600; }
+    .header .sub { color: var(--muted); font-size: 0.75rem; margin-left: auto; }
+    .section { margin-bottom: 1.25rem; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; }
+    .section-head h2 { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-bottom: 0.6rem; }
+
+    /* Goals */
+    .goals-grid { display: grid; grid-template-columns: 1fr; gap: 0.6rem; }
+    @media (min-width: 520px) { .goals-grid { grid-template-columns: 1fr 1fr 1fr; } }
+    .goal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
+    .goal-card:hover { border-color: var(--border-light); }
+    .goal-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+    .goal-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .goal-desc { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.6rem; line-height: 1.4; }
+    .goal-habits { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .goal-habit-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: var(--surface3); color: var(--muted); }
+
+    /* Habit Tracker */
+    .habit-table { width: 100%; border-collapse: collapse; }
+    .habit-table th { font-size: 0.65rem; color: var(--muted); font-weight: 500; text-transform: uppercase; padding: 0.4rem 0.3rem; text-align: center; }
+    .habit-table th:first-child { text-align: left; }
+    .habit-table td { padding: 0.3rem; text-align: center; }
+    .habit-table td:first-child { text-align: left; font-size: 0.82rem; font-weight: 500; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .habit-cell { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s; font-size: 0.75rem; }
+    .habit-cell:hover { border-color: var(--border-light); }
+    .habit-cell.done { background: #22c55e30; border-color: var(--green); color: var(--green); }
+    .habit-cell.missed { background: #ef444420; border-color: #ef444460; color: var(--red); }
+    .habit-cell.na { opacity: 0.15; cursor: default; }
+    .habit-cell.today-pending { border-color: var(--accent); border-style: dashed; }
+    .habit-cell.today-pending:hover { background: var(--accent-dim); border-style: solid; }
+    .habit-cell.future { opacity: 0.4; cursor: default; }
+    .habit-streak { font-size: 0.7rem; color: var(--accent); font-weight: 600; text-align: center; }
+    .habit-domain { font-size: 0.6rem; color: var(--muted); font-weight: 400; margin-left: 0.3rem; }
+    .habit-time { font-size: 0.6rem; color: var(--muted); }
+
+    /* Summary Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+    @media (min-width: 520px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+    .stat { background: var(--surface2); border-radius: 8px; padding: 0.75rem; text-align: center; }
+    .stat .val { font-size: 1.3rem; font-weight: 700; }
+    .stat .lbl { font-size: 0.65rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; }
+
+    .loading { color: var(--muted); text-align: center; padding: 2rem; font-size: 0.85rem; }
+  </style>
+  <link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+<div class="shell">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="page">
+    <div class="header">
+      <div class="mark-mobile">M</div>
+      <h1>Goals & Habits</h1>
+      <span class="sub" id="dateLabel"></span>
+    </div>
+
+    <!-- Weekly Summary -->
+    <div class="section">
+      <div class="section-head"><h2>This Week</h2></div>
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat"><div class="val" id="statDone">-</div><div class="lbl">Completed</div></div>
+        <div class="stat"><div class="val" id="statDue">-</div><div class="lbl">Due</div></div>
+        <div class="stat"><div class="val" id="statRate" style="color:var(--green)">-</div><div class="lbl">Rate</div></div>
+        <div class="stat"><div class="val" id="statStreak" style="color:var(--accent)">-</div><div class="lbl">Best Streak</div></div>
+      </div>
+    </div>
+
+    <!-- Goals -->
+    <div class="section">
+      <div class="section-head"><h2>Goals</h2></div>
+      <div class="goals-grid" id="goalsGrid"></div>
+    </div>
+
+    <!-- Daily Habits -->
+    <div class="section">
+      <div class="section-head"><h2>Daily Habits</h2></div>
+      <div class="card" style="overflow-x:auto;">
+        <table class="habit-table" id="dailyTable"><tr><td class="loading">Loading...</td></tr></table>
+      </div>
+    </div>
+
+    <!-- Weekly Habits -->
+    <div class="section">
+      <div class="section-head"><h2>Weekly Habits</h2></div>
+      <div class="card" style="overflow-x:auto;">
+        <table class="habit-table" id="weeklyTable"><tr><td class="loading">Loading...</td></tr></table>
+      </div>
+    </div>
+  </main>
+  <nav class="tab-bar" id="tabBar"></nav>
+</div>
+
+<script src="/nav.js"></script>
+<script>
+(function(){
+  const API = '/api/vault-db';
+  const now = new Date();
+  const shortDays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  document.getElementById('dateLabel').textContent =
+    now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+
+  function dateKey(d) {
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  function getWeekStart(d) {
+    const dt = new Date(d); dt.setHours(0,0,0,0);
+    const day = dt.getDay(); const diff = day === 0 ? 6 : day - 1;
+    dt.setDate(dt.getDate() - diff); return dt;
+  }
+  function getWeekDates() {
+    const start = getWeekStart(now); const dates = [];
+    for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);dates.push(d);}
+    return dates;
+  }
+  const weekDates = getWeekDates();
+  const todayKey = dateKey(now);
+  const weekStartKey = dateKey(weekDates[0]);
+  const esc = s => { const d=document.createElement('div');d.textContent=s||'';return d.innerHTML; };
+
+  // DB helpers
+  async function dbQuery(sql) {
+    const r = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'query',sql}) });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    return d.rows || [];
+  }
+  async function dbExec(sql) {
+    const r = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'execute',sql}) });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    return d;
+  }
+
+  // State
+  let habits = [];
+  let checks = {}; // key: `${habitId}_${date}` => true
+
+  // Goals (hardcoded — these are the 3 big goals)
+  const goals = [
+    { icon: '💪', name: 'Fitness & Self-Image', desc: 'Gym 4x/week. Stay consistent. Fix health.', habits: ['Gym','Morning routine'] },
+    { icon: '🏗️', name: 'Build the Business', desc: '4hrs deep work/day on revenue. Not systems. Get clients.', habits: ['Deep work block 1','Deep work block 2','Morning engagement'] },
+    { icon: '🤝', name: 'Be More Social', desc: 'Weekly reach out. DMs, coffee, reconnect.', habits: ['Social reach-out'] },
+  ];
+
+  function renderGoals() {
+    document.getElementById('goalsGrid').innerHTML = goals.map(g =>
+      `<div class="goal-card">
+        <div class="goal-icon">${g.icon}</div>
+        <div class="goal-name">${esc(g.name)}</div>
+        <div class="goal-desc">${esc(g.desc)}</div>
+        <div class="goal-habits">${g.habits.map(h=>`<span class="goal-habit-tag">${esc(h)}</span>`).join('')}</div>
+      </div>`
+    ).join('');
+  }
+
+  function isDueOn(habit, dayIdx) {
+    // dayIdx: 0=Mon..6=Sun
+    try {
+      const days = JSON.parse(habit.days || '[]');
+      if (!days.length) return true;
+      return days.includes(shortDays[dayIdx]);
+    } catch { return true; }
+  }
+
+  function renderTable(tableId, habitList) {
+    const table = document.getElementById(tableId);
+    if (!habitList.length) { table.innerHTML = '<tr><td class="loading" style="color:var(--muted)">No habits</td></tr>'; return; }
+
+    let html = '<thead><tr><th>Habit</th>';
+    weekDates.forEach((d,i) => {
+      const isToday = dateKey(d) === todayKey;
+      html += `<th style="${isToday?'color:var(--accent)':''}">${shortDays[i]}<br><span style="font-size:0.55rem;opacity:0.5">${d.getDate()}</span></th>`;
+    });
+    html += '<th>🔥</th></tr></thead><tbody>';
+
+    for (const h of habitList) {
+      html += `<tr><td>${esc(h.title)}<span class="habit-domain">${esc(h.domain)}</span>${h.time?'<br><span class="habit-time">'+esc(h.time)+'</span>':''}</td>`;
+      weekDates.forEach((d, di) => {
+        const dk = dateKey(d);
+        const due = isDueOn(h, di);
+        const isFuture = dk > todayKey;
+        const isPast = dk < todayKey;
+        const key = h.id + '_' + dk;
+        const done = checks[key];
+
+        let cls = 'habit-cell';
+        const isToday = dk === todayKey;
+        if (!due) cls += ' na';
+        else if (isFuture) cls += ' future';
+        else if (done) cls += ' done';
+        else if (isPast) cls += ' missed';
+        else if (isToday && !done) cls += ' today-pending';
+
+        const icon = done ? '✓' : (!due ? '' : (isPast && !isFuture ? '✗' : ''));
+        const click = due && !isFuture ? ` onclick="toggleCheck(${h.id},'${dk}')"` : '';
+        html += `<td><div class="${cls}"${click}>${icon}</div></td>`;
+      });
+
+      // Streak
+      const streak = calcStreak(h);
+      html += `<td class="habit-streak">${streak}</td></tr>`;
+    }
+    html += '</tbody>';
+    table.innerHTML = html;
+  }
+
+  function calcStreak(habit) {
+    let streak = 0;
+    const d = new Date(now); d.setHours(0,0,0,0);
+    for (let i = 0; i < 90; i++) {
+      const dk = dateKey(d);
+      const dayIdx = (d.getDay() + 6) % 7;
+      if (isDueOn(habit, dayIdx)) {
+        if (checks[habit.id + '_' + dk]) streak++;
+        else break;
+      }
+      d.setDate(d.getDate() - 1);
+    }
+    return streak;
+  }
+
+  function renderStats() {
+    let done = 0, due = 0, bestStreak = 0;
+    for (const h of habits) {
+      if (h.active !== 'true') continue;
+      const s = calcStreak(h);
+      if (s > bestStreak) bestStreak = s;
+      weekDates.forEach((d, di) => {
+        const dk = dateKey(d);
+        if (dk > todayKey) return;
+        if (isDueOn(h, di)) {
+          due++;
+          if (checks[h.id + '_' + dk]) done++;
+        }
+      });
+    }
+    document.getElementById('statDone').textContent = done;
+    document.getElementById('statDue').textContent = due;
+    document.getElementById('statRate').textContent = due > 0 ? Math.round((done/due)*100)+'%' : '-';
+    document.getElementById('statStreak').textContent = bestStreak + 'd';
+  }
+
+  window.toggleCheck = async function(habitId, date) {
+    const key = habitId + '_' + date;
+    const habit = habits.find(h => h.id === habitId);
+    if (checks[key]) {
+      // Remove check
+      await dbExec(`DELETE FROM habit_checks WHERE habit_id = ${habitId} AND date = '${date}'`);
+      delete checks[key];
+    } else {
+      // Add check
+      await dbExec(`INSERT OR REPLACE INTO habit_checks (type, habit_title, habit_id, date, completed, created_at, updated_at, sync_source) VALUES ('habit_check', '${(habit?.title||'').replace(/'/g,"''")}', ${habitId}, '${date}', 1, datetime('now'), datetime('now'), 'db')`);
+      checks[key] = true;
+    }
+    render();
+  };
+
+  function render() {
+    const active = habits.filter(h => h.active === 'true');
+    const daily = active.filter(h => h.frequency === 'Daily');
+    const weekly = active.filter(h => h.frequency === 'Weekly');
+    renderTable('dailyTable', daily);
+    renderTable('weeklyTable', weekly);
+    renderStats();
+  }
+
+  async function init() {
+    try {
+      // Load habits
+      habits = await dbQuery(`SELECT * FROM habits ORDER BY CASE time_of_day WHEN 'Morning' THEN 1 WHEN 'Midday' THEN 2 WHEN 'Afternoon' THEN 3 WHEN 'Evening' THEN 4 ELSE 5 END, time, title`);
+
+      // Load checks for this week (and a bit before for streaks)
+      const streakStart = new Date(now);
+      streakStart.setDate(streakStart.getDate() - 90);
+      const rows = await dbQuery(`SELECT habit_id, date, completed FROM habit_checks WHERE date >= '${dateKey(streakStart)}' AND completed = 1`);
+      for (const r of rows) {
+        checks[r.habit_id + '_' + r.date] = true;
+      }
+
+      renderGoals();
+      render();
+    } catch (e) {
+      console.error('Init error:', e);
+      document.getElementById('dailyTable').innerHTML = `<tr><td class="loading" style="color:var(--red)">Error: ${esc(e.message)}</td></tr>`;
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
