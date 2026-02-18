@@ -772,7 +772,7 @@
     let weekColWidth = parseInt(localStorage.getItem('mhub-week-col-width')) || null; // null = auto-calculate to fit 7 days
     const WEEK_COL_MIN = 60;
     const WEEK_COL_MAX = 300;
-    const WEEK_COL_STEP = 20;
+    const WEEK_COL_STEP = 10;
 
     function getWeekColWidth() {
       if (weekColWidth) return weekColWidth;
@@ -1052,11 +1052,14 @@
     // Zoom controls
     $('zoom-out').onclick = () => zoomWeek(-WEEK_COL_STEP);
     $('zoom-in').onclick = () => zoomWeek(WEEK_COL_STEP);
-    // Ctrl+scroll to zoom week view
+    // Ctrl+scroll to zoom week view (debounced)
+    let zoomTimeout = null;
     document.addEventListener('wheel', e => {
       if (view !== 'week' || !e.ctrlKey) return;
       e.preventDefault();
+      if (zoomTimeout) return;
       zoomWeek(e.deltaY < 0 ? WEEK_COL_STEP : -WEEK_COL_STEP);
+      zoomTimeout = setTimeout(() => { zoomTimeout = null; }, 120);
     }, { passive: false });
     // Show zoom controls on initial load (week is default)
     $('zoom-controls').style.display = 'flex';
