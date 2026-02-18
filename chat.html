@@ -6,6 +6,12 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#0d0d0d">
   <title>Morgan Chat</title>
+  
+  <!-- External libraries for enhancements -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/tokyo-night-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+
   <style>
     :root { --bg:#0a0a0a; --surface:#141414; --surface2:#1c1c1c; --border:#222; --text:#e8e8e8; --muted:#555; --accent:#FF4500; --accent-dim:#FF450012; --radius:14px; }
     *{margin:0;padding:0;box-sizing:border-box}
@@ -43,15 +49,34 @@
     .sess-item:hover{background:var(--surface2)}
     .sess-item.active{background:var(--accent-dim)}
     .sess-label{font-size:0.75rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
-    .sess-item.active .sess-label{color:var(--accent)}
-    .sess-preview{font-size:0.68rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
-    .sess-time{font-size:0.6rem;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+    .sess-item.active .sess-label{color:var(--text)}
+    .sess-preview{font-size:0.65rem;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;margin-top:2px}
+    .sess-time{font-size:0.6rem;color:#999;font-variant-numeric:tabular-nums;flex-shrink:0;margin-left:auto}
+    .sess-sub{display:flex;align-items:center;gap:4px;margin-top:1px;font-size:0.6rem;white-space:nowrap;overflow:hidden}
+    .sess-sub .agent-name{font-weight:500;letter-spacing:0.02em;opacity:0.5}
+    .sess-sub .agent-name.morgan{color:var(--accent)}
+    .sess-sub .agent-name.atlas{color:#60a5fa}
+    .sess-sub .agent-name.forge{color:#a78bfa}
+    .sess-sub .agent-name.echo{color:#f472b6}
+    .sess-sub .agent-name.haven{color:#4ade80}
+    .sess-sub .agent-name.scout{color:#fbbf24}
+    .sess-sub .fmt{color:var(--muted);opacity:0.5}
+    .sess-sub .fmt.slack{color:#e0a0e8;opacity:0.6}
+    .sess-sub .fmt.cron{color:#f5a623;opacity:0.6}
+    .sess-sub .fmt.webchat{color:#60a5fa;opacity:0.5}
+    .sess-sub .fmt.siri{color:#c084fc;opacity:0.6}
+    .sess-sub .fmt.sub{color:#4ade80;opacity:0.6}
+    .sess-sub .sep{color:var(--muted);opacity:0.25;font-size:0.5rem}
+    .sess-status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .sess-status-dot.none{display:none}
+    .sess-status-dot.active{background:#22c55e;box-shadow:0 0 6px #22c55e88;animation:pulse-dot 1.5s infinite}
+    .sess-status-dot.unseen{background:#3b82f6;box-shadow:0 0 5px #3b82f688}
+    @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}
     .sess-header{padding:0.65rem;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;gap:0.5rem}
     .sess-new-btn{display:flex;align-items:center;justify-content:center;gap:0.5rem;width:100%;padding:0.6rem;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:inherit;letter-spacing:0.02em}
     .sess-new-btn:hover{background:#e03e00;box-shadow:0 2px 10px rgba(255,69,0,0.25)}
     .sess-new-btn:active{transform:scale(0.97)}
     .sess-new-btn svg{width:16px;height:16px;flex-shrink:0}
-    /* sess-status removed — now in nav sidebar as .sidebar-status */
     .sess-footer{padding:0.5rem 0.65rem;border-top:1px solid var(--border);flex-shrink:0}
     .sess-footer a{color:var(--muted);font-size:0.72rem;text-decoration:none;display:flex;align-items:center;gap:0.4rem}
     .sess-footer a:hover{color:var(--text)}
@@ -80,17 +105,68 @@
     .m{max-width:78%;padding:0.7rem 0.95rem;border-radius:18px;line-height:1.5;font-size:0.875rem;word-wrap:break-word;white-space:pre-wrap;animation:fi 0.2s ease;letter-spacing:0.01em}
     @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
     .m.u{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:6px;box-shadow:0 1px 6px rgba(255,69,0,0.15)}
-    .m.a{align-self:flex-start;background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+    .m.a{align-self:flex-start;background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.2);position:relative}
     .m.s{align-self:center;background:none;color:var(--muted);font-size:0.72rem;font-style:italic;text-align:center;max-width:100%;padding:0.3rem}
     .m .who{font-size:0.58rem;color:var(--muted);margin-bottom:0.2rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:600}
     .m.a .who{color:var(--accent)}
-    .cursor::after{content:"▊";animation:bk 0.7s infinite;color:var(--accent)}
+    .cursor::after{content:"|";animation:bk 0.7s infinite;color:var(--accent);font-weight:200}
     @keyframes bk{50%{opacity:0}}
+    .m.a.streaming{border-color:var(--accent);animation:pulse-border 2s ease-in-out infinite}
+    @keyframes pulse-border{0%,100%{border-color:var(--accent);box-shadow:0 0 8px rgba(255,69,0,0.15)}50%{border-color:var(--border);box-shadow:0 1px 4px rgba(0,0,0,0.2)}}
     .typing{display:none;align-self:flex-start;padding:0.6rem 1rem;background:var(--surface);border-radius:18px;border:1px solid var(--border);border-bottom-left-radius:6px}
     .typing.show{display:flex;gap:5px;align-items:center}
     .typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bo 1.2s infinite}
     .typing span:nth-child(2){animation-delay:0.15s}.typing span:nth-child(3){animation-delay:0.3s}
     @keyframes bo{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+    /* ENHANCED: Copy button for assistant messages */
+    .m.a .copy-btn{position:absolute;top:-8px;right:-8px;width:24px;height:24px;background:var(--surface2);border:1px solid var(--border);border-radius:50%;color:var(--muted);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:0.7rem;z-index:10}
+    .m.a:hover .copy-btn{display:flex}
+    .m.a .copy-btn:hover{background:var(--surface);color:var(--text);transform:scale(1.1)}
+
+    /* ENHANCED: Thinking sections */
+    .thinking{background:#FF450012;border-left:3px solid #FF4500;margin-bottom:0.5rem;border-radius:0 4px 4px 0}
+    .thinking-header{padding:0.5rem 0.75rem;cursor:pointer;display:flex;align-items:center;gap:0.5rem;color:#999;font-size:0.75rem;user-select:none}
+    .thinking-header:hover{background:rgba(255,255,255,0.02)}
+    .thinking-toggle{transition:transform 0.2s}
+    .thinking.expanded .thinking-toggle{transform:rotate(90deg)}
+    .thinking-content{display:none;padding:0 0.75rem 0.5rem;font-size:0.75rem;color:#999;white-space:pre-wrap;border-top:1px solid var(--border)}
+    .thinking.expanded .thinking-content{display:block}
+    .thinking-dots{display:flex;gap:2px;margin-left:auto}
+    .thinking-dots span{width:3px;height:3px;background:#FF4500;border-radius:50%;animation:pulse 1.4s infinite}
+    .thinking-dots span:nth-child(2){animation-delay:0.2s}
+    .thinking-dots span:nth-child(3){animation-delay:0.4s}
+    @keyframes pulse{0%,80%,100%{transform:scale(0.8);opacity:0.5}40%{transform:scale(1);opacity:1}}
+
+    /* ENHANCED: Tool call cards */
+    .tool{background:var(--surface2);border:1px solid var(--border);border-left:3px solid #3b82f6;border-radius:4px;margin-bottom:0.5rem;overflow:hidden}
+    .tool-header{padding:0.5rem 0.75rem;display:flex;align-items:center;gap:0.5rem;cursor:pointer;user-select:none}
+    .tool-header:hover{background:rgba(255,255,255,0.02)}
+    .tool-icon{width:16px;height:16px;background:#3b82f6;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#fff}
+    .tool-name{flex:1;font-size:0.8rem;font-weight:500}
+    .tool-status{font-size:0.7rem}
+    .tool-status.running{color:#f59e0b;animation:spin 1s linear infinite}
+    .tool-status.done{color:#22c55e}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    .tool-details{display:none;padding:0 0.75rem 0.5rem;border-top:1px solid var(--border);font-size:0.7rem;color:#999}
+    .tool.expanded .tool-details{display:block}
+
+    /* ENHANCED: Markdown styling */
+    .m.a h1,.m.a h2,.m.a h3,.m.a h4,.m.a h5,.m.a h6{margin:1em 0 0.5em;font-weight:600}
+    .m.a h1:first-child,.m.a h2:first-child,.m.a h3:first-child{margin-top:0}
+    .m.a p{margin:0.75em 0}
+    .m.a p:first-child{margin-top:0}
+    .m.a p:last-child{margin-bottom:0}
+    .m.a ul,.m.a ol{margin:0.75em 0;padding-left:1.5em}
+    .m.a li{margin:0.25em 0}
+    .m.a blockquote{margin:0.75em 0;padding:0.5em 1em;background:rgba(255,255,255,0.02);border-left:3px solid var(--accent);border-radius:0 4px 4px 0}
+    .m.a code{background:var(--surface2);color:var(--accent);padding:0.125em 0.25em;border-radius:3px;font-size:0.85em;font-family:monospace}
+    .m.a pre{margin:1em 0;position:relative;background:#1a1a2e !important;border-radius:6px;overflow:hidden}
+    .m.a pre code{display:block;padding:1rem;background:none !important;color:inherit !important;font-size:0.8rem;overflow-x:auto}
+    .code-header{position:absolute;top:0.5rem;right:0.5rem;display:flex;gap:0.5rem;align-items:center}
+    .code-lang{background:rgba(0,0,0,0.3);color:#999;padding:0.25rem 0.5rem;border-radius:3px;font-size:0.65rem}
+    .code-copy{width:20px;height:20px;background:rgba(0,0,0,0.3);border:none;border-radius:3px;color:#999;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.65rem}
+    .code-copy:hover{background:rgba(255,255,255,0.1);color:#fff}
 
     /* Tab bar */
     .tab-bar{display:flex;background:var(--surface);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0);flex-shrink:0}
@@ -173,6 +249,8 @@
       .preview-bar.show{padding:0.5rem 4rem}
     }
   </style>
+  <link rel="stylesheet" href="/theme.css?v=20260218b">
+
 </head>
 <body>
   <div id="auth">
@@ -196,9 +274,7 @@
         <button class="sess-new-btn" id="newChatBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Chat</button>
       </div>
       <div class="sess-list" id="sessList"></div>
-      <div class="sess-footer">
-        <button class="verbose-btn" id="verboseBtn2" style="width:100%;text-align:center">Verbose</button>
-      </div>
+      <!-- footer removed -->
     </div>
 
     <div class="chat-col">
@@ -230,9 +306,10 @@
   <script src="/nav.js"></script>
 
 <script>
+  console.log('[MHub] Script starting...');
   // ---- Config ----
-  // WS goes through server.js proxy at /ws — auth handled server-side
-  var GW = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
+  var isTailscaleHost = location.hostname.indexOf('.ts.net') >= 0;
+  var GW = isTailscaleHost ? 'wss://desktop-reimhlv-1.tail801a90.ts.net/ws?client=mhub' : ((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws?client=mhub');
   var GW_URL = location.origin;
   var DKEY='mhub-dev2', AKEY='mhub-auth2';
 
@@ -242,26 +319,50 @@
   var authScreen=document.getElementById('auth'),pwInput=document.getElementById('pw'),authBtn=document.getElementById('authBtn'),authErr=document.getElementById('authErr');
 
   // ---- State ----
-  var ws,mid=0,pending={},ok=false,stream=null,nonce=null,sk='agent:main:main',backoff=800,edLib=null;
+  var ws,mid=0,pending={},ok=false,stream=null,nonce=null,sk='agent:main:main',backoff=800,edLib=null,_loadingHistory=false;
 
   // ---- Session sidebar state ----
   var sessions=[];
   var sessLoaded=false;
+  var _renderTimer=null;
+  function debouncedRenderSessions(){if(_renderTimer)return;_renderTimer=setTimeout(function(){_renderTimer=null;renderSessions()},500)}
 
+  // ---- Enhanced Libraries Setup (safe - won't crash if CDN fails) ----
+  try {
+    if(typeof marked !== 'undefined') {
+      marked.setOptions({
+        highlight: function(code, lang) {
+          if (typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
+            try { return hljs.highlight(code, { language: lang }).value; } catch (__) {}
+          }
+          if (typeof hljs !== 'undefined') return hljs.highlightAuto(code).value;
+          return code;
+        },
+        langPrefix: 'hljs language-'
+      });
+    }
+  } catch(e) { console.warn('marked setup failed:', e); }
+
+  console.log('[MHub] Libraries loaded, marked:', typeof marked, 'hljs:', typeof hljs);
   // ---- Base64url ----
   function toB64(b){var s='';for(var i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/g,'')}
   function fromB64(s){var p=s.replace(/-/g,'+').replace(/_/g,'/');var d=atob(p+'='.repeat((4-p.length%4)%4));var o=new Uint8Array(d.length);for(var i=0;i<d.length;i++)o[i]=d.charCodeAt(i);return o}
   function toHex(b){var s='';for(var i=0;i<b.length;i++)s+=b[i].toString(16).padStart(2,'0');return s}
 
   // ---- Auth ----
-  // Over Tailscale: skip auth screen entirely — Tailscale identity headers handle it.
-  // Localhost: show password prompt as fallback.
   var isTailscale = location.hostname.indexOf('.ts.net') >= 0;
+  var gwToken=null;
   function getAuth(){
-    if(isTailscale) return {}; // empty auth — Tailscale headers do the work
+    if(isTailscale) return {token:gwToken||'',password:'openclaw-noah-2026'};
     try{return JSON.parse(localStorage.getItem(AKEY))}catch(e){return null}
   }
   function setAuth(a){localStorage.setItem(AKEY,JSON.stringify(a))}
+  
+  console.log('[MHub] isTailscale:', isTailscale, 'GW:', GW, 'GW_URL:', GW_URL);
+  if(isTailscale){
+    console.log('[MHub] Fetching auth token...');
+    fetch(GW_URL+'/api/auth').then(r=>r.json()).then(d=>{gwToken=d.token;console.log('[MHub] Got token, starting WS connect...');startConnect()}).catch(e=>{console.error('[MHub] Auth fetch failed:', e)});
+  }
   if(isTailscale || getAuth()){authScreen.classList.add('hidden')}
   authBtn.onclick=function(){
     var pw=pwInput.value.trim();
@@ -301,22 +402,153 @@
       if(!ws||ws.readyState!==1)return rej(new Error('offline'));
       var id=String(++mid);
       pending[id]={resolve:res,reject:rej};
-      ws.send(JSON.stringify({type:'req',id:id,method:method,params:params||{}}));
+      var msg={type:'req',id:id,method:method,params:params||{}};console.log('[MHub] WS send:',method,JSON.stringify(msg).slice(0,200));ws.send(JSON.stringify(msg));
       setTimeout(function(){if(pending[id]){delete pending[id];rej(new Error('timeout'))}},30000);
     });
   }
 
   // ---- UI ----
-  function setSt(state,label){dot.className='dot'+(state==='ok'?' ok':state==='wait'?' wait':'');stxt.textContent=label}
+  function setSt(state,label){if(dot)dot.className='dot'+(state==='ok'?' ok':state==='wait'?' wait':'');if(stxt)stxt.textContent=label}
+  
   function addMsg(role,text,streaming){
     var el=document.createElement('div');
     el.className='m '+(role==='user'?'u':role==='assistant'?'a':'s');
     if(role!=='system'){var w=document.createElement('div');w.className='who';w.textContent=role==='user'?'You':'Morgan';el.appendChild(w)}
     var c=document.createElement('span');c.className='txt';if(streaming)c.classList.add('cursor');
     c.textContent=text;el.appendChild(c);
-    msgs.insertBefore(el,typingEl);msgs.scrollTop=msgs.scrollHeight;return el;
+    
+    // ENHANCED: Add copy button for assistant messages
+    if(role==='assistant'){
+      var copyBtn=document.createElement('button');
+      copyBtn.className='copy-btn';
+      copyBtn.innerHTML='📋';
+      copyBtn.title='Copy message';
+      copyBtn.onclick=function(){
+        var text = c.textContent || c.innerText || '';
+        navigator.clipboard.writeText(text).then(function(){
+          copyBtn.innerHTML='✓';
+          setTimeout(function(){copyBtn.innerHTML='📋'},1000);
+        }).catch(function(){
+          var textarea=document.createElement('textarea');
+          textarea.value=text;
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+          copyBtn.innerHTML='✓';
+          setTimeout(function(){copyBtn.innerHTML='📋'},1000);
+        });
+      };
+      el.appendChild(copyBtn);
+    }
+    
+    msgs.insertBefore(el,typingEl);if(!_loadingHistory)msgs.scrollTop=msgs.scrollHeight;return el;
   }
-  function txt(content){if(typeof content==='string')return content;if(Array.isArray(content))return content.map(function(c){return c.text||''}).join('');return''}
+  
+  // ENHANCED: Markdown rendering function
+  function renderMarkdown(text, container) {
+    if(typeof marked === 'undefined'){container.textContent=text;return}
+    try { container.innerHTML = marked.parse(text); } catch(e) { container.textContent=text; return; }
+    
+    // Add copy buttons and language labels to code blocks
+    container.querySelectorAll('pre code').forEach(function(codeEl) {
+      var preEl = codeEl.parentElement;
+      if (preEl.querySelector('.code-header')) return; // Already processed
+      
+      var headerEl = document.createElement('div');
+      headerEl.className = 'code-header';
+      
+      // Language label
+      var langClass = codeEl.className.match(/language-(\w+)/);
+      var lang = langClass ? langClass[1] : 'text';
+      var langEl = document.createElement('span');
+      langEl.className = 'code-lang';
+      langEl.textContent = lang;
+      headerEl.appendChild(langEl);
+      
+      // Copy button
+      var copyEl = document.createElement('button');
+      copyEl.className = 'code-copy';
+      copyEl.innerHTML = '📋';
+      copyEl.title = 'Copy code';
+      copyEl.onclick = function() {
+        var code = codeEl.textContent || codeEl.innerText || '';
+        navigator.clipboard.writeText(code).then(function() {
+          copyEl.innerHTML = '✓';
+          setTimeout(function() { copyEl.innerHTML = '📋'; }, 1000);
+        });
+      };
+      headerEl.appendChild(copyEl);
+      
+      preEl.style.position = 'relative';
+      preEl.appendChild(headerEl);
+    });
+  }
+  
+  // ENHANCED: Add thinking section
+  function addThinkingSection(content) {
+    var el = document.createElement('div');
+    el.className = 'thinking expanded';
+    
+    var header = document.createElement('div');
+    header.className = 'thinking-header';
+    header.innerHTML = '<span class="thinking-toggle">▶</span><span>Thinking...</span><div class="thinking-dots"><span></span><span></span><span></span></div>';
+    
+    var contentEl = document.createElement('div');
+    contentEl.className = 'thinking-content';
+    contentEl.textContent = content;
+    
+    header.onclick = function() {
+      el.classList.toggle('expanded');
+    };
+    
+    el.appendChild(header);
+    el.appendChild(contentEl);
+    msgs.insertBefore(el, typingEl);
+    msgs.scrollTop = msgs.scrollHeight;
+    return { element: el, content: contentEl };
+  }
+  
+  // ENHANCED: Add tool call section
+  function addToolSection(toolName, params) {
+    var el = document.createElement('div');
+    el.className = 'tool expanded';
+    
+    var header = document.createElement('div');
+    header.className = 'tool-header';
+    header.innerHTML = '<div class="tool-icon">⚡</div><div class="tool-name">' + toolName + '</div><div class="tool-status running">↻</div>';
+    
+    var details = document.createElement('div');
+    details.className = 'tool-details';
+    details.textContent = JSON.stringify(params, null, 2);
+    
+    header.onclick = function() {
+      el.classList.toggle('expanded');
+    };
+    
+    // Auto-complete after delay
+    setTimeout(function() {
+      var status = header.querySelector('.tool-status');
+      status.className = 'tool-status done';
+      status.innerHTML = '✓';
+    }, 1500);
+    
+    el.appendChild(header);
+    el.appendChild(details);
+    msgs.insertBefore(el, typingEl);
+    msgs.scrollTop = msgs.scrollHeight;
+    return el;
+  }
+  
+  function txt(content){
+    if(typeof content==='string')return content;
+    if(Array.isArray(content))return content.map(function(c){return c.text||''}).join('');
+    if(content&&typeof content==='object'){
+      if(content.content)return txt(content.content);
+      if(content.text)return content.text;
+    }
+    return'';
+  }
 
   // ---- Connect ----
   function doConnect(){
@@ -337,30 +569,36 @@
     rpc('connect',params).then(function(res){
       ok=true;backoff=800;setSt('ok','connected');
       historyRetries=0;loadHistory();
-      if(!sessLoaded)loadSessions();
+      loadSessions();
       updateHeaderName();
     }).catch(function(e){
       var m=String(e.message||e);
-      if(m.indexOf('pairing')>=0){setSt('wait','pairing required');addMsg('system','Pairing required — ask Morgan to approve, then refresh.');}
+      if(m.indexOf('pairing')>=0){setSt('wait','pairing required');addMsg('system','Pairing required - ask Morgan to approve, then refresh.');}
       else{setSt('','failed');addMsg('system','Auth failed: '+m);localStorage.removeItem(AKEY);if(!isTailscale)authScreen.classList.remove('hidden');}
     });
   }
 
-  var historyRetries=0;
+  var historyRetries=0, wsHistoryLoaded=false;
   function loadHistory(){
     var targetSk=sk;
     rpc('chat.history',{sessionKey:sk,limit:80}).then(function(r){
       historyRetries=0;
-      if(targetSk!==sk)return; // session changed while loading
+      wsHistoryLoaded=true;
+      if(targetSk!==sk)return;
       if(r&&r.messages){
-        var imgEls=[];msgs.querySelectorAll('.m.has-img').forEach(function(el){imgEls.push(el)});
+        _loadingHistory=true;
         while(msgs.firstChild!==typingEl)msgs.removeChild(msgs.firstChild);
         r.messages.forEach(function(m){
           var t=txt(m.content);
           if(!t||t==='NO_REPLY'||t==='HEARTBEAT_OK'||t.indexOf('Read HEARTBEAT.md')===0)return;
-          addMsg(m.role,t);
+          var msgEl = addMsg(m.role,t);
+          if(m.role === 'assistant' && t.trim()) {
+            var textEl = msgEl.querySelector('.txt');
+            renderMarkdown(t, textEl);
+          }
         });
-        imgEls.forEach(function(el){msgs.insertBefore(el,typingEl)});
+        _loadingHistory=false;
+        msgs.scrollTop=msgs.scrollHeight;
       }
     }).catch(function(e){
       console.warn('history fail',e);
@@ -369,23 +607,49 @@
   }
 
   // ---- Session sidebar ----
+  try{var cached=JSON.parse(localStorage.getItem('mhub-sessions-cache'));if(cached&&cached.length){sessions=cached;renderSessions()}}catch{}
+  // Load sessions via HTTP immediately (don't wait for WS)
+  loadSessions();
+
   async function loadSessions(){
     try{
       const r=await fetch(GW_URL+'/api/gw',{
         method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({tool:'sessions_list',args:{limit:50,messageLimit:1}})
+        body:JSON.stringify({tool:'sessions_list',args:{limit:50,messageLimit:1}}),
+        signal:AbortSignal.timeout(15000)
       });
       if(!r.ok)return;
+      httpOk=true;setSmart();
       const data=await r.json();
       let inner=data;
       if(data.ok&&data.result?.content?.[0]?.text){
         try{inner=JSON.parse(data.result.content[0].text)}catch{}
       }
-      sessions=inner.sessions||inner.result?.sessions||[];
+      var fresh=inner.sessions||inner.result?.sessions||[];
+      // Merge: keep local live preview/timestamp if newer than API data
+      var localMap={};
+      sessions.forEach(function(s){var k=s.sessionKey||s.key;if(k)localMap[k]=s});
+      fresh.forEach(function(s){
+        var k=s.sessionKey||s.key;
+        var local=localMap[k];
+        if(local&&(local.updatedAt||0)>(s.updatedAt||0)){
+          s.messages=local.messages;s.updatedAt=local.updatedAt;s.updatedAtMs=local.updatedAtMs;
+        }
+      });
+      // Ensure current session exists in list
+      var hasCurrent=fresh.some(function(s){return(s.sessionKey||s.key)===sk});
+      if(!hasCurrent&&sk){
+        var localCurrent=localMap[sk];
+        if(localCurrent)fresh.unshift(localCurrent);
+      }
+      sessions=fresh;
       sessLoaded=true;
+      try{localStorage.setItem('mhub-sessions-cache',JSON.stringify(sessions))}catch{}
       renderSessions();
     }catch(e){console.warn('sessions load fail',e)}
   }
+  // Refresh sessions periodically via HTTP (independent of WS)
+  setInterval(function(){loadSessions()},30000);
 
   function sessType(key){
     if(!key)return{badge:'',cls:''};
@@ -398,35 +662,97 @@
     return{badge:'',cls:''};
   }
   function isMainSession(key){ return key==='agent:main:main'||key==='agent:main:webchat'; }
+  // Slack channel ID → name map
+  var slackChannelMap={'c0aecgm60ue':'#hub','c0ae86uqujx':'#ops','c0aecgmhv62':'#build','c0aeejdpcje':'#content','c0aej6strha':'#life'};
+  // Agent extraction from session key/label
+  var cronAgentMap={'atlas':['atlas','pipeline'],'forge':['forge','build','deploy'],'echo':['echo','content'],'haven':['haven','doctor','fitness','health'],'scout':['scout','market','research'],'morgan':['morgan','standup','notification','email']};
+  function extractAgent(s){
+    var key=(s.sessionKey||s.key||'').toLowerCase();
+    var label=(s.label||s.displayName||'').toLowerCase();
+    // Slack channels → agent
+    if(key.includes('c0aecgm60ue'))return'Morgan';if(key.includes('c0ae86uqujx'))return'Atlas';
+    if(key.includes('c0aecgmhv62'))return'Forge';if(key.includes('c0aeejdpcje'))return'Echo';if(key.includes('c0aej6strha'))return'Haven';
+    // Cron/sub labels
+    var combined=label+' '+key;
+    for(var agent in cronAgentMap){var kws=cronAgentMap[agent];for(var i=0;i<kws.length;i++){if(combined.includes(kws[i]))return agent.charAt(0).toUpperCase()+agent.slice(1)}}
+    return'';
+  }
+  function shortModel(m){if(!m)return'';return m.replace('claude-','').replace('anthropic/','').replace('-20250514','').replace('-4-6','4').replace('sonnet-4','sonnet4')}
+  function relativeTime(ts){
+    if(!ts)return'';
+    var diff=Date.now()-ts;var s=Math.floor(diff/1000);
+    if(s<60)return'now';if(s<3600)return Math.floor(s/60)+'m';if(s<86400)return Math.floor(s/3600)+'h';
+    var d=new Date(ts);var now=new Date();
+    if(d.toDateString()===new Date(now-86400000).toDateString())return'Yesterday';
+    return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  }
+  // Track actively streaming sessions
+  var activeSessions={};
+  // Track sessions with unseen responses (assistant replied since last view)
+  var unseenSessions={};
+
+  function updateSessionPreview(key,text){
+    var s=sessions.find(function(s){return(s.sessionKey||s.key)===key});
+    if(!s){
+      // Session not in list yet — add it
+      s={key:key,sessionKey:key,kind:'other',channel:'webchat',messages:[{role:'assistant',content:text}],updatedAt:Date.now(),updatedAtMs:Date.now(),model:'claude-opus-4-6'};
+      sessions.unshift(s);
+    } else {
+      s.messages=[{role:'assistant',content:text}];s.updatedAt=Date.now();s.updatedAtMs=Date.now();
+      // Move to top of list
+      var idx=sessions.indexOf(s);if(idx>0){sessions.splice(idx,1);sessions.unshift(s)}
+    }
+    // Persist to localStorage so refresh doesn't lose live sessions
+    try{localStorage.setItem('mhub-sessions-cache',JSON.stringify(sessions))}catch{}
+  }
   function sessCard(s){
     var key=s.sessionKey||s.key||'';
-    var label=getSessionName(key)||s.label||key.split(':').pop()||key;
+    var label=getSessionName(key)||'';
+    if(!label){
+      // Smart label from slack channel
+      var slackMatch=key.match(/:channel:([a-z0-9]+)$/);
+      if(slackMatch&&slackChannelMap[slackMatch[1]])label=slackChannelMap[slackMatch[1]];
+      else label=s.label||s.displayName||'';
+      // Clean up ugly displayNames
+      if(label.match(/^(webchat|slack):g-/))label='';
+      if(!label){
+        if(key.includes(':main:main'))label='Main Session';
+        else if(key.includes(':webchat:'))label='Chat';
+        else label=key.split(':').pop()||key;
+      }
+    }
     var isActive=key===sk;
     var st=sessType(key);
+    var agent=extractAgent(s);
+    var model=shortModel(s.model);
     var preview='';
     if(s.messages&&s.messages.length){
       var last=s.messages[s.messages.length-1];
       preview=txt(last.content)||'';
-      if(preview.length>60)preview=preview.slice(0,57)+'…';
+      if(preview.length>55)preview=preview.slice(0,52)+'…';
     }else if(s.lastMessage){
       preview=txt(s.lastMessage.content)||'';
-      if(preview.length>60)preview=preview.slice(0,57)+'…';
+      if(preview.length>55)preview=preview.slice(0,52)+'…';
     }
-    var timeStr='';
-    var ts=s.updatedAtMs||s.lastMessageAt||s.createdAtMs;
-    if(ts){
-      var d=new Date(ts);
-      var now=new Date();
-      if(d.toDateString()===now.toDateString())timeStr=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-      else timeStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    }
+    var timeStr=relativeTime(s.updatedAt||s.updatedAtMs||s.lastMessageAt||s.createdAtMs);
+
+    // Status dot: only active (streaming) or unseen (new response)
+    var dotClass='none';
+    if(activeSessions[key])dotClass='active';
+    else if(unseenSessions[key]&&!isActive)dotClass='unseen';
+
     return '<div class="sess-item'+(isActive?' active':'')+'" data-key="'+key+'">'
       +'<div class="sess-label-row">'
+        +'<div class="sess-status-dot '+dotClass+'"></div>'
         +'<div class="sess-label">'+esc(label)+'</div>'
-        +(st.badge?'<span class="sess-badge '+st.cls+'">'+st.badge+'</span>':'')
+        +(timeStr?'<span class="sess-time">'+timeStr+'</span>':'')
+      +'</div>'
+      +'<div class="sess-sub">'
+        +(agent?'<span class="agent-name '+agent.toLowerCase()+'">'+agent+'</span>':'')
+        +(agent&&st.badge?'<span class="sep">·</span>':'')
+        +(st.badge?'<span class="fmt '+st.cls+'">'+st.badge+'</span>':'')
       +'</div>'
       +(preview?'<div class="sess-preview">'+esc(preview)+'</div>':'')
-      +(timeStr?'<div class="sess-time">'+timeStr+'</div>':'')
     +'</div>';
   }
   function renderSessions(){
@@ -455,12 +781,13 @@
         const key=item.dataset.key;
         if(key===sk)return;
         sk=key;
+        delete unseenSessions[key];
         // Clear and reload
         while(msgs.firstChild!==typingEl)msgs.removeChild(msgs.firstChild);
         stream=null;
         historyRetries=0;
-        if(ok)loadHistory();
-        else addMsg('system','Reconnecting — history will load automatically...');
+        wsHistoryLoaded=false;
+        if(ok) loadHistory(); else loadHistoryHTTP();
         renderSessions();
         updateHeaderName();
         // Close mobile sidebar
@@ -520,45 +847,99 @@
     document.getElementById('sessOverlay').classList.remove('show');
   };
 
-  // ---- Events ----
+  // ---- RESTORED ORIGINAL EVENTS WITH ENHANCEMENTS ----
   function onEvent(data){
     if(data.event==='connect.challenge'){nonce=(data.payload&&data.payload.nonce)||null;doConnect();return}
     if(data.event==='chat'){
       var p=data.payload;if(!p)return;
+      // Track activity for session sidebar indicators (all sessions)
+      var evtSk=p.sessionKey||sk;
+      if(p.state==='started'||p.state==='delta'){activeSessions[evtSk]=Date.now();if(evtSk!==sk)unseenSessions[evtSk]=Date.now();if(p.state==='started')renderSessions();else debouncedRenderSessions()}
+      if(p.state==='final'||p.state==='error'||p.state==='aborted'){delete activeSessions[evtSk];if(evtSk!==sk)unseenSessions[evtSk]=Date.now();if(stream&&stream.text)updateSessionPreview(evtSk,stream.text);renderSessions()}
+      // Only render messages for the currently viewed session
+      if(p.sessionKey && p.sessionKey !== sk) return;
       if(p.state==='delta'){
         typingEl.classList.remove('show');
+        
+        // ENHANCED: Handle thinking with collapsible UI
         if(p.thinking){
           var th=typeof p.thinking==='string'?p.thinking:txt(p.thinking);
           if(th){
             if(!stream)stream={el:null,text:'',thinkEl:null,thinkText:'',toolEl:null};
-            if(!stream.thinkEl){stream.thinkEl=addMsg('system','[thinking] '+th);stream.thinkText=th}
-            else{stream.thinkText+=th;stream.thinkEl.querySelector('.txt').textContent='[thinking] '+stream.thinkText}
-            msgs.scrollTop=msgs.scrollHeight;
+            if(!stream.thinkEl){
+              stream.thinkEl=addThinkingSection(th);
+              stream.thinkText=th;
+            }else if(th.length >= stream.thinkText.length){
+              stream.thinkText=th; // replace, not append — gateway sends accumulated
+              stream.thinkEl.content.textContent=stream.thinkText;
+            }
           }
         }
+        
+        // ENHANCED: Handle tool calls with rich cards
         if(p.toolCalls&&p.toolCalls.length){
           if(!stream)stream={el:null,text:'',thinkEl:null,thinkText:'',toolEl:null};
           p.toolCalls.forEach(function(tc){
-            var label='> '+(tc.function&&tc.function.name||tc.name||'tool');
-            if(!stream.toolEl||stream.toolEl._name!==label){stream.toolEl=addMsg('system',label);stream.toolEl._name=label;}
+            var label=tc.function&&tc.function.name||tc.name||'tool';
+            var params=tc.function&&tc.function.arguments||tc.arguments||'{}';
+            try { params = JSON.parse(params); } catch(e) { params = {}; }
+            if(!stream.toolEl||stream.toolEl._name!==label){
+              stream.toolEl=addToolSection(label,params);
+              stream.toolEl._name=label;
+            }
           });
-          msgs.scrollTop=msgs.scrollHeight;
         }
+        
+        // ENHANCED: Handle message content with streaming + markdown
         var t=txt(p.message);
         if(typeof t==='string'&&t){
           if(!stream)stream={el:null,text:'',thinkEl:null,thinkText:'',toolEl:null};
-          if(!stream.el){stream.el=addMsg('assistant',t,true);stream.text=t}
-          else{stream.text+=t;stream.el.querySelector('.txt').textContent=stream.text;msgs.scrollTop=msgs.scrollHeight}
+          // Gateway sends FULL accumulated text in each delta, not just new chunk
+          if(!stream.el){
+            stream.el=addMsg('assistant',t,true);
+            stream.el.classList.add('streaming');
+            stream.text=t;
+          }else if(t.length >= stream.text.length){
+            stream.text=t; // replace, not append
+            var textEl=stream.el.querySelector('.txt');
+            textEl.textContent=stream.text;
+            // Re-render markdown periodically for smooth streaming
+            if(stream.text.match(/[.!?]\s*$/)||stream.text.length%100===0){
+              renderMarkdown(stream.text,textEl);
+              textEl.classList.add('cursor');
+            }
+            msgs.scrollTop=msgs.scrollHeight;
+          }
         }
-      } else if(p.state==='started'){
+      }else if(p.state==='started'){
         typingEl.classList.add('show');msgs.scrollTop=msgs.scrollHeight;
-      } else if(p.state==='final'){
+      }else if(p.state==='final'){
         typingEl.classList.remove('show');
-        if(stream){if(stream.el)stream.el.querySelector('.txt').classList.remove('cursor');if(stream.thinkEl)stream.thinkEl.remove();stream=null}
-        loadHistory();
-      } else if(p.state==='error'||p.state==='aborted'){
+        if(stream){
+          if(stream.el){
+            stream.el.classList.remove('streaming');
+            var textEl=stream.el.querySelector('.txt');
+            textEl.classList.remove('cursor');
+            // Final markdown render
+            if(stream.text){
+              renderMarkdown(stream.text,textEl);
+            }
+          }
+          if(stream.thinkEl){
+            // Collapse thinking section
+            stream.thinkEl.element.classList.remove('expanded');
+            var dots = stream.thinkEl.element.querySelector('.thinking-dots');
+            if(dots) dots.style.display = 'none';
+          }
+          stream=null;
+        }
+      }else if(p.state==='error'||p.state==='aborted'){
         typingEl.classList.remove('show');
-        if(stream){if(stream.el)stream.el.querySelector('.txt').classList.remove('cursor');if(stream.thinkEl)stream.thinkEl.remove();stream=null}
+        if(stream){
+          if(stream.el)stream.el.querySelector('.txt').classList.remove('cursor');
+          if(stream.thinkEl)stream.thinkEl.element.remove();
+          stream=null;
+        }
         if(p.state==='error')addMsg('system','Error: '+(p.errorMessage||'unknown'));
       }
     }
@@ -571,18 +952,30 @@
   }
 
   // ---- WS ----
+  var wsAttempts=0, maxWsAttempts=5, httpOk=false;
+  function setSmart(){
+    if(ok)setSt('ok','connected');
+    else if(httpOk)setSt('ok','connected');
+    else if(wsAttempts>=maxWsAttempts)setSt('wait','http only');
+    else setSt('','connecting...');
+  }
   function wsConnect(){
     if(ws&&ws.readyState<=1)return;
-    ok=false;nonce=null;setSt('','connecting...');
+    if(wsAttempts>=maxWsAttempts){setSmart();return}
+    wsAttempts++;
+    ok=false;nonce=null;setSmart();
+    console.log('[MHub] WS connecting to:', GW, 'attempt:', wsAttempts);
     ws=new WebSocket(GW);
-    ws.onopen=function(){setSt('','waiting for challenge...')};
-    ws.onmessage=function(e){onMsg(String(e.data||''))};
+    ws.onopen=function(){console.log('[MHub] WS open');setSt('','waiting for challenge...')};
+    ws.onmessage=function(e){console.log('[MHub] WS recv type:',typeof e.data,'data:',String(e.data||'').slice(0,200));onMsg(String(e.data||''))};
+    ws.binaryType='blob';
     ws.onclose=function(ev){
-      ok=false;setSt('','reconnecting...');
+      console.log('[MHub] WS closed:', ev.code, ev.reason);
+      ok=false;setSmart();
       Object.keys(pending).forEach(function(k){pending[k].reject(new Error('closed'));delete pending[k]});
       ws=null;backoff=Math.min(backoff*1.7,15000);setTimeout(wsConnect,backoff);
     };
-    ws.onerror=function(){};
+    ws.onerror=function(e){console.error('[MHub] WS error:', e)};
   }
 
   // ---- File Attach ----
@@ -614,7 +1007,7 @@
     var img=document.createElement('img');img.className='attached';img.src=src;
     img.addEventListener('click',function(){window.open(src,'_blank')});el.appendChild(img);
     if(text){var c=document.createElement('span');c.className='txt';c.textContent=text;el.appendChild(c)}
-    msgs.insertBefore(el,typingEl);msgs.scrollTop=msgs.scrollHeight;return el;
+    msgs.insertBefore(el,typingEl);if(!_loadingHistory)msgs.scrollTop=msgs.scrollHeight;return el;
   }
 
   // ---- Send ----
@@ -643,6 +1036,7 @@
       return;
     }
     params.message=t;
+    updateSessionPreview(sk,t);renderSessions();
     rpc('chat.send',params).catch(function(e){
       addMsg('system','Send failed: '+e.message);
       if(!ws||ws.readyState>1){backoff=800;wsConnect()}
@@ -670,29 +1064,77 @@
   function syncVerbose(v){verbose=v;localStorage.setItem('mhub-verbose',v?'1':'0');document.body.classList.toggle('verbose',v);vBtn.classList.toggle('active',v);vBtn2.classList.toggle('active',v)}
   syncVerbose(verbose);
   vBtn.addEventListener('click',function(){syncVerbose(!verbose)});
-  vBtn2.addEventListener('click',function(){syncVerbose(!verbose)});
+  if(vBtn2)vBtn2.addEventListener('click',function(){syncVerbose(!verbose)});
 
   // ---- HTTP fallback for history ----
+  // Poll for new assistant response after HTTP send (appends, no re-render)
+  async function pollForResponse(attempt){
+    attempt=attempt||0;
+    if(attempt>=5)return;
+    var delay=[2000,3000,5000,8000,12000][attempt]||5000;
+    setTimeout(async function(){
+      try{
+        const r=await fetch(GW_URL+'/api/gw',{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({tool:'sessions_history',args:{sessionKey:sk,limit:5}})
+        });
+        if(!r.ok){pollForResponse(attempt+1);return}
+        const data=await r.json();
+        let inner=data;
+        if(data.ok&&data.result?.content?.[0]?.text){
+          try{inner=JSON.parse(data.result.content[0].text)}catch{}
+        }
+        var messages=inner.messages||inner.result?.messages||[];
+        // Find last assistant message
+        for(var i=messages.length-1;i>=0;i--){
+          if(messages[i].role==='assistant'){
+            var t=txt(messages[i].content);
+            if(t&&t!=='NO_REPLY'&&t!=='HEARTBEAT_OK'){
+              var msgEl = addMsg('assistant',t);
+              var textEl = msgEl.querySelector('.txt');
+              renderMarkdown(t, textEl);
+              return;
+            }
+          }
+        }
+        // No assistant response yet, keep polling
+        pollForResponse(attempt+1);
+      }catch(e){pollForResponse(attempt+1)}
+    },delay);
+  }
+
   async function loadHistoryHTTP(){
+    // Skip if WS already loaded history (avoid duplicates)
+    if(wsHistoryLoaded) return;
     try{
       const r=await fetch(GW_URL+'/api/gw',{
         method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({tool:'sessions_history',args:{sessionKey:sk,limit:80}})
       });
       if(!r.ok)return;
+      if(wsHistoryLoaded) return; // check again after await
+      httpOk=true;setSmart();
       const data=await r.json();
+      if(wsHistoryLoaded) return; // WS won the race
       let inner=data;
       if(data.ok&&data.result?.content?.[0]?.text){
         try{inner=JSON.parse(data.result.content[0].text)}catch{}
       }
       var messages=inner.messages||inner.result?.messages||[];
       if(messages.length){
+        _loadingHistory=true;
         while(msgs.firstChild!==typingEl)msgs.removeChild(msgs.firstChild);
         messages.forEach(function(m){
           var t=txt(m.content);
           if(!t||t==='NO_REPLY'||t==='HEARTBEAT_OK'||t.indexOf('Read HEARTBEAT.md')===0)return;
-          addMsg(m.role,t);
+          var msgEl = addMsg(m.role,t);
+          if(m.role === 'assistant' && t.trim()) {
+            var textEl = msgEl.querySelector('.txt');
+            renderMarkdown(t, textEl);
+          }
         });
+        _loadingHistory=false;
+        msgs.scrollTop=msgs.scrollHeight;
       }
     }catch(e){console.warn('HTTP history fail',e)}
   }
@@ -709,10 +1151,8 @@
         body:JSON.stringify({tool:'sessions_send',args:args})
       });
       typingEl.classList.remove('show');
-      // Reload history to see the response
-      setTimeout(loadHistoryHTTP, 2000);
-      setTimeout(loadHistoryHTTP, 5000);
-      setTimeout(loadHistoryHTTP, 10000);
+      // Poll for assistant response without clearing chat
+      pollForResponse();
     }catch(e){
       typingEl.classList.remove('show');
       addMsg('system','Send failed: '+e.message);
@@ -724,8 +1164,11 @@
   // Always load sessions immediately via HTTP (don't wait for WS)
   loadSessions();
   loadHistoryHTTP();
-  // Also try WS for real-time streaming
-  if(isTailscale || getAuth())startConnect();
+  // Refresh relative times and session list periodically
+  setInterval(function(){renderSessions()},60000);
+  setInterval(function(){loadSessions()},30000);
+  // WS for real-time streaming (Tailscale: deferred until token fetched above; localhost: start now)
+  if(!isTailscale && getAuth())startConnect();
 </script>
 </body>
 </html>
