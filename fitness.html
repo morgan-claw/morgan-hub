@@ -11,6 +11,13 @@
 
     /* Sidebar */
     .sidebar{display:none;width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:1.5rem 0;flex-direction:column}
+    .sidebar .brand{display:flex;align-items:center;gap:0.6rem;padding:0 1.25rem 1.25rem;border-bottom:1px solid var(--border);margin-bottom:0.75rem}
+    .sidebar .brand .mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;color:#fff}
+    .sidebar .brand span{font-weight:600;font-size:1rem}
+    .sidebar a{display:flex;align-items:center;gap:0.6rem;padding:0.55rem 1.25rem;color:var(--muted);text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.12s,background 0.12s}
+    .sidebar a:hover{color:var(--text);background:var(--surface2)}
+    .sidebar a.active{color:var(--accent);background:var(--accent-dim)}
+    .sidebar a svg{width:18px;height:18px;flex-shrink:0}
 
     /* Main */
     .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -74,6 +81,42 @@
     .mini-stat{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.5rem;text-align:center}
     .mini-stat .sv{font-size:1.2rem;font-weight:700;font-family:monospace;color:var(--accent)}
     .mini-stat .sl{font-size:0.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px}
+
+    /* ===== HABITS TAB ===== */
+    .habits-wrap{padding:0.75rem;max-width:700px}
+    .habits-date-nav{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+    .habits-date-nav button{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:0.3rem 0.7rem;cursor:pointer;font-size:0.8rem}
+    .habits-date-nav button:hover{border-color:var(--accent)}
+    .habits-date-label{font-family:monospace;font-size:0.9rem;font-weight:600}
+    .habit-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.7rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:0.4rem;cursor:pointer;transition:border-color 0.12s,opacity 0.15s;user-select:none}
+    .habit-item:hover{border-color:var(--accent)}
+    .habit-item.checked{opacity:0.5}
+    .habit-item.checked .habit-name{text-decoration:line-through}
+    .habit-check{width:20px;height:20px;border-radius:5px;border:2px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.12s}
+    .habit-item.checked .habit-check{border-color:var(--green);background:var(--green)}
+    .habit-check svg{display:none;width:12px;height:12px}
+    .habit-item.checked .habit-check svg{display:block}
+    .habit-name{font-size:0.85rem;font-weight:500;flex:1}
+    .habit-cat{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;background:var(--surface2);border-radius:3px}
+    .habits-streak{margin-top:1rem;padding:0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:8px}
+    .habits-streak-title{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:0.5rem}
+    .streak-grid{display:flex;gap:3px;flex-wrap:wrap}
+    .streak-day{width:18px;height:18px;border-radius:3px;background:var(--surface2);border:1px solid var(--border)}
+    .streak-day.partial{background:#FF450040;border-color:var(--accent)}
+    .streak-day.full{background:var(--green);border-color:var(--green)}
+    .streak-day.today{outline:2px solid var(--accent);outline-offset:1px}
+    .habits-edit-bar{display:flex;gap:0.5rem;margin-bottom:0.75rem}
+    .habits-edit-bar input{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:0.4rem 0.6rem;font-size:0.8rem}
+    .habits-edit-bar input::placeholder{color:var(--muted)}
+    .habits-edit-bar select{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:0.4rem 0.5rem;font-size:0.8rem}
+    .habits-edit-bar button{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:0.4rem 0.8rem;font-size:0.8rem;font-weight:600;cursor:pointer}
+    .habit-remove{color:var(--muted);font-size:0.7rem;cursor:pointer;padding:0.2rem 0.4rem;border-radius:4px;opacity:0;transition:opacity 0.12s}
+    .habit-item:hover .habit-remove{opacity:1}
+    .habit-remove:hover{color:var(--red);background:var(--surface2)}
+    .habits-progress{margin-bottom:1rem}
+    .habits-progress-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+    .habits-progress-fill{height:100%;background:var(--green);border-radius:3px;transition:width 0.3s}
+    .habits-progress-label{font-size:0.7rem;color:var(--muted);margin-top:0.3rem;font-family:monospace}
 
     /* Side panel: volume bars */
     .vol-bars{display:flex;align-items:flex-end;gap:3px;height:60px}
@@ -186,6 +229,7 @@
       <button class="active" data-tab="workouts">Workouts</button>
       <button data-tab="routines">Routines</button>
       <button data-tab="stats">Stats</button>
+      <button data-tab="habits">Habits</button>
     </div>
 
     <div class="content-area">
@@ -257,6 +301,32 @@
                 <div id="bigPRs"></div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <!-- HABITS TAB -->
+      <div class="tab-panel" id="panel-habits">
+        <div class="habits-wrap">
+          <div class="habits-date-nav">
+            <button id="habPrev">&lt;</button>
+            <span class="habits-date-label" id="habDate"></span>
+            <button id="habNext">&gt;</button>
+          </div>
+          <div class="habits-progress">
+            <div class="habits-progress-bar"><div class="habits-progress-fill" id="habProgressFill"></div></div>
+            <div class="habits-progress-label" id="habProgressLabel"></div>
+          </div>
+          <div id="habList"></div>
+          <div class="habits-edit-bar">
+            <input type="text" id="habNewName" placeholder="Add a habit...">
+            <select id="habNewCat"><option value="health">Health</option><option value="work">Work</option><option value="mindset">Mindset</option><option value="social">Social</option><option value="other">Other</option></select>
+            <button id="habAddBtn">Add</button>
+          </div>
+          <div class="habits-streak">
+            <div class="habits-streak-title">Last 28 Days</div>
+            <div class="streak-grid" id="habStreak"></div>
           </div>
         </div>
       </div>
@@ -529,6 +599,127 @@
 
   // ---- Auto-load ----
   setTimeout(loadData,500);
+
+  // ====== HABITS ======
+  (function(){
+    var HABITS_KEY='morgan_habits';
+    var CHECKS_KEY='morgan_habit_checks';
+    var habDate=new Date();habDate.setHours(0,0,0,0);
+
+    function dateKey(d){return d.toISOString().slice(0,10)}
+    function getHabits(){try{return JSON.parse(localStorage.getItem(HABITS_KEY))||[]}catch(e){return[]}}
+    function saveHabits(h){localStorage.setItem(HABITS_KEY,JSON.stringify(h))}
+    function getChecks(){try{return JSON.parse(localStorage.getItem(CHECKS_KEY))||{}}catch(e){return{}}}
+    function saveChecks(c){localStorage.setItem(CHECKS_KEY,JSON.stringify(c))}
+
+    // Seed defaults if empty
+    if(!getHabits().length){
+      saveHabits([
+        {id:'h1',name:'Workout',cat:'health'},
+        {id:'h2',name:'10k Steps',cat:'health'},
+        {id:'h3',name:'Read 30 min',cat:'mindset'},
+        {id:'h4',name:'No junk food',cat:'health'},
+        {id:'h5',name:'Ship something',cat:'work'},
+        {id:'h6',name:'Engage on LinkedIn (15 min)',cat:'work'}
+      ]);
+    }
+
+    function renderHabits(){
+      var dk=dateKey(habDate);
+      var today=dateKey(new Date());
+      var isToday=dk===today;
+      var isPast=dk<today;
+
+      // Date label
+      var opts={weekday:'short',month:'short',day:'numeric'};
+      var label=habDate.toLocaleDateString('en-US',opts).toUpperCase();
+      if(isToday)label+=' (TODAY)';
+      document.getElementById('habDate').textContent=label;
+
+      var habits=getHabits();
+      var checks=getChecks();
+      var dayChecks=checks[dk]||{};
+
+      // Progress
+      var done=habits.filter(function(h){return dayChecks[h.id]}).length;
+      var pct=habits.length?Math.round(done/habits.length*100):0;
+      document.getElementById('habProgressFill').style.width=pct+'%';
+      document.getElementById('habProgressLabel').textContent=done+'/'+habits.length+' completed ('+pct+'%)';
+
+      // List
+      document.getElementById('habList').innerHTML=habits.map(function(h){
+        var checked=dayChecks[h.id]?'checked':'';
+        return '<div class="habit-item '+checked+'" data-id="'+h.id+'">'
+          +'<div class="habit-check"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2"><polyline points="2,6 5,9 10,3"/></svg></div>'
+          +'<span class="habit-name">'+esc(h.name)+'</span>'
+          +'<span class="habit-cat">'+esc(h.cat)+'</span>'
+          +'<span class="habit-remove" data-rid="'+h.id+'">X</span>'
+          +'</div>';
+      }).join('');
+
+      // Click to toggle
+      document.querySelectorAll('.habit-item').forEach(function(el){
+        el.addEventListener('click',function(e){
+          if(e.target.classList.contains('habit-remove'))return;
+          var id=el.dataset.id;
+          var checks=getChecks();
+          if(!checks[dk])checks[dk]={};
+          checks[dk][id]=!checks[dk][id];
+          saveChecks(checks);
+          renderHabits();
+        });
+      });
+
+      // Remove buttons
+      document.querySelectorAll('.habit-remove').forEach(function(el){
+        el.addEventListener('click',function(e){
+          e.stopPropagation();
+          var id=el.dataset.rid;
+          var h=getHabits().filter(function(x){return x.id!==id});
+          saveHabits(h);
+          renderHabits();
+        });
+      });
+
+      // Streak grid (28 days)
+      var grid=document.getElementById('habStreak');
+      var cells=[];
+      for(var i=27;i>=0;i--){
+        var d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);
+        var k=dateKey(d);
+        var dc=checks[k]||{};
+        var cnt=habits.filter(function(h){return dc[h.id]}).length;
+        var cls='streak-day';
+        if(cnt===habits.length&&habits.length>0)cls+=' full';
+        else if(cnt>0)cls+=' partial';
+        if(k===today)cls+=' today';
+        cells.push('<div class="'+cls+'" title="'+k+': '+cnt+'/'+habits.length+'"></div>');
+      }
+      grid.innerHTML=cells.join('');
+    }
+
+    // Nav
+    document.getElementById('habPrev').onclick=function(){habDate.setDate(habDate.getDate()-1);renderHabits()};
+    document.getElementById('habNext').onclick=function(){habDate.setDate(habDate.getDate()+1);renderHabits()};
+
+    // Add habit
+    document.getElementById('habAddBtn').onclick=function(){
+      var name=document.getElementById('habNewName').value.trim();
+      if(!name)return;
+      var cat=document.getElementById('habNewCat').value;
+      var habits=getHabits();
+      habits.push({id:'h'+Date.now(),name:name,cat:cat});
+      saveHabits(habits);
+      document.getElementById('habNewName').value='';
+      renderHabits();
+    };
+    document.getElementById('habNewName').addEventListener('keydown',function(e){
+      if(e.key==='Enter')document.getElementById('habAddBtn').click();
+    });
+
+    // Initial render
+    renderHabits();
+  })();
 })();
 </script>
 
