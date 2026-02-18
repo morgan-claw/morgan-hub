@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pipeline - Morgan Hub</title>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --surface2: #1e1e1e;
+      --surface3: #252525;
+      --border: #2a2a2a;
+      --border-light: #333;
+      --text: #e8e8e8;
+      --muted: #666;
+      --accent: #FF4500;
+      --accent-dim: #FF450020;
+      --accent-low: #FF450010;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+      --pink: #ec4899;
+      --cyan: #06b6d4;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    .shell { display: flex; height: 100vh; height: 100dvh; }
+
+    /* Sidebar */
+    .sidebar { display: none; width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); padding: 1.5rem 0; flex-direction: column; }
+    .sidebar .brand { display: flex; align-items: center; gap: 0.6rem; padding: 0 1.25rem 1.25rem; border-bottom: 1px solid var(--border); margin-bottom: 0.75rem; }
+    .sidebar .brand .mark { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: #fff; }
+    .sidebar .brand span { font-weight: 600; font-size: 1rem; }
+    .sidebar a { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 1.25rem; color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.12s, background 0.12s; }
+    .sidebar a:hover { color: var(--text); background: var(--surface2); }
+    .sidebar a.active { color: var(--accent); background: var(--accent-dim); }
+    .sidebar a svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* Tab bar */
+    .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding-bottom: env(safe-area-inset-bottom, 0); z-index: 100; }
+    .tab-bar a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 0 8px; text-decoration: none; color: var(--muted); font-size: 0.7rem; font-weight: 500; }
+    .tab-bar a.active { color: var(--accent); }
+    .tab-bar a svg { width: 22px; height: 22px; }
+
+    /* Page */
+    .page { flex: 1; display: flex; flex-direction: column; padding-bottom: calc(60px + env(safe-area-inset-bottom, 0)); overflow: hidden; }
+
+    /* Top bar */
+    .top-bar { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; flex-shrink: 0; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .top-bar .mark-mobile { width: 30px; height: 30px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: #fff; }
+    .top-bar h1 { font-size: 1.05rem; font-weight: 600; }
+    .top-bar .sub { color: var(--muted); font-size: 0.72rem; margin-left: auto; }
+
+    /* View tabs */
+    .view-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--bg); }
+    .view-tab { flex: none; padding: 0.55rem 1rem; font-size: 0.78rem; font-weight: 500; color: var(--muted); cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; font-family: inherit; transition: all 0.15s; }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* Summary strip */
+    .summary-strip { display: flex; gap: 0.5rem; padding: 0.65rem 1rem; flex-shrink: 0; overflow-x: auto; background: var(--bg); border-bottom: 1px solid var(--border); }
+    .summary-strip::-webkit-scrollbar { display: none; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.55rem 0.85rem; min-width: 130px; flex-shrink: 0; }
+    .stat-label { font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 0.2rem; }
+    .stat-value { font-size: 1.1rem; font-weight: 700; }
+    .stat-value.green { color: var(--green); }
+    .stat-value.accent { color: var(--accent); }
+    .stat-value.blue { color: var(--blue); }
+    .stat-value.yellow { color: var(--yellow); }
+
+    /* Main content area */
+    .main-split { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+    .content-area { flex: 1; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
+
+    /* Pipeline board */
+    .pipeline-board { flex: 1; display: flex; gap: 0.5rem; padding: 0.65rem; overflow-x: auto; overflow-y: hidden; min-height: 0; }
+    .pipeline-board::-webkit-scrollbar { height: 4px; }
+    .pipeline-board::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .pipeline-col { min-width: 220px; width: 220px; flex-shrink: 0; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .col-header { padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .col-title { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .col-count { font-size: 0.6rem; color: var(--muted); background: var(--surface2); padding: 2px 7px; border-radius: 10px; }
+    .col-total { font-size: 0.58rem; color: var(--muted); padding: 0 0.7rem; margin-top: 0.25rem; }
+    .col-cards { flex: 1; overflow-y: auto; padding: 0.35rem; }
+    .col-cards::-webkit-scrollbar { width: 3px; }
+    .col-cards::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .col-header.stage-lead .col-title { color: var(--blue); }
+    .col-header.stage-qualified .col-title { color: var(--cyan); }
+    .col-header.stage-proposal .col-title { color: var(--purple); }
+    .col-header.stage-negotiation .col-title { color: var(--yellow); }
+    .col-header.stage-won .col-title { color: var(--green); }
+    .col-header.stage-lost .col-title { color: var(--red); }
+
+    /* Deal card */
+    .deal-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.65rem; margin-bottom: 0.3rem; cursor: pointer; transition: all 0.15s; }
+    .deal-card:hover { border-color: var(--border-light); background: var(--surface3); }
+    .deal-card.selected { border-color: var(--accent); background: var(--accent-dim); }
+    .deal-card-name { font-size: 0.78rem; font-weight: 600; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .deal-card-company { font-size: 0.66rem; color: var(--muted); margin-bottom: 0.35rem; }
+    .deal-card-row { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; }
+    .deal-card-value { font-size: 0.78rem; font-weight: 700; color: var(--green); }
+    .deal-card-prob { font-size: 0.6rem; color: var(--muted); }
+    .deal-card-date { font-size: 0.58rem; color: var(--muted); margin-top: 0.25rem; }
+    .deal-card-segment { display: inline-block; font-size: 0.55rem; padding: 1px 6px; border-radius: 4px; margin-top: 0.25rem; background: var(--surface3); color: var(--muted); border: 1px solid var(--border); }
+    .segment-product-contractors { color: var(--blue); border-color: #3b82f630; background: #3b82f610; }
+    .segment-proclawed { color: var(--accent); border-color: #FF450030; background: #FF450010; }
+    .segment-airbour { color: var(--purple); border-color: #8b5cf630; background: #8b5cf610; }
+    .segment-megaoperator { color: var(--cyan); border-color: #06b6d430; background: #06b6d410; }
+
+    .col-empty { text-align: center; padding: 1.5rem 0.5rem; color: var(--muted); font-size: 0.7rem; }
+
+    /* Drag states */
+    .deal-card.dragging { opacity: 0.4; }
+    .pipeline-col.drag-over { border-color: var(--accent); background: var(--accent-dim); }
+
+    /* Contacts section */
+    .contacts-view { flex: 1; overflow-y: auto; padding: 0.65rem; display: none; }
+    .contacts-view.active { display: block; }
+    .pipeline-view { display: none; flex: 1; min-height: 0; }
+    .pipeline-view.active { display: flex; flex-direction: column; }
+
+    .contact-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.65rem 0.85rem; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.75rem; }
+    .warmth-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .warmth-hot { background: var(--red); box-shadow: 0 0 6px #ef444440; }
+    .warmth-warm { background: var(--yellow); box-shadow: 0 0 6px #f59e0b40; }
+    .warmth-cold { background: var(--blue); box-shadow: 0 0 6px #3b82f640; }
+    .contact-info { flex: 1; min-width: 0; }
+    .contact-name { font-size: 0.82rem; font-weight: 600; }
+    .contact-company { font-size: 0.66rem; color: var(--muted); }
+    .contact-overdue { font-size: 0.68rem; font-weight: 600; color: var(--red); text-align: right; white-space: nowrap; }
+    .contact-overdue.soon { color: var(--yellow); }
+
+    /* Detail panel */
+    .detail-panel { width: 0; flex-shrink: 0; display: flex; flex-direction: column; background: var(--surface); border-left: 1px solid var(--border); overflow: hidden; transition: width 0.2s ease; }
+    .detail-panel.open { width: 380px; }
+    .detail-header { display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .detail-title { flex: 1; min-width: 0; }
+    .detail-title h2 { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .detail-title .detail-sub { font-size: 0.66rem; color: var(--muted); margin-top: 1px; }
+    .close-btn { background: none; border: none; color: var(--muted); cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: all 0.15s; flex-shrink: 0; }
+    .close-btn:hover { background: var(--surface2); color: var(--text); }
+    .close-btn svg { width: 18px; height: 18px; }
+    .detail-body { flex: 1; overflow-y: auto; padding: 0.85rem; }
+    .detail-body::-webkit-scrollbar { width: 4px; }
+    .detail-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .detail-field { margin-bottom: 0.85rem; }
+    .detail-field-label { font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 0.2rem; }
+    .detail-field-value { font-size: 0.85rem; }
+    .detail-field-value.big { font-size: 1.2rem; font-weight: 700; color: var(--green); }
+
+    .stage-badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 0.68rem; font-weight: 600; text-transform: capitalize; }
+    .stage-badge.lead { background: #3b82f620; color: var(--blue); }
+    .stage-badge.qualified { background: #06b6d420; color: var(--cyan); }
+    .stage-badge.proposal { background: #8b5cf620; color: var(--purple); }
+    .stage-badge.negotiation { background: #f59e0b20; color: var(--yellow); }
+    .stage-badge.won { background: #22c55e20; color: var(--green); }
+    .stage-badge.lost { background: #ef444420; color: var(--red); }
+
+    .detail-notes { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem; font-size: 0.78rem; line-height: 1.5; color: var(--muted); white-space: pre-wrap; }
+
+    /* CRM View */
+    .crm-view { flex: 1; display: none; flex-direction: column; min-height: 0; overflow: hidden; }
+    .crm-view.active { display: flex; }
+
+    .crm-stats-bar { display: flex; gap: 0.5rem; padding: 0.65rem 1rem; flex-shrink: 0; overflow-x: auto; background: var(--bg); border-bottom: 1px solid var(--border); }
+    .crm-stats-bar::-webkit-scrollbar { display: none; }
+
+    .crm-toolbar { display: flex; gap: 0.5rem; padding: 0.5rem 1rem; flex-shrink: 0; background: var(--bg); border-bottom: 1px solid var(--border); align-items: center; flex-wrap: wrap; }
+    .crm-search { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.4rem 0.7rem; font-size: 0.78rem; font-family: inherit; outline: none; min-width: 160px; flex: 1; max-width: 280px; }
+    .crm-search:focus { border-color: var(--accent); }
+    .crm-search::placeholder { color: var(--muted); }
+    .crm-filter-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--muted); padding: 0.35rem 0.7rem; font-size: 0.7rem; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.12s; white-space: nowrap; }
+    .crm-filter-btn:hover { color: var(--text); border-color: var(--border-light); }
+    .crm-filter-btn.active { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+    .crm-select { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--muted); padding: 0.35rem 0.5rem; font-size: 0.7rem; font-family: inherit; outline: none; cursor: pointer; }
+    .crm-select:focus { border-color: var(--accent); }
+
+    .crm-table-wrap { flex: 1; overflow: auto; padding: 0 0.65rem 0.65rem; }
+    .crm-table-wrap::-webkit-scrollbar { width: 4px; height: 4px; }
+    .crm-table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .crm-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .crm-table th { text-align: left; padding: 0.5rem 0.6rem; font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 2; white-space: nowrap; }
+    .crm-table td { padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .crm-table tr { cursor: pointer; transition: background 0.1s; }
+    .crm-table tbody tr:hover { background: var(--surface); }
+    .crm-table tbody tr.selected { background: var(--accent-dim); }
+    .crm-contact-name { font-weight: 600; white-space: nowrap; }
+    .crm-contact-company { font-size: 0.66rem; color: var(--muted); }
+
+    .warmth-badge { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+    .warmth-badge.hot { background: #ef444420; color: var(--red); }
+    .warmth-badge.warm { background: #f59e0b20; color: var(--yellow); }
+    .warmth-badge.cold { background: #3b82f620; color: var(--blue); }
+    .warmth-badge.frozen { background: #64748b20; color: #64748b; }
+
+    .segment-badge-sm { display: inline-block; font-size: 0.6rem; padding: 1px 6px; border-radius: 4px; background: var(--surface3); color: var(--muted); border: 1px solid var(--border); }
+
+    .crm-followup { font-size: 0.72rem; white-space: nowrap; }
+    .crm-followup.overdue { color: var(--red); font-weight: 600; }
+    .crm-followup.today { color: var(--yellow); font-weight: 600; }
+    .crm-followup.upcoming { color: var(--green); }
+    .crm-followup.none { color: var(--muted); }
+
+    .crm-actions-cell { white-space: nowrap; }
+    .crm-action-btn { background: none; border: 1px solid var(--border); border-radius: 5px; color: var(--muted); padding: 2px 6px; font-size: 0.62rem; cursor: pointer; font-family: inherit; transition: all 0.12s; margin-right: 2px; }
+    .crm-action-btn:hover { color: var(--text); border-color: var(--border-light); background: var(--surface2); }
+
+    /* CRM Detail Panel */
+    .crm-detail-section { margin-bottom: 1rem; }
+    .crm-detail-section-title { font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 0.4rem; font-family: 'SF Mono', SFMono-Regular, Consolas, monospace; }
+    .crm-touch-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.45rem 0.6rem; margin-bottom: 0.3rem; font-size: 0.75rem; }
+    .crm-touch-date { font-size: 0.6rem; color: var(--muted); }
+    .crm-deal-link { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 0.45rem 0.6rem; margin-bottom: 0.3rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; cursor: pointer; transition: border-color 0.12s; }
+    .crm-deal-link:hover { border-color: var(--accent); }
+    .crm-deal-value { color: var(--green); font-weight: 600; font-size: 0.72rem; }
+
+    /* CRM Inline Modal */
+    .crm-modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; }
+    .crm-modal-bg.show { display: flex; }
+    .crm-modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; width: 90%; max-width: 420px; padding: 1.25rem; }
+    .crm-modal h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.85rem; font-family: 'SF Mono', SFMono-Regular, Consolas, monospace; text-transform: uppercase; letter-spacing: 0.5px; }
+    .crm-modal label { display: block; font-size: 0.68rem; color: var(--muted); margin-bottom: 0.2rem; text-transform: uppercase; letter-spacing: 0.3px; }
+    .crm-modal input, .crm-modal textarea, .crm-modal select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.45rem 0.6rem; font-size: 0.8rem; font-family: inherit; outline: none; margin-bottom: 0.65rem; }
+    .crm-modal input:focus, .crm-modal textarea:focus, .crm-modal select:focus { border-color: var(--accent); }
+    .crm-modal textarea { min-height: 60px; resize: vertical; }
+    .crm-modal .btn-row { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.25rem; }
+    .crm-modal .btn { padding: 0.4rem 0.9rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; border: none; transition: background 0.12s; }
+    .crm-modal .btn.primary { background: var(--accent); color: #fff; }
+    .crm-modal .btn.primary:hover { background: #e03e00; }
+    .crm-modal .btn.ghost { background: none; color: var(--muted); border: 1px solid var(--border); }
+
+    @media (max-width: 767px) {
+      .crm-table th:nth-child(n+5), .crm-table td:nth-child(n+5) { display: none; }
+      .crm-toolbar { gap: 0.35rem; }
+      .crm-search { min-width: 120px; }
+    }
+
+    /* Loading / empty */
+    .loading { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.8rem; }
+    .empty-state { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.78rem; }
+
+    /* Desktop */
+    @media (min-width: 768px) {
+      .sidebar { display: flex; }
+      .tab-bar { display: none; }
+      .page { padding-bottom: 0; }
+      .top-bar .mark-mobile { display: none; }
+    }
+
+    /* Mobile */
+    @media (max-width: 767px) {
+      .pipeline-col { min-width: 180px; width: 180px; }
+      .detail-panel.open { position: fixed; top: 0; right: 0; bottom: 60px; width: 100%; z-index: 90; border-left: none; }
+      .stat-card { min-width: 110px; padding: 0.45rem 0.65rem; }
+      .stat-value { font-size: 0.95rem; }
+    }
+  </style>
+  <link rel="stylesheet" href="/theme.css">
+
+</head>
+<body>
+<div class="shell">
+  <nav class="sidebar"><div class="sidebar-nav"></div></nav>
+  <main class="page">
+    <div class="top-bar">
+      <div class="mark-mobile">M</div>
+      <h1>Pipeline</h1>
+      <span class="sub" id="lastUpdated"></span>
+    </div>
+
+    <div class="summary-strip" id="summaryStrip">
+      <div class="stat-card"><div class="stat-label">Pipeline Value</div><div class="stat-value green" id="statTotal">—</div></div>
+      <div class="stat-card"><div class="stat-label">Active Deals</div><div class="stat-value accent" id="statCount">—</div></div>
+      <div class="stat-card"><div class="stat-label">Weighted Forecast</div><div class="stat-value blue" id="statForecast">—</div></div>
+      <div class="stat-card"><div class="stat-label">Closing This Week</div><div class="stat-value yellow" id="statClosing">—</div></div>
+    </div>
+
+    <div class="view-tabs">
+      <button class="view-tab active" data-view="pipeline">Pipeline Board</button>
+      <button class="view-tab" data-view="contacts">Follow-ups</button>
+      <button class="view-tab" data-view="crm">CRM</button>
+    </div>
+
+    <div class="main-split">
+      <div class="content-area">
+        <div class="pipeline-view active" id="pipelineView">
+          <div class="pipeline-board" id="pipelineBoard"></div>
+        </div>
+        <div class="contacts-view" id="contactsView"></div>
+        <div class="crm-view" id="crmView">
+          <div class="crm-stats-bar" id="crmStatsBar"></div>
+          <div class="crm-toolbar" id="crmToolbar">
+            <input class="crm-search" id="crmSearch" placeholder="Search contacts..." type="text">
+            <select class="crm-select" id="crmWarmthFilter"><option value="">All Warmth</option><option value="hot">Hot</option><option value="warm">Warm</option><option value="cold">Cold</option><option value="frozen">Frozen</option></select>
+            <select class="crm-select" id="crmSegmentFilter"><option value="">All Segments</option></select>
+            <button class="crm-filter-btn" data-crm-filter="followup">Needs Followup</button>
+            <button class="crm-filter-btn" data-crm-filter="cold">Went Cold</button>
+            <button class="crm-filter-btn" data-crm-filter="past">Past Clients</button>
+            <button class="crm-filter-btn" data-crm-filter="new">New Leads</button>
+          </div>
+          <div class="crm-table-wrap">
+            <table class="crm-table">
+              <thead><tr>
+                <th>Contact</th><th>Warmth</th><th>Segment</th><th>Status</th><th>Next Followup</th><th>Updated</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="crmTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="detail-panel" id="detailPanel">
+        <div class="detail-header">
+          <div class="detail-title">
+            <h2 id="detailName">Deal</h2>
+            <div class="detail-sub" id="detailCompany"></div>
+          </div>
+          <button class="close-btn" onclick="closeDetail()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+        </div>
+        <div class="detail-body" id="detailBody"></div>
+      </div>
+    </div>
+  </main>
+</div>
+<!-- CRM Modals -->
+<div class="crm-modal-bg" id="crmLogTouchModal">
+  <div class="crm-modal">
+    <h3>Log Touch</h3>
+    <label>Date</label><input type="date" id="crmTouchDate">
+    <label>Note</label><textarea id="crmTouchNote" placeholder="What happened..."></textarea>
+    <div class="btn-row">
+      <button class="btn ghost" onclick="closeCrmModal('crmLogTouchModal')">Cancel</button>
+      <button class="btn primary" id="crmTouchSave">Save</button>
+    </div>
+  </div>
+</div>
+<div class="crm-modal-bg" id="crmFollowupModal">
+  <div class="crm-modal">
+    <h3>Schedule Followup</h3>
+    <label>Date</label><input type="date" id="crmFollowupDate">
+    <label>Note (optional)</label><textarea id="crmFollowupNote" placeholder="Followup context..."></textarea>
+    <div class="btn-row">
+      <button class="btn ghost" onclick="closeCrmModal('crmFollowupModal')">Cancel</button>
+      <button class="btn primary" id="crmFollowupSave">Save</button>
+    </div>
+  </div>
+</div>
+<div class="crm-modal-bg" id="crmWarmthModal">
+  <div class="crm-modal">
+    <h3>Change Warmth</h3>
+    <label>Warmth</label>
+    <select id="crmWarmthSelect"><option value="hot">Hot</option><option value="warm">Warm</option><option value="cold">Cold</option><option value="frozen">Frozen</option></select>
+    <div class="btn-row">
+      <button class="btn ghost" onclick="closeCrmModal('crmWarmthModal')">Cancel</button>
+      <button class="btn primary" id="crmWarmthSave">Save</button>
+    </div>
+  </div>
+</div>
+<nav class="tab-bar"></nav>
+<script src="/nav.js"></script>
+<script>
+(function() {
+  const STAGES = ['lead','qualified','proposal','negotiation','won','lost'];
+  const STAGE_LABELS = { lead:'Lead', qualified:'Qualified', proposal:'Proposal', negotiation:'Negotiation', won:'Won', lost:'Lost' };
+  const SEGMENT_LABELS = { 'product-contractors':'Contractors', proclawed:'ProClawed', airbour:'Airbour', megaoperator:'MegaOperator' };
+
+  let deals = [];
+  let contacts = [];
+  let selectedDealId = null;
+
+  // --- API ---
+  async function gwQuery(sql) {
+    try {
+      const r = await fetch('/api/gw', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tool: 'mcporter', args: { call: 'vault-db.query', params: { sql } } })
+      });
+      if (!r.ok) return null;
+      const d = await r.json();
+      return d?.result?.rows || d?.result || d?.rows || (Array.isArray(d) ? d : null);
+    } catch { return null; }
+  }
+
+  async function loadDeals() {
+    const rows = await gwQuery("SELECT * FROM deals WHERE status = 'active' ORDER BY close_date");
+    if (rows && rows.length) {
+      deals = rows;
+    } else {
+      deals = [];
+    }
+  }
+
+  async function loadContacts() {
+    const rows = await gwQuery("SELECT * FROM contacts WHERE next_followup <= date('now') AND status = 'active' ORDER BY next_followup");
+    if (rows && rows.length) {
+      contacts = rows;
+    } else {
+      contacts = [];
+    }
+  }
+
+  // --- Render ---
+  function fmt$(v) { return '$' + Number(v||0).toLocaleString(); }
+
+  function renderSummary() {
+    const active = deals.filter(d => d.stage !== 'won' && d.stage !== 'lost');
+    const total = active.reduce((s,d) => s + (d.value_usd||0), 0);
+    const forecast = active.reduce((s,d) => s + (d.value_usd||0) * (d.probability||0) / 100, 0);
+    const now = new Date();
+    const endOfWeek = new Date(now); endOfWeek.setDate(now.getDate() + (7 - now.getDay()));
+    const closing = active.filter(d => { const cd = new Date(d.close_date); return cd <= endOfWeek && cd >= now; }).length;
+
+    document.getElementById('statTotal').textContent = fmt$(total);
+    document.getElementById('statCount').textContent = active.length;
+    document.getElementById('statForecast').textContent = fmt$(Math.round(forecast));
+    document.getElementById('statClosing').textContent = closing;
+    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  }
+
+  function renderBoard() {
+    const board = document.getElementById('pipelineBoard');
+    board.innerHTML = STAGES.map(stage => {
+      const stageDeals = deals.filter(d => d.stage === stage);
+      const total = stageDeals.reduce((s,d) => s + (d.value_usd||0), 0);
+      const cards = stageDeals.length ? stageDeals.map(d => `
+        <div class="deal-card${d.id == selectedDealId ? ' selected' : ''}" draggable="true" data-id="${d.id}">
+          <div class="deal-card-name">${esc(d.deal_name)}</div>
+          <div class="deal-card-company">${esc(d.company||'')}</div>
+          <div class="deal-card-row">
+            <span class="deal-card-value">${fmt$(d.value_usd)}</span>
+            <span class="deal-card-prob">${d.probability||0}%</span>
+          </div>
+          <div class="deal-card-date">${d.close_date||'—'}</div>
+          ${d.segment ? `<span class="deal-card-segment segment-${d.segment}">${SEGMENT_LABELS[d.segment]||d.segment}</span>` : ''}
+        </div>
+      `).join('') : '<div class="col-empty">No deals</div>';
+
+      return `<div class="pipeline-col" data-stage="${stage}">
+        <div class="col-header stage-${stage}"><span class="col-title">${STAGE_LABELS[stage]}</span><span class="col-count">${stageDeals.length}</span></div>
+        ${total ? `<div class="col-total">${fmt$(total)}</div>` : ''}
+        <div class="col-cards">${cards}</div>
+      </div>`;
+    }).join('');
+
+    // Drag & drop
+    board.querySelectorAll('.deal-card[draggable]').forEach(card => {
+      card.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', card.dataset.id); card.classList.add('dragging'); });
+      card.addEventListener('dragend', () => card.classList.remove('dragging'));
+      card.addEventListener('click', () => openDetail(Number(card.dataset.id)));
+    });
+    board.querySelectorAll('.pipeline-col').forEach(col => {
+      col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
+      col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+      col.addEventListener('drop', e => {
+        e.preventDefault(); col.classList.remove('drag-over');
+        const id = Number(e.dataTransfer.getData('text/plain'));
+        const deal = deals.find(d => d.id == id);
+        if (deal) { deal.stage = col.dataset.stage; renderBoard(); renderSummary(); }
+      });
+    });
+  }
+
+  function renderContacts() {
+    const el = document.getElementById('contactsView');
+    if (!contacts.length) { el.innerHTML = '<div class="empty-state">No follow-ups due</div>'; return; }
+    const today = new Date(); today.setHours(0,0,0,0);
+    el.innerHTML = contacts.map(c => {
+      const fu = new Date(c.next_followup); fu.setHours(0,0,0,0);
+      const days = Math.round((today - fu) / 86400000);
+      const warmth = c.warmth || 'cold';
+      return `<div class="contact-card">
+        <div class="warmth-dot warmth-${warmth}"></div>
+        <div class="contact-info">
+          <div class="contact-name">${esc(c.title||c.name||'Unknown')}</div>
+          <div class="contact-company">${esc(c.company||'')}</div>
+        </div>
+        <div class="contact-overdue${days <= 1 ? ' soon' : ''}">${days > 0 ? days + 'd overdue' : 'Today'}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function openDetail(id) {
+    const deal = deals.find(d => d.id == id);
+    if (!deal) return;
+    selectedDealId = id;
+    document.getElementById('detailName').textContent = deal.deal_name || 'Deal';
+    document.getElementById('detailCompany').textContent = deal.company || '';
+    document.getElementById('detailBody').innerHTML = `
+      <div class="detail-field"><div class="detail-field-label">Value</div><div class="detail-field-value big">${fmt$(deal.value_usd)}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Stage</div><div class="detail-field-value"><span class="stage-badge ${deal.stage}">${STAGE_LABELS[deal.stage]||deal.stage}</span></div></div>
+      <div class="detail-field"><div class="detail-field-label">Probability</div><div class="detail-field-value">${deal.probability||0}%</div></div>
+      <div class="detail-field"><div class="detail-field-label">Close Date</div><div class="detail-field-value">${deal.close_date||'—'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Segment</div><div class="detail-field-value">${deal.segment ? `<span class="deal-card-segment segment-${deal.segment}">${SEGMENT_LABELS[deal.segment]||deal.segment}</span>` : '—'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Weighted Value</div><div class="detail-field-value">${fmt$(Math.round((deal.value_usd||0) * (deal.probability||0) / 100))}</div></div>
+      ${deal.body ? `<div class="detail-field"><div class="detail-field-label">Notes</div><div class="detail-notes">${esc(deal.body)}</div></div>` : ''}
+    `;
+    document.getElementById('detailPanel').classList.add('open');
+    renderBoard(); // update selected state
+  }
+
+  window.closeDetail = function() {
+    selectedDealId = null;
+    document.getElementById('detailPanel').classList.remove('open');
+    renderBoard();
+  };
+
+  function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  // --- CRM ---
+  let allContacts = [];
+  let crmFilter = '';
+  let crmActiveContactId = null;
+
+  async function loadAllContacts() {
+    const rows = await gwQuery("SELECT * FROM contacts ORDER BY updated_at DESC");
+    allContacts = rows || [];
+    populateSegmentFilter();
+  }
+
+  function populateSegmentFilter() {
+    const segs = [...new Set(allContacts.map(c => c.segment).filter(Boolean))].sort();
+    const sel = document.getElementById('crmSegmentFilter');
+    sel.innerHTML = '<option value="">All Segments</option>' + segs.map(s => `<option value="${esc(s)}">${esc(SEGMENT_LABELS[s] || s)}</option>`).join('');
+  }
+
+  function getFilteredContacts() {
+    let list = [...allContacts];
+    const q = (document.getElementById('crmSearch').value || '').toLowerCase();
+    const warmth = document.getElementById('crmWarmthFilter').value;
+    const segment = document.getElementById('crmSegmentFilter').value;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const twoWeeksAgo = new Date(today); twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+    if (q) list = list.filter(c => (c.title||'').toLowerCase().includes(q) || (c.company||'').toLowerCase().includes(q) || (c.segment||'').toLowerCase().includes(q));
+    if (warmth) list = list.filter(c => c.warmth === warmth);
+    if (segment) list = list.filter(c => c.segment === segment);
+
+    if (crmFilter === 'followup') {
+      list = list.filter(c => c.next_followup && new Date(c.next_followup) <= today && c.status === 'active');
+    } else if (crmFilter === 'cold') {
+      list = list.filter(c => { const u = new Date(c.updated_at); return u < twoWeeksAgo && c.status === 'active'; });
+    } else if (crmFilter === 'past') {
+      list = list.filter(c => c.status === 'closed' || c.status === 'past' || c.segment === 'past-client');
+    } else if (crmFilter === 'new') {
+      const sevenAgo = new Date(today); sevenAgo.setDate(sevenAgo.getDate() - 30);
+      list = list.filter(c => new Date(c.created_at) >= sevenAgo && c.status === 'active');
+    }
+    return list;
+  }
+
+  function renderCrmStats() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 7);
+    const total = allContacts.length;
+    const overdue = allContacts.filter(c => c.next_followup && new Date(c.next_followup) <= today && c.status === 'active').length;
+    const warmthMap = { hot: 4, warm: 3, cold: 2, frozen: 1 };
+    const activeC = allContacts.filter(c => c.status === 'active');
+    const avgWarmth = activeC.length ? (activeC.reduce((s, c) => s + (warmthMap[c.warmth] || 2), 0) / activeC.length) : 0;
+    const avgLabel = avgWarmth >= 3.5 ? 'Hot' : avgWarmth >= 2.5 ? 'Warm' : avgWarmth >= 1.5 ? 'Cold' : 'Frozen';
+    const avgColor = avgWarmth >= 3.5 ? 'accent' : avgWarmth >= 2.5 ? 'yellow' : avgWarmth >= 1.5 ? 'blue' : '';
+    const touchedWeek = allContacts.filter(c => new Date(c.updated_at) >= weekAgo).length;
+
+    document.getElementById('crmStatsBar').innerHTML = `
+      <div class="stat-card"><div class="stat-label">Total Contacts</div><div class="stat-value accent">${total}</div></div>
+      <div class="stat-card"><div class="stat-label">Overdue Followups</div><div class="stat-value" style="color:var(--red)">${overdue}</div></div>
+      <div class="stat-card"><div class="stat-label">Avg Warmth</div><div class="stat-value ${avgColor}">${avgLabel}</div></div>
+      <div class="stat-card"><div class="stat-label">Touched This Week</div><div class="stat-value green">${touchedWeek}</div></div>
+    `;
+  }
+
+  function renderCrmTable() {
+    const list = getFilteredContacts();
+    const today = new Date(); today.setHours(0,0,0,0);
+    const tbody = document.getElementById('crmTableBody');
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem">No contacts found</td></tr>'; return; }
+    tbody.innerHTML = list.map(c => {
+      const w = c.warmth || 'cold';
+      const seg = c.segment || '';
+      let fuClass = 'none', fuText = '--';
+      if (c.next_followup) {
+        const fd = new Date(c.next_followup); fd.setHours(0,0,0,0);
+        const diff = Math.round((fd - today) / 86400000);
+        if (diff < 0) { fuClass = 'overdue'; fuText = Math.abs(diff) + 'd overdue'; }
+        else if (diff === 0) { fuClass = 'today'; fuText = 'Today'; }
+        else { fuClass = 'upcoming'; fuText = c.next_followup; }
+      }
+      const updated = c.updated_at ? c.updated_at.slice(0, 10) : '--';
+      return `<tr data-contact-id="${c.id}" class="${c.id == crmActiveContactId ? 'selected' : ''}">
+        <td><div class="crm-contact-name">${esc(c.title || 'Unknown')}</div><div class="crm-contact-company">${esc(c.company || '')}</div></td>
+        <td><span class="warmth-badge ${w}">${w}</span></td>
+        <td>${seg ? `<span class="segment-badge-sm segment-${seg}">${esc(SEGMENT_LABELS[seg] || seg)}</span>` : '--'}</td>
+        <td style="font-size:0.72rem;color:var(--muted)">${esc(c.status || '--')}</td>
+        <td><span class="crm-followup ${fuClass}">${fuText}</span></td>
+        <td style="font-size:0.72rem;color:var(--muted)">${updated}</td>
+        <td class="crm-actions-cell">
+          <button class="crm-action-btn" onclick="event.stopPropagation();openCrmModal('touch',${c.id})">Touch</button>
+          <button class="crm-action-btn" onclick="event.stopPropagation();openCrmModal('followup',${c.id})">Followup</button>
+          <button class="crm-action-btn" onclick="event.stopPropagation();openCrmModal('warmth',${c.id})">Warmth</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    tbody.querySelectorAll('tr[data-contact-id]').forEach(row => {
+      row.addEventListener('click', () => openCrmDetail(Number(row.dataset.contactId)));
+    });
+  }
+
+  function openCrmDetail(id) {
+    const c = allContacts.find(x => x.id == id);
+    if (!c) return;
+    crmActiveContactId = id;
+    const w = c.warmth || 'cold';
+    const linkedDeals = deals.filter(d => d.company && c.company && d.company.toLowerCase() === c.company.toLowerCase());
+
+    document.getElementById('detailName').textContent = c.title || 'Contact';
+    document.getElementById('detailCompany').textContent = c.company || '';
+    document.getElementById('detailBody').innerHTML = `
+      <div class="detail-field"><div class="detail-field-label">Warmth</div><div class="detail-field-value"><span class="warmth-badge ${w}">${w}</span></div></div>
+      <div class="detail-field"><div class="detail-field-label">Segment</div><div class="detail-field-value">${c.segment ? `<span class="deal-card-segment segment-${c.segment}">${esc(SEGMENT_LABELS[c.segment] || c.segment)}</span>` : '--'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Status</div><div class="detail-field-value">${esc(c.status || '--')}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Next Followup</div><div class="detail-field-value">${c.next_followup || '--'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Created</div><div class="detail-field-value">${c.created_at ? c.created_at.slice(0, 10) : '--'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Last Updated</div><div class="detail-field-value">${c.updated_at ? c.updated_at.slice(0, 10) : '--'}</div></div>
+      ${c.body ? `<div class="crm-detail-section"><div class="crm-detail-section-title">Notes</div><div class="detail-notes">${esc(c.body)}</div></div>` : ''}
+      ${linkedDeals.length ? `<div class="crm-detail-section"><div class="crm-detail-section-title">Linked Deals</div>${linkedDeals.map(d => `<div class="crm-deal-link" onclick="openDetail(${d.id})"><span>${esc(d.deal_name)} <span class="stage-badge ${d.stage}">${STAGE_LABELS[d.stage] || d.stage}</span></span><span class="crm-deal-value">${fmt$(d.value_usd)}</span></div>`).join('')}</div>` : ''}
+      <div class="crm-detail-section" style="margin-top:1rem">
+        <button class="crm-action-btn" style="padding:0.35rem 0.7rem;font-size:0.72rem" onclick="openCrmModal('touch',${c.id})">Log Touch</button>
+        <button class="crm-action-btn" style="padding:0.35rem 0.7rem;font-size:0.72rem" onclick="openCrmModal('followup',${c.id})">Schedule Followup</button>
+        <button class="crm-action-btn" style="padding:0.35rem 0.7rem;font-size:0.72rem" onclick="openCrmModal('warmth',${c.id})">Change Warmth</button>
+      </div>
+    `;
+    document.getElementById('detailPanel').classList.add('open');
+    renderCrmTable();
+  }
+
+  window.openCrmModal = function(type, contactId) {
+    crmActiveContactId = contactId;
+    if (type === 'touch') {
+      document.getElementById('crmTouchDate').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('crmTouchNote').value = '';
+      document.getElementById('crmLogTouchModal').classList.add('show');
+    } else if (type === 'followup') {
+      const d = new Date(); d.setDate(d.getDate() + 7);
+      document.getElementById('crmFollowupDate').value = d.toISOString().slice(0, 10);
+      document.getElementById('crmFollowupNote').value = '';
+      document.getElementById('crmFollowupModal').classList.add('show');
+    } else if (type === 'warmth') {
+      const c = allContacts.find(x => x.id == contactId);
+      document.getElementById('crmWarmthSelect').value = c?.warmth || 'cold';
+      document.getElementById('crmWarmthModal').classList.add('show');
+    }
+  };
+
+  window.closeCrmModal = function(id) { document.getElementById(id).classList.remove('show'); };
+
+  async function gwExecute(sql) {
+    try {
+      const r = await fetch('/api/gw', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tool: 'mcporter', args: { call: 'vault-db.execute', params: { sql } } })
+      });
+      return r.ok;
+    } catch { return false; }
+  }
+
+  document.getElementById('crmTouchSave').addEventListener('click', async () => {
+    const note = document.getElementById('crmTouchNote').value.trim();
+    const date = document.getElementById('crmTouchDate').value;
+    const c = allContacts.find(x => x.id == crmActiveContactId);
+    if (!c) return;
+    const newBody = (c.body || '') + '\n[' + date + '] ' + note;
+    await gwExecute(`UPDATE contacts SET body = '${newBody.replace(/'/g, "''")}', updated_at = datetime('now') WHERE id = ${c.id}`);
+    closeCrmModal('crmLogTouchModal');
+    await loadAllContacts(); renderCrmStats(); renderCrmTable();
+    if (document.getElementById('detailPanel').classList.contains('open') && crmActiveContactId === c.id) openCrmDetail(c.id);
+  });
+
+  document.getElementById('crmFollowupSave').addEventListener('click', async () => {
+    const date = document.getElementById('crmFollowupDate').value;
+    const c = allContacts.find(x => x.id == crmActiveContactId);
+    if (!c) return;
+    await gwExecute(`UPDATE contacts SET next_followup = '${date}', updated_at = datetime('now') WHERE id = ${c.id}`);
+    closeCrmModal('crmFollowupModal');
+    await loadAllContacts(); renderCrmStats(); renderCrmTable();
+    if (document.getElementById('detailPanel').classList.contains('open') && crmActiveContactId === c.id) openCrmDetail(c.id);
+  });
+
+  document.getElementById('crmWarmthSave').addEventListener('click', async () => {
+    const warmth = document.getElementById('crmWarmthSelect').value;
+    const c = allContacts.find(x => x.id == crmActiveContactId);
+    if (!c) return;
+    await gwExecute(`UPDATE contacts SET warmth = '${warmth}', updated_at = datetime('now') WHERE id = ${c.id}`);
+    closeCrmModal('crmWarmthModal');
+    await loadAllContacts(); renderCrmStats(); renderCrmTable();
+    if (document.getElementById('detailPanel').classList.contains('open') && crmActiveContactId === c.id) openCrmDetail(c.id);
+  });
+
+  // CRM filter buttons
+  document.querySelectorAll('[data-crm-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.crmFilter;
+      if (crmFilter === f) { crmFilter = ''; btn.classList.remove('active'); }
+      else { document.querySelectorAll('[data-crm-filter]').forEach(b => b.classList.remove('active')); crmFilter = f; btn.classList.add('active'); }
+      renderCrmTable();
+    });
+  });
+
+  // CRM search + filters
+  document.getElementById('crmSearch').addEventListener('input', renderCrmTable);
+  document.getElementById('crmWarmthFilter').addEventListener('change', renderCrmTable);
+  document.getElementById('crmSegmentFilter').addEventListener('change', renderCrmTable);
+
+  // --- View tabs ---
+  document.querySelectorAll('.view-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const v = tab.dataset.view;
+      document.getElementById('pipelineView').classList.toggle('active', v === 'pipeline');
+      document.getElementById('contactsView').classList.toggle('active', v === 'contacts');
+      document.getElementById('crmView').classList.toggle('active', v === 'crm');
+      if (v === 'crm' && !allContacts.length) { loadAllContacts().then(() => { renderCrmStats(); renderCrmTable(); }); }
+      // Show/hide pipeline summary vs CRM summary
+      document.getElementById('summaryStrip').style.display = v === 'crm' ? 'none' : '';
+    });
+  });
+
+  // --- Init ---
+  async function refresh() {
+    await Promise.all([loadDeals(), loadContacts(), loadAllContacts()]);
+    renderSummary();
+    renderBoard();
+    renderContacts();
+    renderCrmStats();
+    renderCrmTable();
+  }
+
+  refresh();
+  setInterval(refresh, 60000);
+})();
+</script>
+</body>
+</html>
