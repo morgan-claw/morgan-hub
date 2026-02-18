@@ -4,6 +4,14 @@ const path = require('path');
 const { URL } = require('url');
 const { WebSocket: WS } = require('ws');
 
+// Prevent uncaught errors from crashing the server
+process.on('uncaughtException', (err) => {
+  console.error('[MHub] Uncaught exception (not crashing):', err.message);
+});
+process.on('unhandledRejection', (err) => {
+  console.error('[MHub] Unhandled rejection (not crashing):', err?.message || err);
+});
+
 const PORT = 3456;
 const GW = 'http://127.0.0.1:18789';
 const GW_WS = 'ws://127.0.0.1:18789';
@@ -66,19 +74,172 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // CORS preflight — must be before route handlers
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    });
+    res.end();
+    return;
+  }
+
+  // Hevy fitness API — calls mcporter CLI directly
+  if (url.pathname.startsWith('/api/hevy/')) {
+    const route = url.pathname.replace('/api/hevy/', '');
+    const toolMap = {
+      'workouts': 'hevy.get_workouts',
+      'all-workouts': 'hevy.get_all_workouts',
+      'routines': 'hevy.get_all_routines',
+      'workout-count': 'hevy.get_workout_count',
+      'trends': 'hevy.analyze_workout_trends',
+      'exercises': 'hevy.get_exercise_templates',
+    };
+    const tool = toolMap[route];
+    if (!tool) { res.writeHead(404, { 'Content-Type': 'application/json' }); res.end('{"error":"unknown route"}'); return; }
+
+    const params = {};
+    for (const [k, v] of url.searchParams) params[k] = isNaN(v) ? v : Number(v);
+    const spawnArgs = ['call', tool, '--json'];
+    if (Object.keys(params).length) spawnArgs.push('--args', JSON.stringify(params));
+
+    const { spawn } = require('child_process');
+    const mcporterCli = path.join(process.env.APPDATA || '', 'npm', 'node_modules', 'mcporter', 'dist', 'cli.js');
+    const child = spawn(process.execPath, [mcporterCli, ...spawnArgs], {
+      cwd: path.resolve(__dirname, '..', '..'),
+      windowsHide: true,
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    let out = '', errOut = '';
+    child.stdout.on('data', d => out += d);
+    child.stderr.on('data', d => errOut += d);
+    child.on('close', code => {
+      if (code !== 0) {
+        console.error('[hevy]', errOut);
+        res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ error: errOut.trim() || `exit ${code}` }));
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      try { JSON.parse(out); res.end(out); }
+      catch { res.end(JSON.stringify({ raw: out.trim() })); }
+    });
+    child.on('error', e => {
+      res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.end(JSON.stringify({ error: e.message }));
+    });
+    return;
+  }
+
+  // Direct fitness API using mcporter (since /api/gw proxy is having issues)
+  if (url.pathname === '/api/fitness') {
+    if (req.method === 'GET') {
+      try {
+        const { spawn } = require('child_process');
+        const { searchParams } = url;
+        const endpoint = searchParams.get('endpoint') || 'hevy.get_workouts';
+        const page = searchParams.get('page') || '1';
+        const pageSize = searchParams.get('pageSize') || '10';
+        
+        console.log(`[fitness] Calling ${endpoint} with page=${page}, pageSize=${pageSize}`);
+        
+        const mcporter = spawn('npx', ['mcporter', 'call', endpoint, `page=${page}`, `pageSize=${pageSize}`], {
+          cwd: 'C:\\Users\\openc\\.openclaw\\workspace',
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+        
+        let output = '';
+        let error = '';
+        
+        mcporter.stdout.on('data', (data) => {
+          output += data.toString();
+        });
+        
+        mcporter.stderr.on('data', (data) => {
+          error += data.toString();
+        });
+        
+        mcporter.on('close', (code) => {
+          if (code === 0 && output.trim()) {
+            try {
+              const result = JSON.parse(output.trim());
+              res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+              res.end(JSON.stringify(result));
+            } catch (parseError) {
+              console.error('[fitness] JSON parse error:', parseError);
+              res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+              res.end(JSON.stringify({ error: 'Invalid JSON response from mcporter' }));
+            }
+          } else {
+            console.error('[fitness] mcporter error:', error, 'code:', code);
+            res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            res.end(JSON.stringify({ error: error || 'mcporter call failed' }));
+          }
+        });
+        
+      } catch (e) {
+        console.error('[fitness] API error:', e);
+        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+      return;
+    }
+  }
+
+  // Vault-DB API — direct SQLite access for habits etc.
+  if (url.pathname === '/api/vault-db') {
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' });
+      res.end(); return;
+    }
+    let body = '';
+    req.on('data', c => body += c);
+    req.on('end', () => {
+      try {
+        const { action, sql } = JSON.parse(body);
+        const { DatabaseSync } = require('node:sqlite');
+        const dbPath = path.resolve(__dirname, '..', '..', 'data', 'vault.db');
+        const db = new DatabaseSync(dbPath);
+        let result;
+        if (action === 'query') {
+          const stmt = db.prepare(sql);
+          result = { rows: stmt.all() };
+        } else if (action === 'execute') {
+          const stmt = db.prepare(sql);
+          const r = stmt.run();
+          result = { changes: r.changes, lastId: r.lastInsertRowid };
+        } else {
+          throw new Error('Unknown action: ' + action);
+        }
+        db.close();
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify(result));
+      } catch (e) {
+        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+    return;
+  }
+
   // Proxy /api/gw/* to gateway /tools/invoke
   if (url.pathname === '/api/gw') {
     let body = '';
     req.on('data', c => body += c);
     req.on('end', async () => {
       try {
+        // Inject sessionKey if not provided — tools/invoke needs it for scoping
+        let parsed;
+        try { parsed = JSON.parse(body); } catch { parsed = {}; }
+        if (!parsed.sessionKey) parsed.sessionKey = 'agent:main:main';
         const gwRes = await fetch(GW + '/tools/invoke', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${GW_TOKEN}`,
           },
-          body,
+          body: JSON.stringify(parsed),
         });
         const data = await gwRes.text();
         res.writeHead(gwRes.status, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
@@ -88,17 +249,6 @@ const server = http.createServer(async (req, res) => {
         res.end(JSON.stringify({ error: e.message }));
       }
     });
-    return;
-  }
-
-  // CORS preflight
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    });
-    res.end();
     return;
   }
 
