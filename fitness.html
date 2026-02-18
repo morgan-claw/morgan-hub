@@ -11,18 +11,11 @@
 
     /* Sidebar */
     .sidebar{display:none;width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:1.5rem 0;flex-direction:column}
-    .sidebar .brand{display:flex;align-items:center;gap:0.6rem;padding:0 1.25rem 1.25rem;border-bottom:1px solid var(--border);margin-bottom:0.75rem}
-    .sidebar .brand .mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;color:#fff}
-    .sidebar .brand span{font-weight:600;font-size:1rem}
-    .sidebar a{display:flex;align-items:center;gap:0.6rem;padding:0.55rem 1.25rem;color:var(--muted);text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.12s,background 0.12s}
-    .sidebar a:hover{color:var(--text);background:var(--surface2)}
-    .sidebar a.active{color:var(--accent);background:var(--accent-dim)}
-    .sidebar a svg{width:18px;height:18px;flex-shrink:0}
 
-    /* Main area */
+    /* Main */
     .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 
-    /* Top bar */
+    /* Top bar — matches missions exactly */
     .topbar{display:flex;align-items:center;gap:1rem;padding:0.75rem 1.25rem;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
     .topbar h1{font-size:1.1rem;font-weight:600;font-family:'SF Mono',SFMono-Regular,Consolas,monospace;text-transform:uppercase;letter-spacing:1px}
     .topbar .stats{display:flex;gap:1.5rem;margin-left:auto}
@@ -38,79 +31,110 @@
 
     /* Tabs */
     .tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
-    .tab-nav button{background:none;border:none;color:var(--muted);font-size:0.8rem;font-weight:600;padding:0.7rem 1.25rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid transparent;transition:all 0.15s}
+    .tab-nav button{background:none;border:none;color:var(--muted);font-size:0.8rem;font-weight:600;padding:0.65rem 1.25rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid transparent;transition:all 0.15s}
     .tab-nav button:hover{color:var(--text)}
     .tab-nav button.active{color:var(--accent);border-bottom-color:var(--accent)}
 
-    /* Content */
-    .content{flex:1;overflow-y:auto;padding:0.75rem}
+    /* Content area */
+    .content-area{flex:1;overflow-y:auto;overflow-x:hidden}
     .tab-panel{display:none}
     .tab-panel.active{display:block}
 
-    /* Cards */
-    .card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.7rem;cursor:pointer;transition:border-color 0.12s;margin-bottom:0.5rem}
+    /* ===== WORKOUTS TAB: 2-column layout ===== */
+    .workouts-layout{display:flex;height:100%;overflow:hidden}
+    .workouts-main{flex:1;overflow-y:auto;padding:0.75rem}
+    .workouts-side{width:300px;flex-shrink:0;border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
+    .side-section{padding:0.75rem;border-bottom:1px solid var(--border)}
+    .side-section-head{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:0.5rem;display:flex;align-items:center;gap:0.4rem}
+
+    /* Cards — same style as missions task cards */
+    .card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.6rem 0.7rem;cursor:pointer;transition:border-color 0.12s;margin-bottom:0.4rem}
     .card:hover{border-color:var(--accent)}
 
-    /* Workout card */
-    .workout-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem}
-    .workout-title{font-size:0.85rem;font-weight:600}
+    /* Workout cards */
+    .workout-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem}
+    .workout-title{font-size:0.8rem;font-weight:500;line-height:1.3}
     .workout-date{font-size:0.7rem;color:var(--muted);font-family:monospace}
-    .workout-meta{display:flex;gap:1rem;font-size:0.7rem;color:var(--muted);margin-bottom:0.3rem}
+    .workout-tags{display:flex;gap:0.3rem;flex-wrap:wrap;margin-top:0.3rem}
+    .workout-tag{font-size:0.6rem;padding:1px 5px;border-radius:3px;font-weight:500;background:var(--surface2);color:var(--muted)}
+    .workout-tag.dur{background:#3b82f620;color:var(--blue)}
+    .workout-tag.vol{background:var(--accent-dim);color:var(--accent)}
+    .workout-tag.ex{background:#22c55e20;color:var(--green)}
+
+    /* Exercise detail inside expanded card */
     .workout-exercises{display:none;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border)}
     .card.expanded .workout-exercises{display:block}
-    .exercise-table{width:100%;border-collapse:collapse;font-size:0.75rem}
-    .exercise-table th{text-align:left;color:var(--muted);font-weight:500;padding:0.3rem 0.5rem;text-transform:uppercase;font-size:0.65rem;letter-spacing:0.3px;border-bottom:1px solid var(--border)}
-    .exercise-table td{padding:0.3rem 0.5rem;font-family:monospace;font-size:0.75rem}
-    .exercise-table tr:not(:last-child) td{border-bottom:1px solid rgba(255,255,255,0.03)}
-    .expand-hint{font-size:0.6rem;color:var(--muted);text-align:right;margin-top:0.2rem}
+    .ex-row{display:flex;align-items:baseline;justify-content:space-between;padding:0.2rem 0;font-size:0.75rem}
+    .ex-row:not(:last-child){border-bottom:1px solid rgba(255,255,255,0.03)}
+    .ex-name{color:var(--text);font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .ex-detail{color:var(--muted);font-family:monospace;font-size:0.7rem;flex-shrink:0;margin-left:0.5rem}
 
-    /* Routine card */
-    .routine-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.7rem;transition:border-color 0.12s;margin-bottom:0.5rem}
+    /* Side panel: mini stat boxes */
+    .mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:0.4rem}
+    .mini-stat{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.5rem;text-align:center}
+    .mini-stat .sv{font-size:1.2rem;font-weight:700;font-family:monospace;color:var(--accent)}
+    .mini-stat .sl{font-size:0.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px}
+
+    /* Side panel: volume bars */
+    .vol-bars{display:flex;align-items:flex-end;gap:3px;height:60px}
+    .vol-bar{flex:1;background:var(--accent);border-radius:2px 2px 0 0;min-height:2px;position:relative;transition:opacity 0.15s}
+    .vol-bar:hover{opacity:0.7}
+    .vol-bar-label{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:0.5rem;color:var(--muted);white-space:nowrap}
+
+    /* Side panel: muscle bars */
+    .muscle-row{display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;font-size:0.7rem}
+    .muscle-name{width:55px;flex-shrink:0;color:var(--muted);font-weight:500}
+    .muscle-track{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden}
+    .muscle-fill{height:100%;background:var(--accent);border-radius:3px}
+    .muscle-ct{color:var(--accent);font-family:monospace;font-size:0.65rem;width:20px;text-align:right}
+
+    /* Side panel: PR items */
+    .pr-row{display:flex;align-items:center;justify-content:space-between;padding:0.3rem 0;font-size:0.7rem;border-bottom:1px solid rgba(255,255,255,0.03)}
+    .pr-row:last-child{border-bottom:none}
+    .pr-name{color:var(--text);font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .pr-val{color:var(--accent);font-family:monospace;font-weight:700;flex-shrink:0;margin-left:0.5rem}
+    .pr-new{background:var(--accent-dim);color:var(--accent);font-size:0.55rem;font-weight:600;padding:1px 4px;border-radius:3px;margin-left:0.3rem}
+
+    /* ===== ROUTINES TAB ===== */
+    .routines-wrap{padding:0.75rem}
+    .routines-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0.5rem}
+    .routine-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.7rem;transition:border-color 0.12s}
     .routine-card:hover{border-color:var(--accent)}
-    .routine-name{font-size:0.85rem;font-weight:600;margin-bottom:0.3rem}
-    .routine-meta{display:flex;gap:1rem;font-size:0.7rem;color:var(--muted)}
+    .routine-name{font-size:0.85rem;font-weight:500;margin-bottom:0.4rem}
+    .routine-exercises{font-size:0.7rem;color:var(--muted);line-height:1.5}
+    .routine-meta{display:flex;gap:0.5rem;margin-top:0.4rem}
+    .routine-tag{font-size:0.6rem;padding:1px 5px;border-radius:3px;background:var(--surface2);color:var(--muted)}
 
-    /* Routines grid */
-    .routines-list{display:grid;grid-template-columns:1fr;gap:0.5rem}
-    @media(min-width:640px){.routines-list{grid-template-columns:repeat(2,1fr)}}
+    /* ===== STATS TAB ===== */
+    .stats-wrap{padding:0.75rem;max-width:900px}
+    .stats-section{margin-bottom:1.25rem}
+    .stats-section h3{font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:0.5rem}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:0.4rem}
+    .stat-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.6rem;text-align:center}
+    .stat-box .sv{font-size:1.4rem;font-weight:700;color:var(--accent);font-family:monospace}
+    .stat-box .sl{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px;margin-top:0.15rem}
+    .stat-box .trend{font-size:0.6rem;margin-top:0.25rem;font-weight:500}
+    .trend-up{color:var(--green)}.trend-down{color:var(--red)}.trend-flat{color:var(--muted)}
 
-    /* Stats tab */
-    .stats-section{margin-bottom:1.5rem}
-    .stats-section h3{font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:0.75rem}
-    .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem}
-    @media(min-width:520px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
-    .stat-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.75rem;text-align:center}
-    .stat-card .sv{font-size:1.5rem;font-weight:700;color:var(--accent);font-family:monospace}
-    .stat-card .sl{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px;margin-top:0.2rem}
+    /* Big volume chart */
+    .big-chart{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1rem}
+    .big-chart-title{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:0.75rem;text-align:center}
+    .big-vol-bars{display:flex;align-items:flex-end;gap:0.35rem;height:140px;padding-bottom:20px;position:relative}
+    .big-vol-bar{flex:1;max-width:50px;background:var(--accent);border-radius:3px 3px 0 0;min-height:3px;position:relative;cursor:pointer;transition:opacity 0.12s}
+    .big-vol-bar:hover{opacity:0.75}
+    .big-vol-bar::after{content:attr(data-label);position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:var(--muted);white-space:nowrap}
+    .big-vol-bar .bar-tip{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:var(--text);font-weight:600;white-space:nowrap;opacity:0;transition:opacity 0.12s}
+    .big-vol-bar:hover .bar-tip{opacity:1}
 
-    /* Volume chart */
-    .chart-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1rem}
-    .chart-title{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:0.75rem;text-align:center}
-    .volume-chart{display:flex;align-items:flex-end;justify-content:center;gap:0.4rem;height:120px;padding:0 0.5rem}
-    .volume-bar{flex:1;max-width:28px;background:var(--accent);border-radius:3px 3px 0 0;min-height:4px;position:relative;transition:opacity 0.15s;cursor:pointer}
-    .volume-bar:hover{opacity:0.8}
-    .volume-bar::after{content:attr(data-week);position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:var(--muted);white-space:nowrap}
-    .volume-bar::before{content:attr(data-volume);position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:var(--text);white-space:nowrap;opacity:0;transition:opacity 0.15s}
-    .volume-bar:hover::before{opacity:1}
-
-    /* Muscle groups */
-    .muscle-item{display:flex;align-items:center;padding:0.5rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:0.4rem}
-    .muscle-name{font-size:0.8rem;font-weight:600;width:80px;flex-shrink:0}
-    .muscle-bar-track{flex:1;height:6px;background:var(--surface2);border-radius:3px;margin:0 0.75rem;overflow:hidden}
-    .muscle-bar-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 0.4s ease}
-    .muscle-count{font-size:0.75rem;color:var(--accent);font-weight:600;font-family:monospace;min-width:24px;text-align:right}
-
-    /* PR list */
-    .pr-item{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.7rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:0.4rem}
-    .pr-item:hover{border-color:var(--accent)}
-    .pr-exercise{font-size:0.8rem;font-weight:600;flex:1}
-    .pr-weight{font-size:0.9rem;font-weight:700;color:var(--accent);font-family:monospace}
-    .pr-date{font-size:0.65rem;color:var(--muted);margin-left:0.75rem}
-    .pr-badge{padding:0.15rem 0.4rem;background:var(--accent-dim);color:var(--accent);border-radius:4px;font-size:0.6rem;font-weight:600;margin-left:0.5rem}
+    /* Big muscle + PR sections */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
+    @media(max-width:640px){.two-col{grid-template-columns:1fr}}
+    .panel-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.75rem}
+    .panel-title{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:0.5rem}
 
     /* Empty / Error / Loading */
     .empty-state{text-align:center;padding:2rem;color:var(--muted);font-size:0.8rem}
-    .error-state{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--red);border-radius:8px;padding:0.75rem;text-align:center;font-size:0.8rem;margin-bottom:0.75rem}
+    .error-state{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--red);border-radius:8px;padding:0.6rem;text-align:center;font-size:0.8rem;margin:0.75rem}
     .loading-spinner{width:24px;height:24px;border:2px solid var(--border);border-top:2px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 0.5rem}
     @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -120,9 +144,8 @@
     .modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:90%;max-width:550px;max-height:80vh;overflow-y:auto;padding:1.5rem}
     .modal h2{font-size:1rem;font-weight:600;margin-bottom:1rem}
     .modal .btn-row{display:flex;gap:0.5rem;justify-content:flex-end;margin-top:0.75rem}
-    .modal .btn{padding:0.4rem 0.9rem;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;border:none;transition:background 0.12s}
+    .modal .btn{padding:0.4rem 0.9rem;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;border:none}
     .modal .btn.ghost{background:none;color:var(--muted);border:1px solid var(--border)}
-    .modal .btn.ghost:hover{color:var(--text)}
 
     /* Mobile bottom tabs */
     .tab-bar{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0);z-index:100}
@@ -130,12 +153,10 @@
     .tab-bar a.active{color:var(--accent)}
     .tab-bar a svg{width:22px;height:22px}
 
-    @media(min-width:768px){
-      .sidebar{display:flex}
-      .tab-bar{display:none}
-    }
+    @media(min-width:768px){.sidebar{display:flex}.tab-bar{display:none}}
     @media(max-width:767px){
-      .content{padding-bottom:70px}
+      .workouts-side{display:none}
+      .content-area{padding-bottom:70px}
     }
     @media(max-width:600px){
       .topbar{flex-wrap:wrap;gap:0.5rem}
@@ -151,7 +172,7 @@
     <div class="topbar">
       <h1>Fitness</h1>
       <div class="stats">
-        <div class="stat"><div class="sv" id="statTotal">-</div><div class="sl">Total</div></div>
+        <div class="stat"><div class="sv" id="statTotal">-</div><div class="sl">Workouts</div></div>
         <div class="stat"><div class="sv" id="statWeek">-</div><div class="sl">This Week</div></div>
         <div class="stat"><div class="sv" id="statStreak">-</div><div class="sl">Streak</div></div>
         <div class="stat"><div class="sv" id="statAvg">-</div><div class="sl">Avg Min</div></div>
@@ -167,45 +188,76 @@
       <button data-tab="stats">Stats</button>
     </div>
 
-    <div class="content">
+    <div class="content-area">
       <div id="errorContainer"></div>
 
-      <!-- Workouts Tab -->
+      <!-- WORKOUTS TAB: list + side panel (like missions kanban + feed) -->
       <div class="tab-panel active" id="panel-workouts">
-        <div id="workoutsContainer">
-          <div class="empty-state"><div class="loading-spinner"></div>Loading workouts...</div>
+        <div class="workouts-layout">
+          <div class="workouts-main" id="workoutsContainer">
+            <div class="empty-state"><div class="loading-spinner"></div>Loading workouts from Hevy...</div>
+          </div>
+          <div class="workouts-side">
+            <div class="side-section">
+              <div class="side-section-head">This Week</div>
+              <div class="mini-stats" id="sideStats">
+                <div class="mini-stat"><div class="sv">-</div><div class="sl">Sessions</div></div>
+                <div class="mini-stat"><div class="sv">-</div><div class="sl">Volume</div></div>
+                <div class="mini-stat"><div class="sv">-</div><div class="sl">Time</div></div>
+                <div class="mini-stat"><div class="sv">-</div><div class="sl">Exercises</div></div>
+              </div>
+            </div>
+            <div class="side-section">
+              <div class="side-section-head">Volume — 8 Weeks</div>
+              <div class="vol-bars" id="sideVolume" style="margin-bottom:16px"></div>
+            </div>
+            <div class="side-section">
+              <div class="side-section-head">Muscle Focus</div>
+              <div id="sideMuscles"></div>
+            </div>
+            <div class="side-section" style="border-bottom:none;flex:1;overflow-y:auto">
+              <div class="side-section-head">Top PRs</div>
+              <div id="sidePRs"></div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Routines Tab -->
+      <!-- ROUTINES TAB -->
       <div class="tab-panel" id="panel-routines">
-        <div class="routines-list" id="routinesContainer">
-          <div class="empty-state">Loading routines...</div>
+        <div class="routines-wrap">
+          <div class="routines-grid" id="routinesContainer">
+            <div class="empty-state">Loading routines...</div>
+          </div>
         </div>
       </div>
 
-      <!-- Stats Tab -->
+      <!-- STATS TAB -->
       <div class="tab-panel" id="panel-stats">
-        <div class="stats-section">
-          <h3>Overview</h3>
-          <div class="stats-grid" id="statsOverview">
-            <div class="empty-state">Load data to see stats</div>
+        <div class="stats-wrap">
+          <div class="stats-section">
+            <h3>Overview</h3>
+            <div class="stats-grid" id="statsOverview"></div>
           </div>
-        </div>
-        <div class="stats-section">
-          <h3>Weekly Volume</h3>
-          <div class="chart-box">
-            <div class="chart-title">Volume (kg) — Last 8 Weeks</div>
-            <div id="volumeChart"><div class="volume-chart"><div class="empty-state">No data</div></div></div>
+          <div class="stats-section">
+            <h3>Weekly Volume</h3>
+            <div class="big-chart">
+              <div class="big-chart-title">Total Volume (kg) — Last 8 Weeks</div>
+              <div class="big-vol-bars" id="bigVolChart"></div>
+            </div>
           </div>
-        </div>
-        <div class="stats-section">
-          <h3>Muscle Focus</h3>
-          <div id="muscleGroups"><div class="empty-state">No data</div></div>
-        </div>
-        <div class="stats-section">
-          <h3>Personal Records</h3>
-          <div id="prList"><div class="empty-state">No data</div></div>
+          <div class="stats-section">
+            <div class="two-col">
+              <div class="panel-box">
+                <div class="panel-title">Muscle Focus (Recent 10)</div>
+                <div id="bigMuscles"></div>
+              </div>
+              <div class="panel-box">
+                <div class="panel-title">Personal Records</div>
+                <div id="bigPRs"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -218,14 +270,13 @@
 
 <script>
 (function(){
-  // ---- Clock ----
+  // ---- Clock (same as missions) ----
   function updateClock(){
     var d=new Date();
     document.getElementById('clock').textContent=d.toLocaleTimeString('en-US',{timeZone:'America/Toronto',hour12:false})
       +' '+d.toLocaleDateString('en-US',{timeZone:'America/Toronto',weekday:'short',month:'short',day:'numeric'}).toUpperCase();
   }
-  setInterval(updateClock,1000);
-  updateClock();
+  setInterval(updateClock,1000);updateClock();
 
   // ---- Tabs ----
   document.querySelectorAll('.tab-nav button').forEach(function(btn){
@@ -237,19 +288,13 @@
     });
   });
 
-  // ---- Modal ----
-  function closeModal(id){document.getElementById(id).classList.remove('show')}
-  document.querySelectorAll('.modal-bg').forEach(function(el){
-    el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('show')});
-  });
-
   // ---- Helpers ----
   function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
-  function getWeekStart(d){var dt=new Date(d);dt.setHours(0,0,0,0);var day=dt.getDay();var diff=day===0?6:day-1;dt.setDate(dt.getDate()-diff);return dt}
-
-  function formatWeight(kg){var lbs=kg*2.20462;return lbs>=100?Math.round(lbs)+'lb':lbs.toFixed(1)+'lb'}
-  function formatDuration(s,e){if(!s||!e)return'-';var m=Math.round((new Date(e)-new Date(s))/60000);return m>=60?Math.floor(m/60)+'h '+m%60+'m':m+'min'}
-  function calculateVolume(w){var v=0;(w.exercises||[]).forEach(function(ex){(ex.sets||[]).forEach(function(s){if(s.reps&&s.weight_kg)v+=s.reps*s.weight_kg})});return v}
+  function getWeekStart(d){var dt=new Date(d);dt.setHours(0,0,0,0);var day=dt.getDay();dt.setDate(dt.getDate()-(day===0?6:day-1));return dt}
+  function fmtWeight(kg){var lbs=kg*2.20462;return lbs>=100?Math.round(lbs)+'lb':lbs.toFixed(1)+'lb'}
+  function fmtDur(s,e){if(!s||!e)return'-';var m=Math.round((new Date(e)-new Date(s))/60000);return m>=60?Math.floor(m/60)+'h'+m%60+'m':m+'m'}
+  function calcVol(w){var v=0;(w.exercises||[]).forEach(function(ex){(ex.sets||[]).forEach(function(s){if(s.reps&&s.weight_kg)v+=s.reps*s.weight_kg})});return v}
+  function fmtVol(v){return v>=10000?(v/1000).toFixed(0)+'k':v>=1000?(v/1000).toFixed(1)+'k':v.toString()}
 
   // ---- State ----
   var state={workouts:[],routines:[],loaded:false,loading:false};
@@ -288,18 +333,53 @@
       state.loading=false;btn.textContent='Retry';btn.disabled=false;
     }
   };
+  document.getElementById('refreshBtn').onclick=loadData;
 
-  document.getElementById('refreshBtn').onclick=function(){loadData()};
+  // ---- Muscle map ----
+  var MUSCLE_MAP={'squat':['Quads','Glutes'],'bench':['Chest','Triceps'],'deadlift':['Back','Hamstrings'],'press':['Shoulders'],'row':['Back'],'curl':['Biceps'],'pull':['Back','Biceps'],'fly':['Chest'],'raise':['Shoulders'],'extension':['Triceps'],'lunge':['Quads','Glutes'],'calf':['Calves'],'shrug':['Traps'],'dip':['Chest','Triceps'],'lat':['Back']};
+  function getMuscles(workouts){
+    var g={};
+    workouts.forEach(function(w){(w.exercises||[]).forEach(function(ex){
+      var t=ex.title.toLowerCase();
+      Object.keys(MUSCLE_MAP).forEach(function(k){if(t.includes(k))MUSCLE_MAP[k].forEach(function(m){g[m]=(g[m]||0)+(ex.sets?ex.sets.length:0)})});
+    })});
+    return Object.entries(g).sort(function(a,b){return b[1]-a[1]});
+  }
 
-  // ---- Render ----
+  // ---- PRs ----
+  function getPRs(){
+    var prs={};
+    state.workouts.forEach(function(w){(w.exercises||[]).forEach(function(ex){(ex.sets||[]).forEach(function(s){
+      if(s.reps&&s.weight_kg&&s.reps<=5){
+        if(!prs[ex.title]||s.weight_kg>prs[ex.title].weight)prs[ex.title]={weight:s.weight_kg,reps:s.reps,date:w.start_time};
+      }
+    })})});
+    return Object.entries(prs).sort(function(a,b){return b[1].weight-a[1].weight});
+  }
+
+  // ---- Weekly volumes ----
+  function getWeeklyVolumes(){
+    var now=new Date(),ws=getWeekStart(now),weeks=[];
+    for(var i=7;i>=0;i--){
+      var s=new Date(ws);s.setDate(s.getDate()-i*7);
+      var e=new Date(s);e.setDate(e.getDate()+6);
+      var ww=state.workouts.filter(function(w){var d=new Date(w.start_time);return d>=s&&d<=e});
+      weeks.push({volume:ww.reduce(function(sum,w){return sum+calcVol(w)},0),label:s.toLocaleDateString('en-US',{month:'short',day:'numeric'}),count:ww.length});
+    }
+    return weeks;
+  }
+
+  // ====== RENDER ALL ======
   function renderAll(){
     if(!state.loaded)return;
     renderTopStats();
     renderWorkouts();
+    renderSidePanel();
     renderRoutines();
     renderStatsTab();
   }
 
+  // ---- Top bar stats ----
   function renderTopStats(){
     var ws=state.workouts;if(!ws.length)return;
     var now=new Date(),weekStart=getWeekStart(now);
@@ -311,112 +391,140 @@
       check.setDate(check.getDate()-7);
     }
     var avgMin=Math.round(ws.reduce(function(sum,w){return w.start_time&&w.end_time?sum+(new Date(w.end_time)-new Date(w.start_time))/60000:sum},0)/ws.length);
-
     document.getElementById('statTotal').textContent=ws.length;
     document.getElementById('statWeek').textContent=thisWeek.length;
     document.getElementById('statStreak').textContent=streak+'w';
     document.getElementById('statAvg').textContent=avgMin>0?avgMin+'m':'-';
   }
 
+  // ---- Workout list ----
   function renderWorkouts(){
     var c=document.getElementById('workoutsContainer');
-    var ws=state.workouts.slice(0,12);
+    var ws=state.workouts.slice(0,15);
     if(!ws.length){c.innerHTML='<div class="empty-state">No workouts found</div>';return}
     c.innerHTML=ws.map(function(w){
-      var dt=new Date(w.start_time).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
-      var dur=formatDuration(w.start_time,w.end_time);
+      var dt=new Date(w.start_time);
+      var dateStr=dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();
+      var timeStr=dt.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+      var dur=fmtDur(w.start_time,w.end_time);
       var exs=w.exercises||[];
-      var vol=calculateVolume(w);
+      var vol=calcVol(w);
       return '<div class="card" onclick="this.classList.toggle(\'expanded\')">'
-        +'<div class="workout-header"><span class="workout-title">'+esc(w.title)+'</span><span class="workout-date">'+dt+'</span></div>'
-        +'<div class="workout-meta"><span>'+dur+'</span><span>'+exs.length+' exercises</span><span>'+vol.toLocaleString()+'kg vol</span></div>'
-        +'<div class="workout-exercises"><table class="exercise-table"><thead><tr><th>Exercise</th><th>Sets</th><th>Best Set</th></tr></thead><tbody>'
+        +'<div class="workout-header"><span class="workout-title">'+esc(w.title)+'</span><span class="workout-date">'+dateStr+' '+timeStr+'</span></div>'
+        +'<div class="workout-tags">'
+        +'<span class="workout-tag dur">'+dur+'</span>'
+        +'<span class="workout-tag ex">'+exs.length+' exercises</span>'
+        +(vol?'<span class="workout-tag vol">'+fmtVol(vol)+'kg</span>':'')
+        +'</div>'
+        +'<div class="workout-exercises">'
         +exs.map(function(ex){
           var sets=ex.sets||[];
           var best=sets.reduce(function(b,s){return s.weight_kg>b.w?{w:s.weight_kg,r:s.reps}:b},{w:0,r:0});
-          return '<tr><td>'+esc(ex.title)+'</td><td>'+sets.length+'</td><td>'+(best.w?best.r+'x'+formatWeight(best.w):'-')+'</td></tr>';
+          return '<div class="ex-row"><span class="ex-name">'+esc(ex.title)+'</span><span class="ex-detail">'+sets.length+'s'+(best.w?' / '+best.r+'×'+fmtWeight(best.w):'')+'</span></div>';
         }).join('')
-        +'</tbody></table></div>'
-        +'<div class="expand-hint">click to expand</div></div>';
+        +'</div></div>';
     }).join('');
   }
 
+  // ---- Side panel (visible on desktop) ----
+  function renderSidePanel(){
+    var ws=state.workouts;if(!ws.length)return;
+    var now=new Date(),weekStart=getWeekStart(now);
+    var thisWeek=ws.filter(function(w){return new Date(w.start_time)>=weekStart});
+    var weekVol=thisWeek.reduce(function(s,w){return s+calcVol(w)},0);
+    var weekTime=thisWeek.reduce(function(s,w){return w.start_time&&w.end_time?s+Math.round((new Date(w.end_time)-new Date(w.start_time))/60000):s},0);
+    var weekEx=thisWeek.reduce(function(s,w){return s+(w.exercises?w.exercises.length:0)},0);
+
+    document.getElementById('sideStats').innerHTML=
+      '<div class="mini-stat"><div class="sv">'+thisWeek.length+'</div><div class="sl">Sessions</div></div>'
+      +'<div class="mini-stat"><div class="sv">'+fmtVol(weekVol)+'</div><div class="sl">Volume kg</div></div>'
+      +'<div class="mini-stat"><div class="sv">'+weekTime+'m</div><div class="sl">Time</div></div>'
+      +'<div class="mini-stat"><div class="sv">'+weekEx+'</div><div class="sl">Exercises</div></div>';
+
+    // Volume bars
+    var weeks=getWeeklyVolumes();
+    var maxV=Math.max.apply(null,weeks.map(function(w){return w.volume}))||1;
+    document.getElementById('sideVolume').innerHTML=weeks.map(function(w){
+      var h=Math.max(2,w.volume/maxV*50);
+      return '<div class="vol-bar" style="height:'+h+'px" title="'+w.label+': '+fmtVol(w.volume)+'kg"><span class="vol-bar-label">'+w.label.split(' ')[1]+'</span></div>';
+    }).join('');
+
+    // Muscles
+    var muscles=getMuscles(ws.slice(0,10)).slice(0,6);
+    var maxM=muscles.length?muscles[0][1]:1;
+    document.getElementById('sideMuscles').innerHTML=muscles.length?muscles.map(function(m){
+      return '<div class="muscle-row"><span class="muscle-name">'+m[0]+'</span><div class="muscle-track"><div class="muscle-fill" style="width:'+Math.round(m[1]/maxM*100)+'%"></div></div><span class="muscle-ct">'+m[1]+'</span></div>';
+    }).join(''):'<div style="color:var(--muted);font-size:0.7rem">No data</div>';
+
+    // PRs
+    var prs=getPRs().slice(0,6);
+    document.getElementById('sidePRs').innerHTML=prs.length?prs.map(function(p){
+      var isNew=new Date(p[1].date)>new Date(Date.now()-7*86400000);
+      return '<div class="pr-row"><span class="pr-name">'+esc(p[0])+'</span><span class="pr-val">'+fmtWeight(p[1].weight)+'</span>'+(isNew?'<span class="pr-new">NEW</span>':'')+'</div>';
+    }).join(''):'<div style="color:var(--muted);font-size:0.7rem">No data</div>';
+  }
+
+  // ---- Routines ----
   function renderRoutines(){
     var c=document.getElementById('routinesContainer');
-    var rs=state.routines.slice(0,8);
+    var rs=state.routines;
     if(!rs.length){c.innerHTML='<div class="empty-state">No routines found</div>';return}
     c.innerHTML=rs.map(function(r){
-      var exCount=r.exercises?r.exercises.length:0;
+      var exs=r.exercises||[];
+      var exList=exs.slice(0,5).map(function(e){return esc(e.title)}).join(', ');
+      if(exs.length>5)exList+=' + '+(exs.length-5)+' more';
       return '<div class="routine-card">'
         +'<div class="routine-name">'+esc(r.title)+'</div>'
-        +'<div class="routine-meta"><span>'+exCount+' exercises</span></div>'
+        +'<div class="routine-exercises">'+exList+'</div>'
+        +'<div class="routine-meta"><span class="routine-tag">'+exs.length+' exercises</span></div>'
         +'</div>';
     }).join('');
   }
 
+  // ---- Stats tab (full page analytics) ----
   function renderStatsTab(){
     var ws=state.workouts;if(!ws.length)return;
-    var now=new Date(),weekStart=getWeekStart(now);
-    var monthStart=new Date(now.getFullYear(),now.getMonth(),1);
+    var now=new Date(),weekStart=getWeekStart(now),monthStart=new Date(now.getFullYear(),now.getMonth(),1);
     var thisWeek=ws.filter(function(w){return new Date(w.start_time)>=weekStart});
+    var prevWeekStart=new Date(weekStart);prevWeekStart.setDate(prevWeekStart.getDate()-7);
+    var prevWeek=ws.filter(function(w){var d=new Date(w.start_time);return d>=prevWeekStart&&d<weekStart});
     var thisMonth=ws.filter(function(w){return new Date(w.start_time)>=monthStart});
-    var totalVol=ws.reduce(function(s,w){return s+calculateVolume(w)},0);
+    var totalVol=ws.reduce(function(s,w){return s+calcVol(w)},0);
     var avgEx=Math.round(ws.reduce(function(s,w){return s+(w.exercises?w.exercises.length:0)},0)/ws.length);
+    var avgMin=Math.round(ws.reduce(function(s,w){return w.start_time&&w.end_time?s+(new Date(w.end_time)-new Date(w.start_time))/60000:s},0)/ws.length);
+    var weekDiff=thisWeek.length-prevWeek.length;
 
+    // Overview
     document.getElementById('statsOverview').innerHTML=
-      '<div class="stat-card"><div class="sv">'+ws.length+'</div><div class="sl">Total Workouts</div></div>'
-      +'<div class="stat-card"><div class="sv">'+thisWeek.length+'</div><div class="sl">This Week</div></div>'
-      +'<div class="stat-card"><div class="sv">'+thisMonth.length+'</div><div class="sl">This Month</div></div>'
-      +'<div class="stat-card"><div class="sv">'+(totalVol>1000?(totalVol/1000).toFixed(0)+'k':totalVol)+'</div><div class="sl">Total Vol (kg)</div></div>'
-      +'<div class="stat-card"><div class="sv">'+avgEx+'</div><div class="sl">Avg Exercises</div></div>';
+      '<div class="stat-box"><div class="sv">'+ws.length+'</div><div class="sl">Total Workouts</div></div>'
+      +'<div class="stat-box"><div class="sv">'+thisWeek.length+'</div><div class="sl">This Week</div><div class="trend '+(weekDiff>0?'trend-up':weekDiff<0?'trend-down':'trend-flat')+'">'+(weekDiff>0?'+':'')+weekDiff+' vs last</div></div>'
+      +'<div class="stat-box"><div class="sv">'+thisMonth.length+'</div><div class="sl">This Month</div></div>'
+      +'<div class="stat-box"><div class="sv">'+fmtVol(totalVol)+'</div><div class="sl">Total Vol (kg)</div></div>'
+      +'<div class="stat-box"><div class="sv">'+avgEx+'</div><div class="sl">Avg Exercises</div></div>'
+      +'<div class="stat-box"><div class="sv">'+avgMin+'m</div><div class="sl">Avg Duration</div></div>';
 
-    // Volume chart
-    var weeks=[];
-    for(var i=7;i>=0;i--){
-      var s=new Date(weekStart);s.setDate(s.getDate()-i*7);
-      var e=new Date(s);e.setDate(e.getDate()+6);
-      var ww=ws.filter(function(w){var d=new Date(w.start_time);return d>=s&&d<=e});
-      var tv=ww.reduce(function(sum,w){return sum+calculateVolume(w)},0);
-      weeks.push({volume:tv,label:s.toLocaleDateString('en-US',{month:'short',day:'numeric'})});
-    }
+    // Big volume chart
+    var weeks=getWeeklyVolumes();
     var maxV=Math.max.apply(null,weeks.map(function(w){return w.volume}))||1;
-    document.getElementById('volumeChart').innerHTML='<div class="volume-chart" style="margin-bottom:24px">'
-      +weeks.map(function(w){
-        var h=Math.max(4,w.volume/maxV*100);
-        var vt=w.volume>1000?(w.volume/1000).toFixed(1)+'k':w.volume.toString();
-        return '<div class="volume-bar" style="height:'+h+'px" data-week="'+w.label+'" data-volume="'+vt+'kg"></div>';
-      }).join('')+'</div>';
-
-    // Muscle groups
-    var muscleMap={'squat':['Quads','Glutes'],'bench':['Chest','Triceps'],'deadlift':['Back','Hamstrings'],'press':['Shoulders'],'row':['Back'],'curl':['Biceps'],'pull':['Back','Biceps'],'fly':['Chest'],'raise':['Shoulders'],'extension':['Triceps']};
-    var groups={};
-    ws.slice(0,10).forEach(function(w){(w.exercises||[]).forEach(function(ex){
-      var t=ex.title.toLowerCase();
-      Object.keys(muscleMap).forEach(function(k){if(t.includes(k))muscleMap[k].forEach(function(m){groups[m]=(groups[m]||0)+(ex.sets?ex.sets.length:0)})});
-    })});
-    var mgEl=document.getElementById('muscleGroups');
-    var sorted=Object.entries(groups).sort(function(a,b){return b[1]-a[1]}).slice(0,6);
-    if(!sorted.length){mgEl.innerHTML='<div class="empty-state">No muscle data</div>';return}
-    var maxC=Math.max.apply(null,sorted.map(function(s){return s[1]}));
-    mgEl.innerHTML=sorted.map(function(s){
-      return '<div class="muscle-item"><span class="muscle-name">'+s[0]+'</span><div class="muscle-bar-track"><div class="muscle-bar-fill" style="width:'+Math.round(s[1]/maxC*100)+'%"></div></div><span class="muscle-count">'+s[1]+'</span></div>';
+    document.getElementById('bigVolChart').innerHTML=weeks.map(function(w){
+      var h=Math.max(3,w.volume/maxV*120);
+      return '<div class="big-vol-bar" style="height:'+h+'px" data-label="'+w.label+'"><span class="bar-tip">'+fmtVol(w.volume)+'kg</span></div>';
     }).join('');
+
+    // Muscles
+    var muscles=getMuscles(ws.slice(0,10)).slice(0,8);
+    var maxM=muscles.length?muscles[0][1]:1;
+    document.getElementById('bigMuscles').innerHTML=muscles.length?muscles.map(function(m){
+      return '<div class="muscle-row"><span class="muscle-name">'+m[0]+'</span><div class="muscle-track"><div class="muscle-fill" style="width:'+Math.round(m[1]/maxM*100)+'%"></div></div><span class="muscle-ct">'+m[1]+'</span></div>';
+    }).join(''):'<div style="color:var(--muted);font-size:0.7rem">No data</div>';
 
     // PRs
-    var prs={};
-    ws.forEach(function(w){(w.exercises||[]).forEach(function(ex){(ex.sets||[]).forEach(function(s){
-      if(s.reps&&s.weight_kg&&s.reps<=5){
-        if(!prs[ex.title]||s.weight_kg>prs[ex.title].weight)prs[ex.title]={weight:s.weight_kg,reps:s.reps,date:w.start_time};
-      }
-    })})});
-    var prSorted=Object.entries(prs).sort(function(a,b){return b[1].weight-a[1].weight}).slice(0,8);
-    var prEl=document.getElementById('prList');
-    if(!prSorted.length){prEl.innerHTML='<div class="empty-state">No PR data</div>';return}
-    prEl.innerHTML=prSorted.map(function(p){
+    var prs=getPRs().slice(0,10);
+    document.getElementById('bigPRs').innerHTML=prs.length?prs.map(function(p){
       var dt=new Date(p[1].date).toLocaleDateString('en-US',{month:'short',day:'numeric'});
       var isNew=new Date(p[1].date)>new Date(Date.now()-7*86400000);
-      return '<div class="pr-item"><span class="pr-exercise">'+esc(p[0])+'</span><span class="pr-weight">'+formatWeight(p[1].weight)+'</span><span class="pr-date">'+dt+'</span>'+(isNew?'<span class="pr-badge">NEW</span>':'')+'</div>';
-    }).join('');
+      return '<div class="pr-row"><span class="pr-name">'+esc(p[0])+'</span><span class="pr-val">'+fmtWeight(p[1].weight)+'</span>'+(isNew?'<span class="pr-new">NEW</span>':'')+'</div>';
+    }).join(''):'<div style="color:var(--muted);font-size:0.7rem">No data</div>';
   }
 
   // ---- Auto-load ----
