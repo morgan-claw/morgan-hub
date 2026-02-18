@@ -27,18 +27,10 @@
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; overflow: hidden; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      background: var(--bg); color: var(--text);
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
     .shell { display: flex; height: 100vh; height: 100dvh; }
 
-    /* Sidebar (nav.js) */
-    .sidebar {
-      display: none; width: 220px; flex-shrink: 0;
-      background: var(--surface); border-right: 1px solid var(--border);
-      padding: 1.5rem 0; flex-direction: column;
-    }
+    .sidebar { display: none; width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); padding: 1.5rem 0; flex-direction: column; }
     .sidebar .brand { display: flex; align-items: center; gap: 0.6rem; padding: 0 1.25rem 1.25rem; border-bottom: 1px solid var(--border); margin-bottom: 0.75rem; }
     .sidebar .brand .mark { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: #fff; }
     .sidebar .brand span { font-weight: 600; font-size: 1rem; }
@@ -46,283 +38,315 @@
     .sidebar a:hover { color: var(--text); background: var(--surface2); }
     .sidebar a.active { color: var(--accent); background: var(--accent-dim); }
     .sidebar a svg { width: 18px; height: 18px; flex-shrink: 0; }
-
-    .tab-bar {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--surface); border-top: 1px solid var(--border);
-      display: flex; padding-bottom: env(safe-area-inset-bottom, 0); z-index: 100;
-    }
+    .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding-bottom: env(safe-area-inset-bottom, 0); z-index: 100; }
     .tab-bar a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 0 8px; text-decoration: none; color: var(--muted); font-size: 0.7rem; font-weight: 500; }
     .tab-bar a.active { color: var(--accent); }
     .tab-bar a svg { width: 22px; height: 22px; }
 
-    /* Page */
-    .page {
-      flex: 1; display: flex; flex-direction: column;
-      padding-bottom: calc(60px + env(safe-area-inset-bottom, 0));
-      overflow: hidden;
-    }
-
-    /* Top bar */
-    .top-bar {
-      display: flex; align-items: center; gap: 0.75rem;
-      padding: 0.75rem 1rem; flex-shrink: 0;
-      background: var(--surface); border-bottom: 1px solid var(--border);
-    }
-    .top-bar .mark-mobile {
-      width: 30px; height: 30px; background: var(--accent); border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 0.8rem; color: #fff;
-    }
+    .page { flex: 1; display: flex; flex-direction: column; padding-bottom: calc(60px + env(safe-area-inset-bottom, 0)); overflow: hidden; }
+    .top-bar { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; flex-shrink: 0; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .top-bar .mark-mobile { width: 30px; height: 30px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; color: #fff; }
     .top-bar h1 { font-size: 1.05rem; font-weight: 600; }
     .top-bar .sub { color: var(--muted); font-size: 0.72rem; margin-left: auto; }
 
-    /* Controls bar */
-    .controls {
-      display: flex; align-items: center; gap: 0.5rem;
-      padding: 0.6rem 1rem; flex-shrink: 0;
-      background: var(--bg); border-bottom: 1px solid var(--border);
-      flex-wrap: wrap;
-    }
-    .view-toggle {
-      display: flex; background: var(--surface); border: 1px solid var(--border);
-      border-radius: 8px; overflow: hidden;
-    }
-    .view-toggle button {
-      background: none; border: none; color: var(--muted); padding: 0.4rem 0.75rem;
-      font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
-      font-family: inherit;
-    }
+    .controls { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; flex-shrink: 0; background: var(--bg); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .view-toggle { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .view-toggle button { background: none; border: none; color: var(--muted); padding: 0.4rem 0.75rem; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: all 0.15s; font-family: inherit; }
     .view-toggle button.active { background: var(--accent); color: #fff; }
     .view-toggle button:hover:not(.active) { color: var(--text); background: var(--surface2); }
-
-    .nav-btn {
-      background: var(--surface); border: 1px solid var(--border); color: var(--muted);
-      width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.9rem; transition: all 0.15s; font-family: inherit;
-    }
+    .nav-btn { background: var(--surface); border: 1px solid var(--border); color: var(--muted); width: 30px; height: 30px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: all 0.15s; font-family: inherit; }
     .nav-btn:hover { color: var(--text); background: var(--surface2); }
-    .today-btn {
-      background: var(--surface); border: 1px solid var(--border); color: var(--muted);
-      padding: 0.4rem 0.65rem; border-radius: 8px; cursor: pointer;
-      font-size: 0.75rem; font-weight: 500; transition: all 0.15s; font-family: inherit;
-    }
+    .today-btn { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 0.4rem 0.65rem; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.15s; font-family: inherit; }
     .today-btn:hover { color: var(--text); background: var(--surface2); }
     .date-label { font-size: 0.85rem; font-weight: 600; }
+    .mobile-jobs-btn { display: none; background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 0.4rem 0.65rem; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.15s; font-family: inherit; align-items: center; gap: 4px; }
+    .mobile-jobs-btn svg { width: 14px; height: 14px; }
+    .mobile-jobs-btn:hover { color: var(--text); background: var(--surface2); }
 
-    /* Split: job panel + calendar */
     .split { display: flex; flex: 1; min-height: 0; overflow: hidden; }
 
     /* Job panel */
-    .job-panel {
-      width: 240px; flex-shrink: 0; display: flex; flex-direction: column;
-      background: var(--surface); border-right: 1px solid var(--border);
-      overflow: hidden;
-    }
-    .job-panel-header {
-      padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border);
-      font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.5px; color: var(--muted);
-    }
+    .job-panel { width: 240px; flex-shrink: 0; display: flex; flex-direction: column; background: var(--surface); border-right: 1px solid var(--border); overflow: hidden; }
+    .job-panel-header { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .job-panel-header span { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+    .job-panel-header .job-count { font-size: 0.65rem; color: var(--muted); background: var(--surface2); padding: 2px 7px; border-radius: 10px; }
     .job-list { flex: 1; overflow-y: auto; padding: 0.35rem; }
     .job-list::-webkit-scrollbar { width: 4px; }
     .job-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-    .job-item {
-      padding: 0.5rem 0.65rem; border-radius: 8px; cursor: pointer;
-      margin-bottom: 1px; transition: background 0.12s;
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .job-item:hover { background: var(--surface2); }
-    .job-item.selected { background: var(--accent-dim); }
-    .job-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .job-dot.ok { background: var(--green); }
-    .job-dot.error { background: var(--red); }
-    .job-dot.pending { background: var(--yellow); }
+
+    .job-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.45rem 0.6rem; margin-bottom: 0.25rem; cursor: pointer; transition: all 0.15s; }
+    .job-card:hover { border-color: var(--border-light); background: var(--surface3); }
+    .job-card.selected { border-color: var(--accent); background: var(--accent-dim); }
+    .job-card.disabled-job { opacity: 0.4; }
+    .job-card-top { display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.25rem; }
+    .job-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .job-dot.ok { background: var(--green); box-shadow: 0 0 6px #22c55e40; }
+    .job-dot.error { background: var(--red); box-shadow: 0 0 6px #ef444440; }
+    .job-dot.pending { background: var(--yellow); box-shadow: 0 0 6px #f59e0b40; }
     .job-dot.disabled { background: var(--muted); }
-    .job-toggle { width: 18px; height: 18px; flex-shrink: 0; cursor: pointer; opacity: 0.35; transition: opacity 0.15s; }
-    .job-toggle:hover { opacity: 0.8; }
-    .job-item.hidden-job { opacity: 0.35; }
-    .job-item.hidden-job .job-toggle { opacity: 0.6; }
-    .job-info { flex: 1; min-width: 0; }
-    .job-name { font-size: 0.78rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .job-schedule { font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
+    .job-card-name { font-size: 0.78rem; font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .job-card-meta { display: flex; align-items: center; gap: 0.6rem; }
+    .job-card-sched { font-size: 0.66rem; color: var(--muted); display: flex; align-items: center; gap: 3px; }
+    .job-card-sched svg { width: 11px; height: 11px; opacity: 0.5; }
+    .job-card-target { font-size: 0.58rem; color: var(--muted); background: var(--bg); padding: 1px 5px; border-radius: 4px; }
+    .job-card-next { font-size: 0.6rem; color: var(--muted); margin-top: 0.15rem; }
+    .job-card-next strong { color: var(--text); font-weight: 500; }
 
-    /* Job detail drawer */
-    .job-detail {
-      display: none; padding: 0.75rem; border-top: 1px solid var(--border);
-      background: var(--surface2); flex-shrink: 0; max-height: 180px; overflow-y: auto;
-    }
-    .job-detail.open { display: block; }
-    .job-detail h3 { font-size: 0.82rem; margin-bottom: 0.4rem; }
-    .job-detail-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 0.72rem; border-bottom: 1px solid var(--border); }
-    .job-detail-row:last-child { border-bottom: none; }
-    .job-detail-row .k { color: var(--muted); }
-    .job-detail-row .v { color: var(--text); text-align: right; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 600; }
-    .badge.ok { background: #22c55e20; color: var(--green); }
-    .badge.error { background: #ef444420; color: var(--red); }
-    .badge.pending { background: #f59e0b20; color: var(--yellow); }
-    .badge.disabled { background: #66666620; color: var(--muted); }
+    /* Calendar area */
+    .calendar-area { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; background: var(--bg); }
 
-    /* ============ WEEK VIEW (default, square-ui inspired) ============ */
-    .week-wrap { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+    /* Detail panel - inline, not overlay */
+    .detail-panel { width: 0; flex-shrink: 0; display: flex; flex-direction: column; background: var(--surface); border-left: 1px solid var(--border); overflow: hidden; transition: width 0.2s ease; }
+    .detail-panel.open { width: 400px; }
+    .detail-header { display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .detail-title { flex: 1; min-width: 0; }
+    .detail-title h2 { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .detail-title .detail-id { font-size: 0.62rem; color: var(--muted); font-family: monospace; margin-top: 1px; }
+    .close-btn { background: none; border: none; color: var(--muted); cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: all 0.15s; flex-shrink: 0; }
+    .close-btn:hover { background: var(--surface2); color: var(--text); }
+    .close-btn svg { width: 18px; height: 18px; }
+    .detail-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .detail-tab { flex: 1; padding: 0.5rem; text-align: center; font-size: 0.72rem; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; }
+    .detail-tab:hover { color: var(--text); }
+    .detail-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .detail-body { flex: 1; overflow-y: auto; padding: 0.85rem; }
+    .detail-body::-webkit-scrollbar { width: 4px; }
+    .detail-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .detail-actions { display: flex; gap: 0.4rem; padding: 0.7rem 0.85rem; border-top: 1px solid var(--border); flex-shrink: 0; flex-wrap: wrap; }
 
-    .week-header {
-      display: flex; flex-shrink: 0; border-bottom: 1px solid var(--border);
-      background: var(--surface); position: sticky; top: 0; z-index: 10;
+    /* Info sections */
+    .info-section { margin-bottom: 1rem; }
+    .info-section-title { font-size: 0.66rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 0.4rem; }
+    .info-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); font-size: 0.75rem; gap: 0.5rem; }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .k { color: var(--muted); font-weight: 500; flex-shrink: 0; }
+    .info-row .v { color: var(--text); text-align: right; max-width: 65%; font-weight: 500; font-variant-numeric: tabular-nums; word-break: break-word; }
+    .info-row .v.mono { font-family: 'SF Mono', 'Consolas', monospace; font-size: 0.7rem; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 6px; font-size: 0.66rem; font-weight: 600; }
+    .badge .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .badge.ok { background: #22c55e15; color: var(--green); } .badge.ok .badge-dot { background: var(--green); }
+    .badge.error { background: #ef444415; color: var(--red); } .badge.error .badge-dot { background: var(--red); }
+    .badge.pending { background: #f59e0b15; color: var(--yellow); } .badge.pending .badge-dot { background: var(--yellow); }
+    .badge.disabled { background: #66666615; color: var(--muted); } .badge.disabled .badge-dot { background: var(--muted); }
+
+    .payload-block {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 0.75rem 0.85rem; margin-bottom: 0.85rem;
     }
-    .week-header-time { width: 52px; flex-shrink: 0; }
-    .week-header-day {
-      flex: 1; text-align: center; padding: 0.55rem 0 0.45rem;
-      font-size: 0.68rem; font-weight: 500; color: var(--muted);
-      text-transform: uppercase; letter-spacing: 0.3px;
-      border-left: 1px solid var(--border);
+    .payload-block-label {
+      font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;
+      color: var(--accent); margin-bottom: 0.45rem; display: flex; align-items: center; gap: 5px;
     }
-    .week-header-day .day-num {
-      display: block; font-size: 1.15rem; font-weight: 600;
-      color: var(--text); margin-top: 1px; line-height: 1.3;
+    .payload-block-label svg { width: 13px; height: 13px; stroke: var(--accent); }
+    .payload-text {
+      font-size: 0.82rem; color: var(--text); line-height: 1.6;
+      white-space: pre-wrap; word-break: break-word; max-height: 200px; overflow-y: auto;
     }
-    .week-header-day.is-today .day-num {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 30px; height: 30px; border-radius: 50%;
-      background: var(--accent); color: #fff;
+    .payload-text::-webkit-scrollbar { width: 3px; }
+    .payload-text::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .payload-preview { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.7rem; font-family: 'SF Mono', 'Consolas', monospace; color: var(--muted); line-height: 1.5; white-space: pre-wrap; word-break: break-all; max-height: 100px; overflow-y: auto; }
+    .payload-preview::-webkit-scrollbar { width: 3px; }
+    .payload-preview::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Action buttons */
+    .action-btn { display: flex; align-items: center; justify-content: center; gap: 5px; padding: 0.45rem 0.65rem; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 0.72rem; font-weight: 500; cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap; }
+    .action-btn:hover { background: var(--surface3); border-color: var(--border-light); }
+    .action-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .action-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .action-btn.primary:hover { opacity: 0.85; }
+    .action-btn.danger { color: var(--red); }
+    .action-btn.danger:hover { background: #ef444415; border-color: #ef444440; }
+    .action-btn:disabled { opacity: 0.35; pointer-events: none; }
+
+    /* Run history */
+    .run-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.65rem; border-bottom: 1px solid var(--border); }
+    .run-item:last-child { border-bottom: none; }
+    .run-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .run-status-dot.ok { background: var(--green); }
+    .run-status-dot.error { background: var(--red); }
+    .run-info { flex: 1; min-width: 0; }
+    .run-time { font-size: 0.7rem; font-weight: 500; }
+    .run-detail { font-size: 0.62rem; color: var(--muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .run-duration { font-size: 0.62rem; color: var(--muted); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; color: var(--muted); font-size: 0.75rem; text-align: center; gap: 0.4rem; }
+    .empty-state svg { width: 28px; height: 28px; opacity: 0.3; }
+
+    /* Edit form */
+    .edit-group { margin-bottom: 0.85rem; }
+    .edit-label { display: block; font-size: 0.68rem; font-weight: 600; color: var(--muted); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.3px; }
+    .edit-input, .edit-select, .edit-textarea {
+      width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); padding: 0.45rem 0.6rem; font-size: 0.78rem; font-family: inherit;
+      transition: border-color 0.15s; outline: none;
     }
+    .edit-input:focus, .edit-select:focus, .edit-textarea:focus { border-color: var(--accent); }
+    .edit-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 28px; }
+    .edit-textarea { min-height: 80px; resize: vertical; font-family: 'SF Mono', 'Consolas', monospace; font-size: 0.72rem; line-height: 1.5; }
+    .edit-row { display: flex; gap: 0.5rem; }
+    .edit-row > * { flex: 1; }
+    .edit-hint { font-size: 0.62rem; color: var(--muted); margin-top: 0.2rem; }
+    .edit-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .edit-actions .action-btn { flex: 1; }
+
+    /* Confirm dialog */
+    .confirm-dialog { display: none; position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+    .confirm-dialog.open { display: flex; }
+    .confirm-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; width: 340px; max-width: 90%; }
+    .confirm-box h3 { font-size: 0.95rem; margin-bottom: 0.5rem; }
+    .confirm-box p { font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem; line-height: 1.4; }
+    .confirm-btns { display: flex; gap: 0.5rem; }
+    .confirm-btns button { flex: 1; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border); font-size: 0.78rem; font-weight: 500; cursor: pointer; font-family: inherit; }
+    .confirm-btns .cancel-btn { background: var(--surface2); color: var(--text); }
+    .confirm-btns .cancel-btn:hover { background: var(--surface3); }
+    .confirm-btns .danger-btn { background: var(--red); border-color: var(--red); color: #fff; }
+    .confirm-btns .danger-btn:hover { opacity: 0.85; }
+
+    .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--surface3); border: 1px solid var(--border-light); color: var(--text); padding: 0.55rem 1.2rem; border-radius: 10px; font-size: 0.78rem; font-weight: 500; z-index: 400; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+
+    /* Mobile sheet */
+    .mobile-sheet-overlay { display: none; position: fixed; inset: 0; z-index: 150; background: rgba(0,0,0,0.4); }
+    .mobile-sheet-overlay.open { display: block; }
+    .mobile-sheet { position: fixed; bottom: 0; left: 0; right: 0; z-index: 151; background: var(--surface); border-top-left-radius: 16px; border-top-right-radius: 16px; max-height: 70vh; display: none; flex-direction: column; padding-bottom: calc(60px + env(safe-area-inset-bottom, 0)); animation: sheetUp 0.25s ease-out; }
+    .mobile-sheet.open { display: flex; }
+    @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .mobile-sheet-handle { width: 36px; height: 4px; background: var(--border-light); border-radius: 2px; margin: 10px auto 6px; }
+    .mobile-sheet-header { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 1rem 0.65rem; border-bottom: 1px solid var(--border); }
+    .mobile-sheet-header span { font-size: 0.85rem; font-weight: 600; }
+    .mobile-sheet-header button { background: none; border: none; color: var(--accent); font-size: 0.78rem; cursor: pointer; font-family: inherit; font-weight: 500; }
+    .mobile-sheet-body { flex: 1; overflow-y: auto; padding: 0.5rem; }
+
+    /* Calendar views */
+    /* Week view — single unified 2D scroll area, continuous days */
+    .week-wrap { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; position: relative; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+    .week-wrap::-webkit-scrollbar { width: 6px; }
+    .week-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .week-wrap::-webkit-scrollbar-corner { background: transparent; }
+    .week-grid { display: grid; position: relative; }
+    /* Sticky time column (left) */
+    .week-time-cell { position: sticky; left: 0; z-index: 5; background: var(--bg); width: 48px; min-width: 48px; padding: 0 4px 0 0; font-size: 0.6rem; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: flex-end; padding-top: 2px; }
+    /* Sticky header row (top) */
+    .week-header-corner { position: sticky; top: 0; left: 0; z-index: 12; background: var(--surface); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); width: 48px; min-width: 48px; }
+    .week-header-day { position: sticky; top: 0; z-index: 11; background: var(--surface); text-align: center; padding: 0.55rem 0 0.45rem; font-size: 0.68rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); min-width: 100px; }
+    .week-header-day .day-num { display: block; font-size: 1.15rem; font-weight: 600; color: var(--text); margin-top: 1px; line-height: 1.3; }
+    .week-header-day.is-today .day-num { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff; }
     .week-header-day.is-today { color: var(--accent); }
-
-    .week-scroll {
-      flex: 1; overflow-y: auto; position: relative;
-      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
-    }
-    .week-scroll::-webkit-scrollbar { width: 6px; }
-    .week-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    .week-body { display: flex; position: relative; }
-    .week-times { width: 52px; flex-shrink: 0; }
-    .week-time-slot {
-      height: 60px; display: flex; align-items: flex-start; justify-content: flex-end;
-      padding: 0 6px 0 0; font-size: 0.62rem; color: var(--muted);
-      transform: translateY(-7px); font-variant-numeric: tabular-nums;
-    }
-    .week-columns { flex: 1; display: flex; position: relative; }
-    .week-col {
-      flex: 1; position: relative; border-left: 1px solid var(--border);
-      min-width: 0;
-    }
-    .week-col-bg { position: absolute; inset: 0; }
-    .week-hour-line {
-      position: absolute; left: 0; right: 0; height: 1px;
-      background: var(--border); pointer-events: none;
-    }
-    .week-half-line {
-      position: absolute; left: 0; right: 0; height: 1px;
-      background: var(--border); opacity: 0.3; pointer-events: none;
-    }
-
-    /* Now indicator */
-    .now-line-wrap {
-      position: absolute; left: 52px; right: 0; z-index: 8; pointer-events: none;
-    }
-    .now-line-bar { height: 2px; background: var(--accent); }
-    .now-dot-left {
-      position: absolute; left: -5px; top: -4px;
-      width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
-    }
-
-    /* Event cards */
-    .ev-card {
-      position: absolute; left: 2px; right: 2px; z-index: 5;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 6px; padding: 3px 6px; cursor: default;
-      overflow: hidden; transition: background 0.12s, border-color 0.12s;
-      display: flex; align-items: flex-start; gap: 5px;
-      min-height: 18px;
-    }
+    /* Weekend columns slightly dimmed */
+    .week-header-day.is-weekend { opacity: 0.6; }
+    /* Day cells in the grid */
+    .week-day-cell { border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); min-height: 60px; min-width: 100px; padding: 1px 0; position: relative; }
+    .week-day-cell .week-half-line { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--border); opacity: 0.2; pointer-events: none; }
+    /* Now line spans across all visible day columns */
+    .week-now-marker { position: absolute; z-index: 8; pointer-events: none; height: 2px; background: var(--accent); }
+    .week-now-dot { position: absolute; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); pointer-events: none; z-index: 9; }
+    .ev-card { position: absolute; left: 2px; right: 2px; z-index: 5; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; cursor: pointer; overflow: hidden; transition: background 0.12s, border-color 0.12s; display: flex; align-items: center; gap: 6px; min-height: 24px; }
     .ev-card:hover { background: var(--surface3); border-color: var(--border-light); }
-    .ev-dot {
-      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
-    }
-    .ev-dot.c0 { background: var(--accent); }
-    .ev-dot.c1 { background: var(--blue); }
-    .ev-dot.c2 { background: var(--purple); }
-    .ev-dot.c3 { background: var(--green); }
-    .ev-dot.c4 { background: var(--pink); }
-    .ev-dot.c5 { background: var(--yellow); }
-    .ev-dot.c6 { background: var(--cyan); }
-    .ev-content { flex: 1; min-width: 0; }
-    .ev-name {
-      font-size: 0.7rem; font-weight: 500; color: var(--text);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3;
-    }
-    .ev-time { font-size: 0.6rem; color: var(--muted); line-height: 1.3; }
-    .ev-card.compact { align-items: center; padding: 1px 5px; }
-    .ev-card.compact .ev-dot { margin-top: 0; width: 5px; height: 5px; }
-    .ev-card.compact .ev-name { font-size: 0.62rem; }
-
-    /* ============ DAY VIEW ============ */
+    .ev-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
+    .ev-dot.c0 { background: var(--accent); } .ev-dot.c1 { background: var(--blue); } .ev-dot.c2 { background: var(--purple); } .ev-dot.c3 { background: var(--green); } .ev-dot.c4 { background: var(--pink); } .ev-dot.c5 { background: var(--yellow); } .ev-dot.c6 { background: var(--cyan); }
+    .ev-content { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 6px; }
+    .ev-name { font-size: 0.72rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+    .ev-time { font-size: 0.62rem; color: var(--muted); line-height: 1.3; flex-shrink: 0; }
+    /* Stacked events in week columns — not absolutely positioned */
+    .ev-stacked { position: relative; left: auto; right: auto; margin: 1px 2px; }
+    .ev-card.compact { align-items: center; padding: 2px 6px; }
+    .ev-card.compact .ev-dot { width: 4px; height: 4px; }
+    .ev-card.compact .ev-name { font-size: 0.68rem; }
     .day-grid { flex: 1; overflow-y: auto; position: relative; }
     .hour-row { display: flex; min-height: 60px; border-bottom: 1px solid var(--border); }
     .hour-label { width: 52px; flex-shrink: 0; padding: 2px 6px 0; font-size: 0.62rem; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
     .hour-content { flex: 1; position: relative; padding: 2px 6px; border-left: 1px solid var(--border); }
     .day-now-line { position: absolute; left: 52px; right: 0; height: 2px; background: var(--accent); z-index: 5; pointer-events: none; }
     .day-now-dot { position: absolute; left: 47px; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; z-index: 6; transform: translateY(-4px); pointer-events: none; }
-
-    /* ============ MONTH VIEW ============ */
-    .month-wrap { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-    .month-header { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .month-wrap { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+    .month-header { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; background: var(--surface); flex-shrink: 0; width: 100%; }
     .month-header-day { text-align: center; padding: 0.45rem 0; font-size: 0.68rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
-    .month-grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 1fr; overflow-y: auto; }
-    .month-cell { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 6px 8px; min-height: 100px; position: relative; cursor: pointer; transition: background 0.12s; }
+    .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: minmax(90px, auto); width: 100%; min-width: 0; }
+    .month-cell { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 6px 8px; min-height: 0; position: relative; cursor: pointer; transition: background 0.12s; overflow: hidden; min-width: 0; }
     .month-cell:hover { background: var(--surface2); }
     .month-cell:nth-child(7n) { border-right: none; }
     .month-cell.other { opacity: 0.25; }
     .month-cell.today { background: var(--accent-low); }
     .month-day-num { font-size: 0.75rem; font-weight: 500; margin-bottom: 6px; color: var(--muted); }
     .month-cell.today .month-day-num { color: var(--bg); background: var(--accent); width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
-    .month-dots { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 4px; }
-    .month-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .month-dot.c0 { background: var(--accent); }
-    .month-dot.c1 { background: var(--blue); }
-    .month-dot.c2 { background: var(--purple); }
-    .month-dot.c3 { background: var(--green); }
-    .month-dot.c4 { background: var(--pink); }
-    .month-dot.c5 { background: var(--yellow); }
-    .month-dot.c6 { background: var(--cyan); }
-    .month-event-line { display: flex; align-items: center; gap: 5px; padding: 1px 0; }
-    .month-event-line .ev-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-    .month-event-line .ev-dot.c0 { background: var(--accent); }
-    .month-event-line .ev-dot.c1 { background: var(--blue); }
-    .month-event-line .ev-dot.c2 { background: var(--purple); }
-    .month-event-line .ev-dot.c3 { background: var(--green); }
-    .month-event-line .ev-dot.c4 { background: var(--pink); }
-    .month-event-line .ev-dot.c5 { background: var(--yellow); }
-    .month-event-line .ev-dot.c6 { background: var(--cyan); }
+    .month-event-line { display: flex; align-items: center; gap: 5px; padding: 1px 0; cursor: pointer; }
     .month-event-line .ev-name { font-size: 0.65rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
     .month-event-line .ev-count { font-size: 0.58rem; color: var(--muted); margin-left: 4px; flex-shrink: 0; }
     .month-more { font-size: 0.58rem; color: var(--muted); padding-top: 1px; }
-    .month-summary { font-size: 0.62rem; color: var(--muted); margin-top: 2px; }
-    /* Legacy chip (unused but kept for compat) */
-    .event-chip {
-      display: block; padding: 1px 5px; margin: 1px 0; border-radius: 4px;
-      font-size: 0.6rem; font-weight: 500; white-space: nowrap;
-      overflow: hidden; text-overflow: ellipsis; color: #fff; cursor: default;
-    }
-    .event-chip.c0 { background: var(--accent); }
-    .event-chip.c1 { background: var(--blue); }
-    .event-chip.c2 { background: var(--purple); }
-    .event-chip.c3 { background: var(--green); }
-    .event-chip.c4 { background: var(--pink); }
-    .event-chip.c5 { background: var(--yellow); color: #000; }
-    .event-chip.c6 { background: var(--cyan); }
-
-    /* Loading */
+    .month-cell.first-of-month { border-top: 2px solid var(--border-light); }
+    .month-label-tag { display: block; font-size: 0.55rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px; font-weight: 600; }
     .loading { display: flex; align-items: center; justify-content: center; flex: 1; color: var(--muted); font-size: 0.85rem; }
 
-    /* Calendar area */
-    .calendar-area { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; background: var(--bg); }
+    /* Hero status block */
+    .hero-status {
+      display: flex; align-items: center; gap: 0.85rem;
+      padding: 0.85rem; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; margin-bottom: 0.85rem;
+    }
+    .hero-dot {
+      width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hero-dot.ok { background: #22c55e18; }
+    .hero-dot.error { background: #ef444418; }
+    .hero-dot.pending { background: #f59e0b18; }
+    .hero-dot.disabled { background: #66666618; }
+    .hero-dot svg { width: 20px; height: 20px; }
+    .hero-dot.ok svg { stroke: var(--green); }
+    .hero-dot.error svg { stroke: var(--red); }
+    .hero-dot.pending svg { stroke: var(--yellow); }
+    .hero-dot.disabled svg { stroke: var(--muted); }
+    .hero-info { flex: 1; min-width: 0; }
+    .hero-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600; }
+    .hero-value { font-size: 1.1rem; font-weight: 700; margin-top: 1px; }
+    .hero-value.ok { color: var(--green); }
+    .hero-value.error { color: var(--red); }
+    .hero-value.pending { color: var(--yellow); }
+    .hero-value.disabled { color: var(--muted); }
+    .hero-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+
+    /* Stat row */
+    .stat-row { display: flex; gap: 0.5rem; margin-bottom: 0.85rem; }
+    .stat-card {
+      flex: 1; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.55rem 0.65rem; text-align: center;
+    }
+    .stat-label { font-size: 0.58rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600; margin-bottom: 2px; }
+    .stat-value { font-size: 0.82rem; font-weight: 600; }
+    .stat-sub { font-size: 0.58rem; color: var(--muted); margin-top: 1px; }
+
+    /* Compact key-value list */
+    .kv-list { margin-bottom: 0.85rem; }
+    .kv-item { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.3rem 0; font-size: 0.75rem; }
+    .kv-item .k { color: var(--muted); font-size: 0.68rem; min-width: 70px; flex-shrink: 0; }
+    .kv-item .v { color: var(--text); font-weight: 500; word-break: break-word; }
+    .kv-item .v.mono { font-family: 'SF Mono', 'Consolas', monospace; font-size: 0.7rem; }
+
+    /* Error banner */
+    .error-banner {
+      background: #ef444412; border: 1px solid #ef444430; border-radius: 8px;
+      padding: 0.5rem 0.65rem; margin-bottom: 0.85rem; font-size: 0.72rem;
+      color: var(--red); line-height: 1.4; word-break: break-word;
+    }
+    .error-banner .error-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; opacity: 0.7; margin-bottom: 2px; }
+
+    /* Collapsible section */
+    .collapse-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.4rem 0; cursor: pointer; user-select: none;
+    }
+    .collapse-header .info-section-title { margin-bottom: 0; }
+    .collapse-header svg { width: 14px; height: 14px; color: var(--muted); transition: transform 0.15s; }
+    .collapse-header.open svg { transform: rotate(180deg); }
+    .collapse-body { display: none; }
+    .collapse-body.open { display: block; }
+
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
     @media (max-width: 767px) {
       .job-panel { display: none; }
+      .mobile-jobs-btn { display: flex; }
       .page { padding-bottom: calc(56px + env(safe-area-inset-bottom, 0)); }
       .controls { padding: 0.5rem 0.65rem; gap: 0.35rem; }
       .week-header-time, .week-times { width: 40px; }
@@ -330,6 +354,7 @@
       .ev-card { left: 1px; right: 1px; padding: 2px 4px; gap: 3px; }
       .ev-name { font-size: 0.62rem; }
       .now-line-wrap { left: 40px; }
+      .detail-panel.open { position: fixed; top: 0; right: 0; bottom: 0; width: 100%; z-index: 120; }
     }
     @media (min-width: 768px) {
       .sidebar { display: flex; }
@@ -338,6 +363,8 @@
       .page { padding-bottom: 0; }
     }
   </style>
+  <link rel="stylesheet" href="/theme.css">
+
 </head>
 <body>
   <div class="shell">
@@ -358,399 +385,861 @@
         <button class="today-btn" id="today-btn">Today</button>
         <button class="nav-btn" id="next-btn">&#8250;</button>
         <span class="date-label" id="date-label"></span>
+        <button class="mobile-jobs-btn" id="mobile-jobs-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Jobs
+        </button>
       </div>
       <div class="split">
         <div class="job-panel">
-          <div class="job-panel-header">Cron Jobs</div>
+          <div class="job-panel-header">
+            <span>Cron Jobs</span>
+            <span class="job-count" id="job-count">0</span>
+          </div>
           <div class="job-list" id="job-list"></div>
-          <div class="job-detail" id="job-detail"></div>
         </div>
         <div class="calendar-area" id="calendar-area">
           <div class="loading" id="cal-loading">Loading schedule...</div>
+        </div>
+        <div class="detail-panel" id="detail-panel">
+          <div class="detail-header">
+            <div class="detail-title">
+              <h2 id="detail-name"></h2>
+              <div class="detail-id" id="detail-id"></div>
+            </div>
+            <button class="close-btn" id="detail-close">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="detail-tabs">
+            <button class="detail-tab active" data-tab="info">Info</button>
+            <button class="detail-tab" data-tab="edit">Edit</button>
+            <button class="detail-tab" data-tab="history">History</button>
+          </div>
+          <div class="detail-body" id="detail-body"></div>
+          <div class="detail-actions" id="detail-actions"></div>
         </div>
       </div>
     </div>
   </div>
   <nav class="tab-bar"></nav>
+
+  <div class="mobile-sheet-overlay" id="mobile-sheet-overlay"></div>
+  <div class="mobile-sheet" id="mobile-sheet">
+    <div class="mobile-sheet-handle"></div>
+    <div class="mobile-sheet-header"><span>Cron Jobs</span><button id="mobile-sheet-close">Done</button></div>
+    <div class="mobile-sheet-body" id="mobile-sheet-body"></div>
+  </div>
+
+  <div class="confirm-dialog" id="confirm-dialog">
+    <div class="confirm-box">
+      <h3 id="confirm-title"></h3>
+      <p id="confirm-msg"></p>
+      <div class="confirm-btns">
+        <button class="cancel-btn" id="confirm-cancel">Cancel</button>
+        <button class="danger-btn" id="confirm-ok">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
   <script src="/nav.js"></script>
   <script>
-    const GW_URL = location.origin;
+    const GW = location.origin;
     const TZ = 'America/Toronto';
     const COLORS = ['c0','c1','c2','c3','c4','c5','c6'];
     const HOUR_H = 60;
 
-    let jobs = [];
-    let view = 'week';
-    let cursor = new Date();
-    let selectedJobId = null;
+    let jobs = [], view = 'week', cursor = new Date(), selectedJobId = null, activeTab = 'info';
     let hiddenJobIds = JSON.parse(localStorage.getItem('mhub-hidden-jobs') || '[]');
+
+    const $ = id => document.getElementById(id);
     function saveHidden() { localStorage.setItem('mhub-hidden-jobs', JSON.stringify(hiddenJobIds)); }
     function isJobVisible(id) { return !hiddenJobIds.includes(id); }
-    function toggleJobVisibility(id) {
-      if (hiddenJobIds.includes(id)) hiddenJobIds = hiddenJobIds.filter(x => x !== id);
-      else hiddenJobIds.push(id);
-      saveHidden();
-    }
+    function toggleJobVisibility(id) { hiddenJobIds.includes(id) ? hiddenJobIds = hiddenJobIds.filter(x => x !== id) : hiddenJobIds.push(id); saveHidden(); }
+    function showToast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
     // --- API ---
-    async function fetchJobs() {
-      try {
-        const r = await fetch(GW_URL + '/api/gw', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tool: 'cron', args: { action: 'list', includeDisabled: true } })
-        });
-        if (!r.ok) return [];
-        const data = await r.json();
-        let inner = data;
-        if (data.ok && data.result?.content?.[0]?.text) {
-          try { inner = JSON.parse(data.result.content[0].text); } catch {}
-        }
-        if (inner.jobs) return inner.jobs;
-        if (data.result?.jobs) return data.result.jobs;
-        if (Array.isArray(data.result)) return data.result;
-        return [];
-      } catch (e) { console.error('Failed to fetch cron jobs:', e); return []; }
+    async function gwCall(tool, args) {
+      const r = await fetch(GW + '/api/gw', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tool, args }) });
+      if (!r.ok) throw new Error(`API ${r.status}`);
+      const data = await r.json();
+      if (data.ok && data.result?.content?.[0]?.text) { try { return JSON.parse(data.result.content[0].text); } catch { return data.result; } }
+      return data.result || data;
     }
+    async function fetchJobs() { try { const d = await gwCall('cron', { action: 'list', includeDisabled: true }); return d.jobs || (Array.isArray(d) ? d : []); } catch { return []; } }
+    async function fetchRuns(jobId) { try { const d = await gwCall('cron', { action: 'runs', jobId }); return d.runs || d || []; } catch { return []; } }
+    async function runJobNow(jobId) { try { await gwCall('cron', { action: 'run', jobId }); return true; } catch { return false; } }
+    async function updateJob(jobId, patch) { try { await gwCall('cron', { action: 'update', jobId, patch }); return true; } catch(e) { console.error(e); return false; } }
+    async function deleteJob(jobId) { try { await gwCall('cron', { action: 'remove', jobId }); return true; } catch { return false; } }
 
     // --- Cron parsing ---
-    function parseCronExpr(expr, tz) {
-      const parts = expr.split(/\s+/);
-      if (parts.length < 5) return () => [];
-      const [minF, hourF, domF, monF, dowF] = parts;
-      return (startDate, endDate) => {
-        const results = [];
-        const d = new Date(startDate); d.setHours(0,0,0,0);
-        const end = new Date(endDate); end.setHours(23,59,59,999);
-        while (d <= end) {
-          const hours = expandField(hourF, 0, 23);
-          const mins = expandField(minF, 0, 59);
-          const dom = d.getDate(), mon = d.getMonth() + 1, dow = d.getDay();
-          if (matchField(domF, dom, 1, 31) && matchField(monF, mon, 1, 12) && matchField(dowF, dow, 0, 6)) {
-            for (const h of hours) for (const m of mins) {
-              const t = new Date(d); t.setHours(h, m, 0, 0);
-              if (t >= startDate && t <= end) results.push(new Date(t));
-            }
-          }
-          d.setDate(d.getDate() + 1);
-        }
-        return results;
-      };
-    }
     function expandField(field, min, max) {
       if (field === '*') { const r = []; for (let i = min; i <= max; i++) r.push(i); return r; }
       const vals = new Set();
       for (const part of field.split(',')) {
-        if (part.includes('/')) {
-          const [range, step] = part.split('/'); const s = parseInt(step);
-          let start = range !== '*' ? parseInt(range) : min;
-          for (let i = start; i <= max; i += s) vals.add(i);
-        } else if (part.includes('-')) {
-          const [a, b] = part.split('-').map(Number);
-          for (let i = a; i <= b; i++) vals.add(i);
-        } else { vals.add(parseInt(part)); }
+        if (part.includes('/')) { const [range, step] = part.split('/'); const s = parseInt(step); let start = range !== '*' ? parseInt(range) : min; for (let i = start; i <= max; i += s) vals.add(i); }
+        else if (part.includes('-')) { const [a, b] = part.split('-').map(Number); for (let i = a; i <= b; i++) vals.add(i); }
+        else vals.add(parseInt(part));
       }
       return [...vals].sort((a,b) => a - b);
     }
-    function matchField(field, val, min, max) { return expandField(field, min, max).includes(val); }
-
-    function getJobOccurrences(job, startDate, endDate) {
-      const sched = job.schedule;
-      if (sched.kind === 'cron') {
-        const fn = parseCronExpr(sched.expr, sched.tz);
-        return fn(startDate, endDate);
-      }
-      if (sched.kind === 'every') {
-        const results = [], interval = sched.everyMs, anchor = sched.anchorMs || Date.now();
-        let t = anchor;
-        if (t < startDate.getTime()) { const diff = startDate.getTime() - t; t += Math.floor(diff / interval) * interval; if (t < startDate.getTime()) t += interval; }
-        const maxPerView = view === 'day' ? 24 : view === 'week' ? 7 : 0;
-        while (t <= endDate.getTime() && results.length < maxPerView) { results.push(new Date(t)); t += interval; }
+    function matchField(f, v, min, max) { return expandField(f, min, max).includes(v); }
+    function getJobOccurrences(job, start, end) {
+      const s = job.schedule;
+      if (s.kind === 'cron') {
+        const parts = s.expr.split(/\s+/); if (parts.length < 5) return [];
+        const [minF, hourF, domF, monF, dowF] = parts; const results = [];
+        const d = new Date(start); d.setHours(0,0,0,0); const e2 = new Date(end); e2.setHours(23,59,59,999);
+        while (d <= e2) {
+          if (matchField(domF, d.getDate(), 1, 31) && matchField(monF, d.getMonth()+1, 1, 12) && matchField(dowF, d.getDay(), 0, 6)) {
+            for (const h of expandField(hourF, 0, 23)) for (const m of expandField(minF, 0, 59)) { const t = new Date(d); t.setHours(h, m, 0, 0); if (t >= start && t <= end) results.push(new Date(t)); }
+          }
+          d.setDate(d.getDate() + 1);
+        }
         return results;
       }
-      if (sched.kind === 'at') { const t = new Date(sched.at); return (t >= startDate && t <= endDate) ? [t] : []; }
+      if (s.kind === 'every') {
+        const results = [], interval = s.everyMs, anchor = s.anchorMs || Date.now();
+        let t = anchor;
+        if (t < start.getTime()) { const diff = start.getTime() - t; t += Math.floor(diff / interval) * interval; if (t < start.getTime()) t += interval; }
+        const max = view === 'day' ? 48 : view === 'week' ? 50 : 0;
+        while (t <= end.getTime() && results.length < max) { results.push(new Date(t)); t += interval; }
+        return results;
+      }
+      if (s.kind === 'at') { const t = new Date(s.at); return (t >= start && t <= end) ? [t] : []; }
       return [];
     }
 
-    function jobStatus(job) {
-      if (!job.enabled) return 'disabled';
-      if (job.state?.lastStatus === 'error') return 'error';
-      if (!job.state?.lastRunAtMs) return 'pending';
-      return 'ok';
-    }
-    function friendlySchedule(job) {
-      const s = job.schedule;
-      if (s.kind === 'every') { const m = s.everyMs / 60000; return m < 60 ? `Every ${m}m` : `Every ${(m/60).toFixed(0)}h`; }
-      if (s.kind === 'cron') return s.expr;
+    function jobStatus(j) { if (!j.enabled) return 'disabled'; if (j.state?.lastStatus === 'error') return 'error'; if (!j.state?.lastRunAtMs) return 'pending'; return 'ok'; }
+    function friendlySchedule(j) {
+      const s = j.schedule;
+      if (s.kind === 'every') { const m = s.everyMs / 60000; if (m < 1) return `Every ${s.everyMs/1000}s`; if (m < 60) return `Every ${m}m`; const h = m/60; return h < 24 ? `Every ${h%1===0?h:h.toFixed(1)}h` : `Every ${(h/24).toFixed(0)}d`; }
+      if (s.kind === 'cron') return humanCron(s.expr, s.tz);
       if (s.kind === 'at') return 'One-shot';
       return s.kind;
     }
+    function humanCron(expr, tz) {
+      const p = expr.split(/\s+/); if (p.length < 5) return expr;
+      const [min, hour, dom, mon, dow] = p; const dowN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      let d = '';
+      if (hour !== '*' && min !== '*') { const h = parseInt(hour), m = parseInt(min); d += `${h===0?12:h>12?h-12:h}:${String(m).padStart(2,'0')} ${h<12?'AM':'PM'}`; } else return expr;
+      if (dow !== '*') d += ' ' + expandField(dow, 0, 6).map(x => dowN[x]).join(', ');
+      else if (dom !== '*') d += ` day ${dom}`;
+      else d += ' daily';
+      if (tz) d += ` (${tz.replace('America/','')})`;
+      return d;
+    }
+    function relativeTime(ms) {
+      if (!ms) return 'N/A'; const diff = ms - Date.now(), abs = Math.abs(diff), past = diff < 0;
+      let s; if (abs < 60000) s = '<1m'; else if (abs < 3600000) s = Math.floor(abs/60000) + 'm'; else if (abs < 86400000) s = Math.floor(abs/3600000) + 'h ' + Math.floor((abs%3600000)/60000) + 'm'; else s = Math.floor(abs/86400000) + 'd';
+      return past ? s + ' ago' : 'in ' + s;
+    }
+    function fmtDate(ms) { return ms ? new Date(ms).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : 'Never'; }
     function fmtTime(d) { return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }); }
-    function fmtTimeShort(d) { const h = d.getHours(), m = d.getMinutes(); return (h === 0 ? '12' : h > 12 ? h-12 : h) + ':' + String(m).padStart(2,'0') + (h < 12 ? 'a' : 'p'); }
-    function shortName(name) { return name.length <= 14 ? name : name.slice(0, 13) + '…'; }
-    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    function fmtTimeShort(d) { const h = d.getHours(), m = d.getMinutes(); return (h===0?'12':h>12?h-12:h) + ':' + String(m).padStart(2,'0') + (h<12?'a':'p'); }
+    function shortName(n) { return n.length <= 14 ? n : n.slice(0, 13) + '\u2026'; }
+    function payloadPreview(j) { const p = j.payload; if (!p) return ''; if (p.kind === 'systemEvent') return p.text || ''; if (p.kind === 'agentTurn') return p.message || ''; return JSON.stringify(p, null, 2); }
 
-    // --- Render job list ---
-    function renderJobList() {
-      const el = document.getElementById('job-list');
-      const eyeOn = `<svg class="job-toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
-      const eyeOff = `<svg class="job-toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
-      el.innerHTML = jobs.map((job, i) => {
-        const st = jobStatus(job), sel = job.id === selectedJobId ? 'selected' : '', hidden = !isJobVisible(job.id) ? 'hidden-job' : '';
-        return `<div class="job-item ${sel} ${hidden}" data-id="${job.id}">
-          <div class="job-dot ${st}"></div>
-          <div class="job-info"><div class="job-name">${esc(job.name || 'Unnamed')}</div><div class="job-schedule">${esc(friendlySchedule(job))}</div></div>
-          <span class="job-vis" data-id="${job.id}">${isJobVisible(job.id) ? eyeOn : eyeOff}</span>
+    // ============ JOB LIST ============
+    function renderJobList(targetEl) {
+      const el = targetEl || $('job-list');
+      $('job-count').textContent = jobs.length;
+      if (!jobs.length) { el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>No cron jobs</span></div>`; return; }
+      const sorted = [...jobs].sort((a,b) => { if (a.enabled !== b.enabled) return a.enabled ? -1 : 1; return (a.name||'').localeCompare(b.name||''); });
+      el.innerHTML = sorted.map(job => {
+        const st = jobStatus(job), sel = job.id === selectedJobId ? 'selected' : '', dis = !job.enabled ? 'disabled-job' : '';
+        const nextMs = job.state?.nextRunAtMs, nextStr = nextMs ? relativeTime(nextMs) : '', isSoon = nextMs && (nextMs - Date.now()) < 3600000 && (nextMs - Date.now()) > 0;
+        return `<div class="job-card ${sel} ${dis}" data-id="${job.id}">
+          <div class="job-card-top"><div class="job-dot ${st}"></div><div class="job-card-name">${esc(job.name||'Unnamed')}</div></div>
+          <div class="job-card-meta"><span class="job-card-sched"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${esc(friendlySchedule(job))}</span><span class="job-card-target">${job.sessionTarget||'?'}</span></div>
+          ${nextStr ? `<div class="job-card-next">Next: <strong class="${isSoon?'time-relative soon':''}">${esc(nextStr)}</strong></div>` : ''}
         </div>`;
       }).join('');
-      el.querySelectorAll('.job-item').forEach(item => {
-        item.querySelector('.job-info').onclick = () => {
-          selectedJobId = selectedJobId === item.dataset.id ? null : item.dataset.id;
-          renderJobList(); renderJobDetail(); renderCalendar();
-        };
-      });
-      el.querySelectorAll('.job-vis').forEach(btn => {
-        btn.onclick = (e) => { e.stopPropagation(); toggleJobVisibility(btn.dataset.id); renderJobList(); renderCalendar(); };
-      });
-    }
-    function renderJobDetail() {
-      const el = document.getElementById('job-detail');
-      if (!selectedJobId) { el.classList.remove('open'); return; }
-      const job = jobs.find(j => j.id === selectedJobId);
-      if (!job) { el.classList.remove('open'); return; }
-      const st = jobStatus(job);
-      const fmtDate = ms => ms ? new Date(ms).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : 'N/A';
-      el.innerHTML = `<h3>${esc(job.name || 'Unnamed')}</h3>
-        <div class="job-detail-row"><span class="k">Status</span><span class="v"><span class="badge ${st}">${st.toUpperCase()}</span></span></div>
-        <div class="job-detail-row"><span class="k">Schedule</span><span class="v">${esc(friendlySchedule(job))}</span></div>
-        <div class="job-detail-row"><span class="k">Last Run</span><span class="v">${fmtDate(job.state?.lastRunAtMs)}</span></div>
-        <div class="job-detail-row"><span class="k">Next Run</span><span class="v">${fmtDate(job.state?.nextRunAtMs)}</span></div>
-        <div class="job-detail-row"><span class="k">Errors</span><span class="v">${job.state?.consecutiveErrors || 0}</span></div>
-        ${job.state?.lastError ? `<div class="job-detail-row"><span class="k">Last Error</span><span class="v" title="${esc(job.state.lastError)}">${esc(job.state.lastError)}</span></div>` : ''}
-        <div class="job-detail-row"><span class="k">Target</span><span class="v">${job.sessionTarget || 'N/A'}</span></div>`;
-      el.classList.add('open');
+      el.querySelectorAll('.job-card').forEach(c => { c.onclick = () => openDetail(c.dataset.id); });
     }
 
-    // --- Calendar rendering ---
+    // ============ DETAIL PANEL ============
+    function openDetail(jobId) {
+      selectedJobId = jobId;
+      activeTab = 'info';
+      renderJobList();
+      renderCalendar();
+      renderDetail();
+      $('detail-panel').classList.add('open');
+    }
+    function closeDetail() {
+      selectedJobId = null;
+      $('detail-panel').classList.remove('open');
+      renderJobList();
+      renderCalendar();
+    }
+    $('detail-close').onclick = closeDetail;
+
+    // Tabs
+    document.querySelectorAll('.detail-tab').forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeTab = tab.dataset.tab;
+        renderDetail();
+      };
+    });
+
+    function renderDetail() {
+      const job = jobs.find(j => j.id === selectedJobId);
+      if (!job) return;
+      $('detail-name').textContent = job.name || 'Unnamed';
+      $('detail-id').textContent = job.id;
+      // Sync tab UI
+      document.querySelectorAll('.detail-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === activeTab));
+
+      if (activeTab === 'info') renderInfoTab(job);
+      else if (activeTab === 'edit') renderEditTab(job);
+      else if (activeTab === 'history') renderHistoryTab(job);
+    }
+
+    function renderInfoTab(job) {
+      const st = jobStatus(job);
+      const lastMs = job.state?.lastRunAtMs, nextMs = job.state?.nextRunAtMs;
+      const p = job.payload || {};
+      let h = '';
+
+      // Hero: status + next run — the thing you care about most
+      const heroIcons = {
+        ok: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+        pending: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+        disabled: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>'
+      };
+      const heroLabels = { ok: 'Healthy', error: 'Failing', pending: 'Waiting', disabled: 'Disabled' };
+      const nextStr = nextMs ? relativeTime(nextMs) : null;
+
+      h += `<div class="hero-status">
+        <div class="hero-dot ${st}">${heroIcons[st]}</div>
+        <div class="hero-info">
+          <div class="hero-label">${st === 'disabled' ? 'Status' : 'Next Run'}</div>
+          <div class="hero-value ${st}">${st === 'disabled' ? 'Disabled' : (nextStr || 'No schedule')}</div>
+          <div class="hero-sub">${st === 'disabled' ? 'Enable to resume' : (nextMs ? fmtDate(nextMs) : friendlySchedule(job))}</div>
+        </div>
+      </div>`;
+
+      // Error banner if failing
+      if (job.state?.lastError) {
+        h += `<div class="error-banner"><div class="error-label">Last error${job.state.consecutiveErrors > 1 ? ` (${job.state.consecutiveErrors}x in a row)` : ''}</div>${esc(job.state.lastError)}</div>`;
+      }
+
+      // Stat cards: last run, schedule, session
+      h += `<div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-label">Last Run</div>
+          <div class="stat-value">${lastMs ? esc(relativeTime(lastMs)) : 'Never'}</div>
+          ${lastMs ? `<div class="stat-sub">${esc(fmtDate(lastMs))}</div>` : ''}
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Schedule</div>
+          <div class="stat-value">${esc(friendlySchedule(job))}</div>
+          ${job.schedule.kind === 'cron' ? `<div class="stat-sub mono" style="font-family:monospace;font-size:0.58rem">${esc(job.schedule.expr)}</div>` : ''}
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Target</div>
+          <div class="stat-value">${esc(job.sessionTarget || '?')}</div>
+          <div class="stat-sub">${esc(p.kind || '?')}</div>
+        </div>
+      </div>`;
+
+      // What it does — prominent, easy to read
+      const preview = payloadPreview(job);
+      if (preview) {
+        const kindLabel = p.kind === 'agentTurn' ? 'Agent Prompt' : 'System Event';
+        h += `<div class="payload-block">
+          <div class="payload-block-label"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${kindLabel}</div>
+          <div class="payload-text">${esc(preview)}</div>
+        </div>`;
+      }
+
+      // Configuration details — collapsed by default, for when you need specifics
+      const configItems = [];
+      if (p.model) configItems.push(['Model', p.model, true]);
+      if (p.thinking) configItems.push(['Thinking', p.thinking]);
+      if (p.timeoutSeconds) configItems.push(['Timeout', p.timeoutSeconds + 's']);
+      if (job.schedule.tz) configItems.push(['Timezone', job.schedule.tz]);
+      if (job.delivery?.mode) configItems.push(['Delivery', job.delivery.mode]);
+      if (job.delivery?.channel) configItems.push(['Channel', job.delivery.channel]);
+      if (job.delivery?.to) configItems.push(['To', job.delivery.to]);
+
+      if (configItems.length) {
+        h += `<div class="info-section">
+          <div class="collapse-header" onclick="this.classList.toggle('open');this.nextElementSibling.classList.toggle('open')">
+            <span class="info-section-title">Configuration</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="collapse-body"><div class="kv-list">${configItems.map(([k, v, mono]) => `<div class="kv-item"><span class="k">${esc(k)}</span><span class="v${mono ? ' mono' : ''}">${esc(v)}</span></div>`).join('')}</div></div>
+        </div>`;
+      }
+
+      $('detail-body').innerHTML = h;
+      $('detail-actions').innerHTML = `
+        <button class="action-btn primary" id="btn-run" ${!job.enabled?'disabled':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run</button>
+        <button class="action-btn" id="btn-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${job.enabled?'<line x1="2" y1="2" x2="22" y2="22"/><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>':'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'}</svg>${job.enabled?'Disable':'Enable'}</button>
+        <button class="action-btn" id="btn-vis">${isJobVisible(job.id)?'Hide':'Show'}</button>
+        <button class="action-btn danger" id="btn-del"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg></button>
+      `;
+      $('btn-run').onclick = async () => { $('btn-run').disabled = true; $('btn-run').textContent = 'Running...'; const ok = await runJobNow(selectedJobId); showToast(ok ? 'Triggered' : 'Failed'); setTimeout(refresh, 1500); };
+      $('btn-toggle').onclick = async () => { const ok = await updateJob(selectedJobId, { enabled: !job.enabled }); if (ok) { showToast(job.enabled ? 'Disabled' : 'Enabled'); await refresh(); renderDetail(); } };
+      $('btn-vis').onclick = () => { toggleJobVisibility(selectedJobId); renderJobList(); renderCalendar(); renderDetail(); };
+      $('btn-del').onclick = () => showConfirm('Delete Job', `Delete "${job.name||'Unnamed'}"? This can't be undone.`, async () => { if (await deleteJob(selectedJobId)) { showToast('Deleted'); closeDetail(); await refresh(); } else showToast('Failed'); });
+    }
+
+    // ============ EDIT TAB ============
+    function renderEditTab(job) {
+      const s = job.schedule, p = job.payload || {};
+      let h = '';
+
+      h += `<div class="edit-group"><label class="edit-label">Name</label><input class="edit-input" id="ed-name" value="${esc(job.name||'')}"></div>`;
+
+      h += `<div class="edit-group"><label class="edit-label">Enabled</label>
+        <select class="edit-select" id="ed-enabled"><option value="true" ${job.enabled?'selected':''}>Yes</option><option value="false" ${!job.enabled?'selected':''}>No</option></select></div>`;
+
+      h += `<div class="edit-group"><label class="edit-label">Schedule Type</label>
+        <select class="edit-select" id="ed-sched-kind"><option value="cron" ${s.kind==='cron'?'selected':''}>Cron</option><option value="every" ${s.kind==='every'?'selected':''}>Interval</option><option value="at" ${s.kind==='at'?'selected':''}>One-shot</option></select></div>`;
+
+      h += `<div id="ed-sched-fields"></div>`;
+
+      h += `<div class="edit-group"><label class="edit-label">Payload Kind</label>
+        <select class="edit-select" id="ed-payload-kind"><option value="agentTurn" ${p.kind==='agentTurn'?'selected':''}>Agent Turn</option><option value="systemEvent" ${p.kind==='systemEvent'?'selected':''}>System Event</option></select></div>`;
+
+      h += `<div class="edit-group"><label class="edit-label">Session Target</label>
+        <select class="edit-select" id="ed-session"><option value="isolated" ${job.sessionTarget==='isolated'?'selected':''}>Isolated</option><option value="main" ${job.sessionTarget==='main'?'selected':''}>Main</option></select>
+        <div class="edit-hint">Main requires systemEvent. Isolated requires agentTurn.</div></div>`;
+
+      h += `<div class="edit-group"><label class="edit-label">Message / Text</label>
+        <textarea class="edit-textarea" id="ed-text">${esc(p.kind === 'agentTurn' ? (p.message||'') : (p.text||''))}</textarea></div>`;
+
+      h += `<div class="edit-row">
+        <div class="edit-group"><label class="edit-label">Model</label><input class="edit-input" id="ed-model" value="${esc(p.model||'')}" placeholder="(default)"></div>
+        <div class="edit-group"><label class="edit-label">Thinking</label>
+          <select class="edit-select" id="ed-thinking"><option value="">Default</option><option value="off" ${p.thinking==='off'?'selected':''}>Off</option><option value="low" ${p.thinking==='low'?'selected':''}>Low</option><option value="medium" ${p.thinking==='medium'?'selected':''}>Medium</option><option value="high" ${p.thinking==='high'?'selected':''}>High</option></select></div>
+      </div>`;
+
+      h += `<div class="edit-group"><label class="edit-label">Timeout (seconds)</label><input class="edit-input" id="ed-timeout" type="number" value="${p.timeoutSeconds||''}" placeholder="(default)"></div>`;
+
+      h += `<div class="edit-group"><label class="edit-label">Delivery Mode</label>
+        <select class="edit-select" id="ed-delivery"><option value="">Default</option><option value="none" ${job.delivery?.mode==='none'?'selected':''}>None</option><option value="announce" ${job.delivery?.mode==='announce'?'selected':''}>Announce</option></select></div>`;
+
+      h += `<div class="edit-actions">
+        <button class="action-btn" id="ed-cancel">Cancel</button>
+        <button class="action-btn primary" id="ed-save">Save Changes</button>
+      </div>`;
+
+      $('detail-body').innerHTML = h;
+      $('detail-actions').innerHTML = '';
+
+      renderSchedFields(s);
+
+      $('ed-sched-kind').onchange = () => {
+        const kind = $('ed-sched-kind').value;
+        const defaults = { cron: { kind: 'cron', expr: '0 9 * * *', tz: TZ }, every: { kind: 'every', everyMs: 600000 }, at: { kind: 'at', at: new Date().toISOString() } };
+        renderSchedFields(defaults[kind]);
+      };
+
+      $('ed-cancel').onclick = () => { activeTab = 'info'; renderDetail(); };
+      $('ed-save').onclick = saveEdit;
+    }
+
+    function renderSchedFields(s) {
+      const el = $('ed-sched-fields');
+      if (s.kind === 'cron') {
+        el.innerHTML = `<div class="edit-row">
+          <div class="edit-group"><label class="edit-label">Cron Expression</label><input class="edit-input" id="ed-cron-expr" value="${esc(s.expr||'0 9 * * *')}">
+            <div class="edit-hint">min hour dom mon dow</div></div>
+          <div class="edit-group"><label class="edit-label">Timezone</label><input class="edit-input" id="ed-cron-tz" value="${esc(s.tz||TZ)}"></div>
+        </div>`;
+      } else if (s.kind === 'every') {
+        const mins = (s.everyMs || 600000) / 60000;
+        el.innerHTML = `<div class="edit-group"><label class="edit-label">Interval (minutes)</label><input class="edit-input" id="ed-every-mins" type="number" value="${mins}" min="1"></div>`;
+      } else if (s.kind === 'at') {
+        const d = s.at ? new Date(s.at) : new Date();
+        const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        el.innerHTML = `<div class="edit-group"><label class="edit-label">Date & Time</label><input class="edit-input" id="ed-at-time" type="datetime-local" value="${local}"></div>`;
+      }
+    }
+
+    async function saveEdit() {
+      const job = jobs.find(j => j.id === selectedJobId);
+      if (!job) return;
+      const btn = $('ed-save');
+      btn.disabled = true; btn.textContent = 'Saving...';
+
+      const patch = {};
+      const newName = $('ed-name').value.trim();
+      if (newName !== (job.name||'')) patch.name = newName;
+
+      const enabled = $('ed-enabled').value === 'true';
+      if (enabled !== job.enabled) patch.enabled = enabled;
+
+      // Schedule
+      const schedKind = $('ed-sched-kind').value;
+      const schedule = { kind: schedKind };
+      if (schedKind === 'cron') {
+        schedule.expr = $('ed-cron-expr').value.trim();
+        const tz = $('ed-cron-tz').value.trim();
+        if (tz) schedule.tz = tz;
+      } else if (schedKind === 'every') {
+        schedule.everyMs = Math.max(1, parseInt($('ed-every-mins').value) || 10) * 60000;
+      } else if (schedKind === 'at') {
+        schedule.at = new Date($('ed-at-time').value).toISOString();
+      }
+      patch.schedule = schedule;
+
+      // Payload
+      const payloadKind = $('ed-payload-kind').value;
+      const text = $('ed-text').value;
+      const payload = { kind: payloadKind };
+      if (payloadKind === 'agentTurn') payload.message = text; else payload.text = text;
+      const model = $('ed-model').value.trim();
+      if (model) payload.model = model;
+      const thinking = $('ed-thinking').value;
+      if (thinking) payload.thinking = thinking;
+      const timeout = parseInt($('ed-timeout').value);
+      if (timeout > 0) payload.timeoutSeconds = timeout;
+      patch.payload = payload;
+
+      // Session target
+      patch.sessionTarget = $('ed-session').value;
+
+      // Delivery
+      const delMode = $('ed-delivery').value;
+      if (delMode) patch.delivery = { mode: delMode };
+
+      const ok = await updateJob(selectedJobId, patch);
+      if (ok) {
+        showToast('Saved');
+        await refresh();
+        activeTab = 'info';
+        renderDetail();
+      } else {
+        showToast('Save failed');
+        btn.disabled = false; btn.textContent = 'Save Changes';
+      }
+    }
+
+    // ============ HISTORY TAB ============
+    async function renderHistoryTab(job) {
+      $('detail-body').innerHTML = '<div class="empty-state" style="padding:2rem"><span>Loading run history...</span></div>';
+      $('detail-actions').innerHTML = `<button class="action-btn primary" id="btn-run-h" ${!job.enabled?'disabled':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Run Now</button>`;
+      $('btn-run-h').onclick = async () => { $('btn-run-h').disabled = true; const ok = await runJobNow(selectedJobId); showToast(ok ? 'Triggered' : 'Failed'); setTimeout(async () => { await refresh(); renderHistoryTab(jobs.find(j => j.id === selectedJobId)); }, 2000); };
+
+      const runs = await fetchRuns(job.id);
+      if (!runs || !runs.length) {
+        $('detail-body').innerHTML = '<div class="empty-state" style="padding:2rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>No run history yet</span></div>';
+        return;
+      }
+      let h = '<div class="info-section"><div class="info-section-title">Last ' + Math.min(runs.length, 20) + ' runs</div><div class="info-card">';
+      runs.slice(0, 20).forEach(run => {
+        const ok = run.status !== 'error';
+        const t = run.startedAtMs || run.triggeredAtMs;
+        const dur = run.durationMs != null ? (run.durationMs < 1000 ? run.durationMs + 'ms' : (run.durationMs / 1000).toFixed(1) + 's') : '';
+        h += `<div class="run-item">
+          <div class="run-status-dot ${ok ? 'ok' : 'error'}"></div>
+          <div class="run-info"><div class="run-time">${esc(fmtDate(t))}</div>${run.error ? `<div class="run-detail" style="color:var(--red)">${esc(run.error)}</div>` : run.status ? `<div class="run-detail">${esc(run.status)}</div>` : ''}</div>
+          ${dur ? `<div class="run-duration">${dur}</div>` : ''}
+        </div>`;
+      });
+      h += '</div></div>';
+      $('detail-body').innerHTML = h;
+    }
+
+    // Confirm
+    let confirmCb = null;
+    function showConfirm(title, msg, cb) { $('confirm-title').textContent = title; $('confirm-msg').textContent = msg; confirmCb = cb; $('confirm-dialog').classList.add('open'); }
+    $('confirm-cancel').onclick = () => $('confirm-dialog').classList.remove('open');
+    $('confirm-ok').onclick = () => { $('confirm-dialog').classList.remove('open'); if (confirmCb) confirmCb(); };
+
+    // Mobile sheet
+    $('mobile-jobs-btn').onclick = () => { $('mobile-sheet-overlay').classList.add('open'); $('mobile-sheet').classList.add('open'); renderJobList($('mobile-sheet-body')); };
+    function closeMobileSheet() { $('mobile-sheet-overlay').classList.remove('open'); $('mobile-sheet').classList.remove('open'); }
+    $('mobile-sheet-close').onclick = closeMobileSheet;
+    $('mobile-sheet-overlay').onclick = closeMobileSheet;
+
+    // ============ CALENDAR ============
     function renderCalendar() {
-      const area = document.getElementById('calendar-area');
-      document.getElementById('cal-loading').style.display = 'none';
+      const area = $('calendar-area');
+      $('cal-loading').style.display = 'none';
       if (view === 'day') renderDayView(area);
       else if (view === 'week') renderWeekView(area);
       else renderMonthView(area);
       updateDateLabel();
     }
-
     function getDateRange() {
       const d = new Date(cursor);
       if (view === 'day') { const s = new Date(d); s.setHours(0,0,0,0); const e = new Date(d); e.setHours(23,59,59,999); return { start: s, end: e }; }
-      if (view === 'week') { const day = d.getDay(); const s = new Date(d); s.setDate(d.getDate() - day); s.setHours(0,0,0,0); const e = new Date(s); e.setDate(s.getDate() + 6); e.setHours(23,59,59,999); return { start: s, end: e }; }
-      const s = new Date(d.getFullYear(), d.getMonth(), 1);
-      const e = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59, 999);
-      return { start: s, end: e };
+      if (view === 'week') { const day = d.getDay(); const s = new Date(d); s.setDate(d.getDate()-day); s.setHours(0,0,0,0); const e = new Date(s); e.setDate(s.getDate()+6); e.setHours(23,59,59,999); return { start: s, end: e }; }
+      return { start: new Date(d.getFullYear(), d.getMonth(), 1), end: new Date(d.getFullYear(), d.getMonth()+1, 0, 23, 59, 59, 999) };
     }
-
     function getAllEvents(start, end) {
       const events = [];
-      const visibleJobs = selectedJobId ? jobs.filter(j => j.id === selectedJobId) : jobs.filter(j => isJobVisible(j.id));
-      visibleJobs.forEach(job => {
-        if (!job.enabled && !selectedJobId) return;
-        const colorIdx = jobs.indexOf(job) % COLORS.length;
-        getJobOccurrences(job, start, end).forEach(t => events.push({ time: t, job, color: COLORS[colorIdx] }));
+      jobs.filter(j => isJobVisible(j.id) && j.enabled).forEach(job => {
+        const ci = jobs.indexOf(job) % COLORS.length;
+        getJobOccurrences(job, start, end).forEach(t => events.push({ time: t, job, color: COLORS[ci] }));
       });
-      events.sort((a,b) => a.time - b.time);
-      return events;
+      return events.sort((a,b) => a.time - b.time);
     }
+    function wireEvCards(area) { area.querySelectorAll('.ev-card[data-job]').forEach(c => { c.onclick = () => openDetail(c.dataset.job); }); }
 
-    // --- WEEK VIEW ---
+    const WEEK_DAYS_BUFFER = 7; // show exactly 1 week
+    const WEEK_DAYS_BEFORE = 0; // start from Sunday of cursor's week
+    let weekRenderedStart = null; // track what range is rendered
+
     function renderWeekView(area) {
-      const { start, end } = getDateRange();
-      const events = getAllEvents(start, end);
       const now = new Date();
+      // Start from Sunday of cursor's week
+      const rangeStart = new Date(cursor);
+      rangeStart.setDate(rangeStart.getDate() - rangeStart.getDay());
+      rangeStart.setHours(0, 0, 0, 0);
+      const rangeEnd = new Date(rangeStart);
+      rangeEnd.setDate(rangeStart.getDate() + 6);
+      rangeEnd.setHours(23, 59, 59, 999);
+      weekRenderedStart = new Date(rangeStart);
+
+      const events = getAllEvents(rangeStart, rangeEnd);
       const days = [];
-      for (let i = 0; i < 7; i++) { const d = new Date(start); d.setDate(start.getDate() + i); days.push(d); }
-      const dayNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+      for (let i = 0; i < WEEK_DAYS_BUFFER; i++) {
+        const d = new Date(rangeStart);
+        d.setDate(rangeStart.getDate() + i);
+        days.push(d);
+      }
+      const dn = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+      const nir = now >= rangeStart && now <= rangeEnd;
 
-      let html = '<div class="week-wrap">';
-      // Header
-      html += '<div class="week-header"><div class="week-header-time"></div>';
+      // Build CSS grid — 7 days filling available width
+      const colDef = `48px repeat(7, 1fr)`;
+      let h = `<div class="week-wrap"><div class="week-grid" style="grid-template-columns: ${colDef}; min-width: 100%">`;
+
+      // Header row
+      h += '<div class="week-header-corner"></div>';
       days.forEach(d => {
-        const isToday = d.toDateString() === now.toDateString();
-        html += `<div class="week-header-day${isToday ? ' is-today' : ''}">${dayNames[d.getDay()]}<span class="day-num">${d.getDate()}</span></div>`;
+        const t = d.toDateString() === now.toDateString();
+        const weekend = d.getDay() === 0 || d.getDay() === 6;
+        const monthLabel = d.getDate() === 1 || d === days[0] ? `<span style="font-size:0.55rem;display:block;opacity:0.5">${d.toLocaleDateString('en-US', { month: 'short' })}</span>` : '';
+        h += `<div class="week-header-day${t ? ' is-today' : ''}${weekend ? ' is-weekend' : ''}" data-date="${d.toISOString().slice(0,10)}">${dn[d.getDay()]}<span class="day-num">${d.getDate()}</span>${monthLabel}</div>`;
       });
-      html += '</div>';
-      // Scrollable body
-      html += '<div class="week-scroll"><div class="week-body">';
-      // Time labels
-      html += '<div class="week-times">';
-      for (let h = 0; h < 24; h++) {
-        const label = h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h-12} PM`;
-        html += `<div class="week-time-slot">${label}</div>`;
+
+      // Precompute events by day+hour for fast lookup
+      const evMap = {};
+      events.forEach(e => {
+        const key = e.time.toDateString() + '|' + e.time.getHours();
+        (evMap[key] || (evMap[key] = [])).push(e);
+      });
+
+      // Hour rows
+      for (let hr = 0; hr < 24; hr++) {
+        const label = hr === 0 ? '12 AM' : hr < 12 ? hr + ' AM' : hr === 12 ? '12 PM' : (hr - 12) + ' PM';
+        h += `<div class="week-time-cell">${label}</div>`;
+        days.forEach(d => {
+          const hourEvs = evMap[d.toDateString() + '|' + hr] || [];
+          h += '<div class="week-day-cell"><div class="week-half-line"></div>';
+          const maxShow = 3;
+          hourEvs.slice(0, maxShow).forEach(e => {
+            h += `<div class="ev-card ev-stacked compact" data-job="${e.job.id}" title="${esc(e.job.name)} — ${fmtTime(e.time)}"><div class="ev-dot ${e.color}"></div><div class="ev-content"><div class="ev-name">${esc(e.job.name)}</div><div class="ev-time">${fmtTimeShort(e.time)}</div></div></div>`;
+          });
+          if (hourEvs.length > maxShow) h += `<div style="font-size:0.58rem;color:var(--muted);padding:1px 6px">+${hourEvs.length - maxShow} more</div>`;
+          h += '</div>';
+        });
       }
-      html += '</div>';
-      // Day columns
-      html += '<div class="week-columns">';
-      days.forEach((d, di) => {
-        html += '<div class="week-col"><div class="week-col-bg">';
-        for (let h = 0; h < 24; h++) {
-          html += `<div class="week-hour-line" style="top:${h * HOUR_H}px"></div>`;
-          html += `<div class="week-half-line" style="top:${h * HOUR_H + 30}px"></div>`;
+
+      h += '</div></div>'; // close week-grid + week-wrap
+      area.querySelectorAll('.day-grid,.day-snap-wrap,.week-wrap,.month-wrap').forEach(el => el.remove());
+      area.insertAdjacentHTML('beforeend', h);
+      wireEvCards(area);
+
+      const wrap = area.querySelector('.week-wrap');
+      const grid = area.querySelector('.week-grid');
+      if (wrap && grid) {
+        const timeCells = wrap.querySelectorAll('.week-time-cell');
+        const headerDays = wrap.querySelectorAll('.week-header-day');
+
+        // Now-line
+        if (nir && timeCells[now.getHours()]) {
+          const cell = timeCells[now.getHours()];
+          const minFraction = now.getMinutes() / 60;
+          const nowTop = cell.offsetTop + (cell.offsetHeight * minFraction);
+          const marker = document.createElement('div');
+          marker.className = 'week-now-marker';
+          marker.style.top = nowTop + 'px';
+          marker.style.left = '52px';
+          marker.style.right = '0';
+          grid.appendChild(marker);
+          const dot = document.createElement('div');
+          dot.className = 'week-now-dot';
+          dot.style.top = nowTop + 'px';
+          dot.style.left = '47px';
+          grid.appendChild(dot);
         }
-        html += '</div>';
-        // Events for this day
-        const dayEvents = events.filter(e => e.time.toDateString() === d.toDateString());
-        dayEvents.forEach(e => {
-          const mins = e.time.getHours() * 60 + e.time.getMinutes();
-          const top = (mins / 60) * HOUR_H;
-          const h = 22; // default height for point-in-time events
-          const compact = true;
-          html += `<div class="ev-card${compact ? ' compact' : ''}" style="top:${top}px;height:${h}px" title="${esc(e.job.name)} — ${fmtTime(e.time)}">
-            <div class="ev-dot ${e.color}"></div>
-            <div class="ev-content"><div class="ev-name">${esc(shortName(e.job.name))}</div></div>
-          </div>`;
-        });
-        html += '</div>';
+
+        // Scroll to current hour vertically
+        const targetHour = nir ? Math.max(0, now.getHours() - 1) : 8;
+        if (timeCells[targetHour]) {
+          wrap.scrollTop = timeCells[targetHour].offsetTop - 10;
+        }
+      }
+    }
+
+    function onWeekScroll() {
+      const wrap = document.querySelector('.week-wrap');
+      if (!wrap) return;
+      const headers = wrap.querySelectorAll('.week-header-day');
+      if (!headers.length) return;
+      // Find which day headers are visible
+      const wrapLeft = wrap.scrollLeft + 60; // offset for time column
+      const wrapRight = wrapLeft + wrap.clientWidth - 60;
+      let firstVisible = null, lastVisible = null;
+      headers.forEach(h => {
+        const left = h.offsetLeft, right = left + h.offsetWidth;
+        if (right > wrapLeft && left < wrapRight) {
+          if (!firstVisible) firstVisible = h;
+          lastVisible = h;
+        }
       });
-      html += '</div>';
-      // Now line
-      const nowInRange = now >= start && now <= end;
-      if (nowInRange) {
-        const mins = now.getHours() * 60 + now.getMinutes();
-        const top = (mins / 60) * HOUR_H;
-        html += `<div class="now-line-wrap" style="top:${top}px"><div class="now-dot-left"></div><div class="now-line-bar"></div></div>`;
+      if (firstVisible && lastVisible) {
+        const opts = { timeZone: TZ, month: 'short', day: 'numeric' };
+        const d1 = new Date(firstVisible.dataset.date + 'T12:00:00');
+        const d2 = new Date(lastVisible.dataset.date + 'T12:00:00');
+        const label = d1.toLocaleDateString('en-US', opts) + ' \u2013 ' + d2.toLocaleDateString('en-US', { ...opts, year: 'numeric' });
+        $('date-label').textContent = label;
       }
-      html += '</div></div></div>';
 
-      area.querySelectorAll('.day-grid,.week-wrap,.month-wrap').forEach(el => el.remove());
-      area.insertAdjacentHTML('beforeend', html);
-      const scroll = area.querySelector('.week-scroll');
-      if (scroll) {
-        const scrollTo = nowInRange ? Math.max(0, ((now.getHours() - 1) * HOUR_H)) : 8 * HOUR_H;
-        scroll.scrollTop = scrollTo;
+      // Infinite scroll: if near edges, re-render with shifted center
+      const scrollPct = wrap.scrollLeft / (wrap.scrollWidth - wrap.clientWidth);
+      if (scrollPct < 0.1 || scrollPct > 0.9) {
+        // Shift cursor to the first visible day and re-render
+        if (firstVisible) {
+          const newCenter = new Date(firstVisible.dataset.date + 'T12:00:00');
+          if (Math.abs(newCenter - cursor) > 7 * 86400000) { // only if shifted >7 days
+            const oldScrollLeft = wrap.scrollLeft;
+            cursor = newCenter;
+            renderWeekView($('calendar-area'));
+            // Restore approximate scroll position
+            const newWrap = document.querySelector('.week-wrap');
+            if (newWrap) {
+              const newHeaders = newWrap.querySelectorAll('.week-header-day');
+              const targetHeader = Array.from(newHeaders).find(h => h.dataset.date === firstVisible.dataset.date);
+              if (targetHeader) newWrap.scrollLeft = targetHeader.offsetLeft - 60;
+            }
+          }
+        }
       }
     }
 
-    // --- DAY VIEW ---
+    function buildDayPane(date) {
+      const s = new Date(date); s.setHours(0,0,0,0);
+      const e = new Date(date); e.setHours(23,59,59,999);
+      const events = getAllEvents(s, e), now = new Date(), isToday = s.toDateString()===now.toDateString();
+      let h = '';
+      for (let i = 0; i < 24; i++) {
+        const label = i===0?'12 AM':i<12?i+' AM':i===12?'12 PM':(i-12)+' PM';
+        const he = events.filter(ev => ev.time.getHours()===i);
+        h += `<div class="hour-row"><div class="hour-label">${label}</div><div class="hour-content">`;
+        he.forEach(ev => h += `<div class="ev-card ev-stacked" style="position:relative;left:0;right:0;margin:2px 0" title="${esc(ev.job.name)} — ${fmtTime(ev.time)}" data-job="${ev.job.id}"><div class="ev-dot ${ev.color}"></div><div class="ev-content"><div class="ev-name">${esc(ev.job.name)}</div><div class="ev-time">${fmtTimeShort(ev.time)}</div></div></div>`);
+        h += '</div></div>';
+      }
+      if (isToday) { const top = ((now.getHours()*60+now.getMinutes())/60)*60; h += `<div class="day-now-line" style="top:${top}px"></div><div class="day-now-dot" style="top:${top}px"></div>`; }
+      return h;
+    }
+
     function renderDayView(area) {
-      const { start, end } = getDateRange();
-      const events = getAllEvents(start, end);
-      const now = new Date();
-      const isToday = start.toDateString() === now.toDateString();
-      let html = '<div class="day-grid">';
-      for (let h = 0; h < 24; h++) {
-        const label = h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h-12} PM`;
-        const hourEvents = events.filter(e => e.time.getHours() === h);
-        html += `<div class="hour-row"><div class="hour-label">${label}</div><div class="hour-content">`;
-        hourEvents.forEach(e => {
-          html += `<div class="ev-card compact" style="position:relative;left:0;right:0;margin:1px 0" title="${esc(e.job.name)} — ${fmtTime(e.time)}">
-            <div class="ev-dot ${e.color}"></div>
-            <div class="ev-content"><div class="ev-name">${esc(e.job.name)}</div><div class="ev-time">${fmtTimeShort(e.time)}</div></div>
-          </div>`;
-        });
-        html += '</div></div>';
-      }
-      if (isToday) {
-        const top = ((now.getHours() * 60 + now.getMinutes()) / 60) * 60;
-        html += `<div class="day-now-line" style="top:${top}px"></div><div class="day-now-dot" style="top:${top}px"></div>`;
-      }
-      html += '</div>';
-      area.querySelectorAll('.day-grid,.week-wrap,.month-wrap').forEach(el => el.remove());
-      area.insertAdjacentHTML('beforeend', html);
-      const grid = area.querySelector('.day-grid');
-      if (grid) grid.scrollTop = isToday ? Math.max(0, (now.getHours() - 1) * 60) : 8 * 60;
+      const now = new Date(), isToday = cursor.toDateString()===now.toDateString();
+      let h = '<div class="day-grid">' + buildDayPane(cursor) + '</div>';
+      area.querySelectorAll('.day-grid,.day-snap-wrap,.week-wrap,.month-wrap').forEach(el => el.remove());
+      area.insertAdjacentHTML('beforeend', h);
+      wireEvCards(area);
+      const g = area.querySelector('.day-grid');
+      if (g) g.scrollTop = isToday ? Math.max(0, (now.getHours()-1)*60) : 8*60;
+
+      // Touch swipe for day view
+      let startX = 0, startTime = 0;
+      g.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startTime = Date.now(); }, { passive: true });
+      g.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - startX;
+        const dt = Date.now() - startTime;
+        if (Math.abs(dx) > 50 && dt < 500) {
+          if (dx > 0) { cursor.setDate(cursor.getDate() - 1); } else { cursor.setDate(cursor.getDate() + 1); }
+          updateDateLabel();
+          // Slide animation
+          const dir = dx > 0 ? 'right' : 'left';
+          g.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+          g.style.transform = `translateX(${dir === 'left' ? '-30' : '30'}px)`;
+          g.style.opacity = '0';
+          setTimeout(() => renderDayView(area), 200);
+        }
+      }, { passive: true });
     }
 
-    // --- MONTH VIEW ---
+    const MONTH_WEEKS_BUFFER = 18; // ~4.5 months of rows
+    const MONTH_WEEKS_BEFORE = 6; // ~1.5 months before cursor
+
     function renderMonthView(area) {
-      const { start, end } = getDateRange();
       const now = new Date();
-      const firstDay = new Date(start); firstDay.setDate(1 - firstDay.getDay());
-      const lastDay = new Date(end); lastDay.setDate(lastDay.getDate() + (6 - lastDay.getDay())); lastDay.setHours(23,59,59,999);
-      let html = '<div class="month-wrap"><div class="month-header">';
-      ['SUN','MON','TUE','WED','THU','FRI','SAT'].forEach(d => html += `<div class="month-header-day">${d}</div>`);
-      html += '</div><div class="month-grid">';
-      const d = new Date(firstDay);
-      const visibleJobs2 = selectedJobId ? jobs.filter(j => j.id === selectedJobId) : jobs.filter(j => isJobVisible(j.id));
-      while (d <= lastDay) {
-        const isOther = d.getMonth() !== cursor.getMonth();
+      // Start from MONTH_WEEKS_BEFORE weeks before cursor's month start, aligned to Sunday
+      const monthStart = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
+      const rangeStart = new Date(monthStart);
+      rangeStart.setDate(rangeStart.getDate() - (MONTH_WEEKS_BEFORE * 7) - rangeStart.getDay());
+      rangeStart.setHours(0, 0, 0, 0);
+      const totalDays = MONTH_WEEKS_BUFFER * 7;
+      const rangeEnd = new Date(rangeStart);
+      rangeEnd.setDate(rangeStart.getDate() + totalDays - 1);
+      rangeEnd.setHours(23, 59, 59, 999);
+
+      const vj = jobs.filter(j => isJobVisible(j.id) && j.enabled);
+
+      let h = '<div class="month-wrap"><div class="month-header">';
+      ['SUN','MON','TUE','WED','THU','FRI','SAT'].forEach(d => h += `<div class="month-header-day">${d}</div>`);
+      h += '</div><div class="month-grid">';
+
+      const d = new Date(rangeStart);
+      for (let i = 0; i < totalDays; i++) {
         const isToday = d.toDateString() === now.toDateString();
+        const isFirstOfMonth = d.getDate() === 1;
         const dayJobs = [], seen = new Set();
-        visibleJobs2.forEach(job => {
-          if (!job.enabled && !selectedJobId) return;
-          const ds = new Date(d); ds.setHours(0,0,0,0); const de = new Date(d); de.setHours(23,59,59,999);
-          const occs = getJobOccurrences(job, ds, de);
-          if (occs.length > 0 && !seen.has(job.id)) { seen.add(job.id); dayJobs.push({ job, color: COLORS[jobs.indexOf(job) % COLORS.length], count: occs.length }); }
-        });
-        const maxShow = 3;
-        html += `<div class="month-cell${isOther ? ' other' : ''}${isToday ? ' today' : ''}">
-          <div class="month-day-num">${d.getDate()}</div>
-          ${dayJobs.slice(0, maxShow).map(e => `<div class="month-event-line" title="${esc(e.job.name)}${e.count > 1 ? ' (x'+e.count+')' : ''}">
-            <div class="ev-dot ${e.color}"></div>
-            <span class="ev-name">${esc(e.job.name)}</span>
-            ${e.count > 1 ? `<span class="ev-count">x${e.count}</span>` : ''}
-          </div>`).join('')}
-          ${dayJobs.length > maxShow ? `<div class="month-more">+${dayJobs.length - maxShow} more</div>` : ''}
-        </div>`;
+        vj.forEach(job => { const ds = new Date(d); ds.setHours(0,0,0,0); const de = new Date(d); de.setHours(23,59,59,999); const o = getJobOccurrences(job, ds, de); if (o.length && !seen.has(job.id)) { seen.add(job.id); dayJobs.push({ job, color: COLORS[jobs.indexOf(job)%COLORS.length], count: o.length }); } });
+        const monthTag = isFirstOfMonth || i === 0 ? `<span class="month-label-tag">${d.toLocaleDateString('en-US', { month: 'short' })}</span>` : '';
+        h += `<div class="month-cell${isToday ? ' today' : ''}${isFirstOfMonth ? ' first-of-month' : ''}" data-date="${d.toISOString().slice(0,10)}"><div class="month-day-num">${monthTag}${d.getDate()}</div>`;
+        dayJobs.slice(0, 3).forEach(e => h += `<div class="month-event-line" data-job="${e.job.id}" title="${esc(e.job.name)}"><div class="ev-dot ${e.color}"></div><span class="ev-name">${esc(e.job.name)}</span>${e.count>1?`<span class="ev-count">x${e.count}</span>`:''}</div>`);
+        if (dayJobs.length > 3) h += `<div class="month-more">+${dayJobs.length-3} more</div>`;
+        h += '</div>';
         d.setDate(d.getDate() + 1);
       }
-      html += '</div></div>';
-      area.querySelectorAll('.day-grid,.week-wrap,.month-wrap').forEach(el => el.remove());
-      area.insertAdjacentHTML('beforeend', html);
+
+      h += '</div></div>';
+      area.querySelectorAll('.day-grid,.day-snap-wrap,.week-wrap,.month-wrap').forEach(el => el.remove());
+      area.insertAdjacentHTML('beforeend', h);
+      area.querySelectorAll('[data-job]').forEach(el => { el.onclick = e => { e.stopPropagation(); openDetail(el.dataset.job); }; });
+
+      // Scroll to first of cursor's month
+      const wrap = area.querySelector('.month-wrap');
+      if (wrap) {
+        // Find the cell for the 1st of cursor's month
+        const targetDate = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-01`;
+        const firstOfMonth = wrap.querySelector(`.month-cell[data-date="${targetDate}"]`) || wrap.querySelector('.month-cell.today');
+        if (firstOfMonth) {
+          const headerH = wrap.querySelector('.month-header').offsetHeight;
+          wrap.scrollTop = Math.max(0, firstOfMonth.offsetTop - headerH - 10);
+        }
+        wrap.addEventListener('scroll', onMonthScroll, { passive: true });
+      }
+    }
+
+    function onMonthScroll() {
+      const wrap = document.querySelector('.month-wrap');
+      if (!wrap) return;
+      const cells = wrap.querySelectorAll('.month-cell[data-date]');
+      if (!cells.length) return;
+      const headerH = wrap.querySelector('.month-header').offsetHeight;
+      const viewTop = wrap.scrollTop + headerH + 20;
+      // Find which cell is near the top
+      let topCell = cells[0];
+      for (const c of cells) {
+        if (c.offsetTop <= viewTop) topCell = c;
+        else break;
+      }
+      const topDate = new Date(topCell.dataset.date + 'T12:00:00');
+      const label = topDate.toLocaleDateString('en-US', { timeZone: TZ, month: 'long', year: 'numeric' });
+      $('date-label').textContent = label;
+
+      // Infinite scroll: re-render if near edges
+      const maxScroll = wrap.scrollHeight - wrap.clientHeight;
+      if (maxScroll > 0) {
+        const scrollPct = wrap.scrollTop / maxScroll;
+        if (scrollPct < 0.15 || scrollPct > 0.85) {
+          const newCenter = new Date(topDate.getFullYear(), topDate.getMonth(), 15);
+          if (Math.abs(newCenter - cursor) > 20 * 86400000) {
+            cursor = newCenter;
+            const area = wrap.closest('#calendar-area') || wrap.parentElement;
+            renderMonthView(area);
+          }
+        }
+      }
     }
 
     function updateDateLabel() {
-      const el = document.getElementById('date-label');
-      const opts = { timeZone: TZ };
+      const el = $('date-label'), opts = { timeZone: TZ };
       if (view === 'day') el.textContent = cursor.toLocaleDateString('en-US', { ...opts, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-      else if (view === 'week') { const { start, end } = getDateRange(); el.textContent = `${start.toLocaleDateString('en-US', { ...opts, month: 'short', day: 'numeric' })} – ${end.toLocaleDateString('en-US', { ...opts, month: 'short', day: 'numeric', year: 'numeric' })}`; }
+      else if (view === 'week') {
+        // Week label is updated dynamically by onWeekScroll; set initial value
+        const { start, end } = getDateRange();
+        el.textContent = `${start.toLocaleDateString('en-US', { ...opts, month: 'short', day: 'numeric' })} \u2013 ${end.toLocaleDateString('en-US', { ...opts, month: 'short', day: 'numeric', year: 'numeric' })}`;
+      }
       else el.textContent = cursor.toLocaleDateString('en-US', { ...opts, month: 'long', year: 'numeric' });
     }
 
-    // Navigation
-    document.getElementById('prev-btn').onclick = () => {
-      if (view === 'day') cursor.setDate(cursor.getDate() - 1);
-      else if (view === 'week') cursor.setDate(cursor.getDate() - 7);
-      else cursor.setMonth(cursor.getMonth() - 1);
+    // Nav
+    function navPrev() {
+      if (view === 'week') cursor.setDate(cursor.getDate() - 7);
+      else if (view === 'month') cursor.setMonth(cursor.getMonth() - 1);
+      else cursor.setDate(cursor.getDate() - 1);
       renderCalendar();
-    };
-    document.getElementById('next-btn').onclick = () => {
-      if (view === 'day') cursor.setDate(cursor.getDate() + 1);
-      else if (view === 'week') cursor.setDate(cursor.getDate() + 7);
-      else cursor.setMonth(cursor.getMonth() + 1);
+    }
+    function navNext() {
+      if (view === 'week') cursor.setDate(cursor.getDate() + 7);
+      else if (view === 'month') cursor.setMonth(cursor.getMonth() + 1);
+      else cursor.setDate(cursor.getDate() + 1);
       renderCalendar();
-    };
-    document.getElementById('today-btn').onclick = () => { cursor = new Date(); renderCalendar(); };
-
-    document.querySelectorAll('.view-toggle button').forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        view = btn.dataset.view;
+    }
+    $('prev-btn').onclick = navPrev;
+    $('next-btn').onclick = navNext;
+    $('today-btn').onclick = () => {
+      cursor = new Date();
+      if (view === 'week') {
         renderCalendar();
-      };
-    });
+        return;
+      }
+      if (view === 'month') {
+        // Re-render centered on today's month, then scroll to today
+        renderCalendar();
+        const wrap = document.querySelector('.month-wrap');
+        const todayCell = wrap && wrap.querySelector('.month-cell.today');
+        if (todayCell) {
+          const headerH = wrap.querySelector('.month-header').offsetHeight;
+          wrap.scrollTo({ top: todayCell.offsetTop - headerH - 10, behavior: 'smooth' });
+        }
+        return;
+      }
+      renderCalendar();
+    };
+    document.querySelectorAll('.view-toggle button').forEach(btn => { btn.onclick = () => { document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active')); btn.classList.add('active'); view = btn.dataset.view; renderCalendar(); }; });
 
-    // Touch swipe
-    let touchStartX = 0;
-    document.getElementById('calendar-area').addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-    document.getElementById('calendar-area').addEventListener('touchend', e => {
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      if (Math.abs(dx) > 60) { dx > 0 ? document.getElementById('prev-btn').click() : document.getElementById('next-btn').click(); }
+    // Touch swipe for day/month views (week view uses native scroll)
+    let tsx = 0, tsxTime = 0;
+    $('calendar-area').addEventListener('touchstart', e => { tsx = e.touches[0].clientX; tsxTime = Date.now(); }, { passive: true });
+    $('calendar-area').addEventListener('touchend', e => {
+      return; // all views handle their own scroll/swipe
+      const dx = e.changedTouches[0].clientX - tsx;
+      const dt = Date.now() - tsxTime;
+      if (Math.abs(dx) > 50 && dt < 500) {
+        dx > 0 ? navPrev() : navNext();
+      }
     }, { passive: true });
 
-    // Now line auto-update
+    // Keyboard
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if ($('confirm-dialog').classList.contains('open')) $('confirm-dialog').classList.remove('open');
+        else if ($('detail-panel').classList.contains('open')) closeDetail();
+      }
+    });
+
+    // Auto-refresh
     setInterval(() => { if (view === 'week' || view === 'day') renderCalendar(); }, 60000);
 
-    // Init
-    async function init() {
+    async function refresh() {
       jobs = await fetchJobs();
       renderJobList(); renderCalendar();
-      document.getElementById('updated').textContent = new Date().toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+      $('updated').textContent = new Date().toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
     }
-    init();
-
-    // Refresh every 60s
-    setInterval(async () => { jobs = await fetchJobs(); renderJobList(); renderJobDetail(); renderCalendar(); }, 60000);
+    refresh();
+    setInterval(refresh, 60000);
   </script>
 </body>
 </html>
