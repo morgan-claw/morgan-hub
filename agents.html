@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Agents — Morgan Hub</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface2: #1a1a1a;
+      --surface3: #222;
+      --border: #262626;
+      --border-light: #333;
+      --text: #e5e5e5;
+      --muted: #737373;
+      --dim: #525252;
+      --accent: #FF4500;
+      --accent-dim: #FF450020;
+      --accent-hover: #FF5722;
+      --green: #22c55e;
+      --green-dim: #22c55e20;
+      --blue: #3b82f6;
+      --blue-dim: #3b82f620;
+      --purple: #8b5cf6;
+      --purple-dim: #8b5cf620;
+      --pink: #ec4899;
+      --pink-dim: #ec489920;
+      --amber: #f59e0b;
+      --amber-dim: #f59e0b20;
+      --red: #ef4444;
+      --red-dim: #ef444420;
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font-family: inherit; cursor: pointer; }
+    .shell { display: flex; min-height: 100vh; min-height: 100dvh; }
+
+    /* Sidebar */
+    .sidebar {
+      display: none; width: 220px; flex-shrink: 0;
+      background: var(--surface); border-right: 1px solid var(--border);
+      padding: 1.5rem 0; flex-direction: column;
+    }
+    .sidebar .brand { display: flex; align-items: center; gap: 0.6rem; padding: 0 1.25rem 1.25rem; border-bottom: 1px solid var(--border); margin-bottom: 0.75rem; }
+    .sidebar .brand .mark { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: #fff; }
+    .sidebar .brand span { font-weight: 600; font-size: 1rem; }
+    .sidebar a { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 1.25rem; color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.12s, background 0.12s; }
+    .sidebar a:hover { color: var(--text); background: var(--surface2); }
+    .sidebar a.active { color: var(--accent); background: var(--accent-dim); }
+    .sidebar a svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* Tab bar */
+    .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding-bottom: env(safe-area-inset-bottom, 0); z-index: 100; }
+    .tab-bar a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 0 8px; text-decoration: none; color: var(--muted); font-size: 0.7rem; font-weight: 500; transition: color 0.15s; }
+    .tab-bar a.active { color: var(--accent); }
+    .tab-bar a svg { width: 22px; height: 22px; }
+
+    /* Page */
+    .page { flex: 1; padding: 1rem 1rem calc(70px + env(safe-area-inset-bottom, 0)); width: 100%; overflow-x: hidden; }
+    .page-inner { max-width: 1100px; margin: 0 auto; }
+
+    /* Header */
+    .header { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0 1rem; }
+    .header .mark-mobile { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: #fff; }
+    .header h1 { font-size: 1.2rem; font-weight: 600; }
+    .header .sub { color: var(--muted); font-size: 0.75rem; margin-left: auto; }
+
+    /* Agent Grid */
+    .agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+    .agent-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 1rem; cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden;
+    }
+    .agent-card:hover { border-color: var(--border-light); transform: translateY(-1px); }
+    .agent-card.selected { border-color: var(--accent); background: var(--accent-dim); }
+    .agent-card .card-top { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.65rem; }
+    .agent-card .avi { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .agent-card .card-name { font-weight: 600; font-size: 0.9rem; }
+    .agent-card .card-role { color: var(--muted); font-size: 0.72rem; }
+    .agent-card .card-stats { display: flex; gap: 0.75rem; }
+    .agent-card .stat { font-size: 0.7rem; color: var(--muted); }
+    .agent-card .stat strong { color: var(--text); font-weight: 600; }
+    .agent-card .status-dot { position: absolute; top: 0.75rem; right: 0.75rem; width: 8px; height: 8px; border-radius: 50%; }
+    .agent-card .status-dot.online { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .agent-card .status-dot.idle { background: var(--amber); }
+    .agent-card .status-dot.offline { background: var(--dim); }
+
+    /* Colors */
+    .c-morgan { background: var(--accent); } .c-atlas { background: var(--blue); } .c-forge { background: var(--purple); }
+    .c-echo { background: var(--pink); } .c-haven { background: var(--green); } .c-scout { background: var(--amber); } .c-siri { background: #737373; }
+
+    /* Detail Panel */
+    .detail-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; min-height: 400px; }
+    .detail-panel.empty { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.85rem; min-height: 300px; }
+    .detail-header {
+      display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border); background: var(--surface2);
+    }
+    .detail-header .avi { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; color: #fff; }
+    .detail-header .info { flex: 1; }
+    .detail-header .info h2 { font-size: 1rem; font-weight: 600; }
+    .detail-header .info .meta { color: var(--muted); font-size: 0.75rem; }
+    .detail-header .actions { display: flex; gap: 0.5rem; }
+    .detail-header .actions button {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 0.4rem 0.75rem; border-radius: 7px; font-size: 0.75rem; font-weight: 500;
+      transition: all 0.12s;
+    }
+    .detail-header .actions button:hover { background: var(--surface3); border-color: var(--border-light); }
+
+    /* Detail Tabs */
+    .detail-tabs {
+      display: flex; border-bottom: 1px solid var(--border); background: var(--surface);
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+    }
+    .detail-tabs button {
+      background: none; border: none; color: var(--muted); padding: 0.7rem 1rem;
+      font-size: 0.8rem; font-weight: 500; white-space: nowrap; position: relative;
+      transition: color 0.12s;
+    }
+    .detail-tabs button:hover { color: var(--text); }
+    .detail-tabs button.active { color: var(--accent); }
+    .detail-tabs button.active::after {
+      content: ''; position: absolute; bottom: 0; left: 0.5rem; right: 0.5rem;
+      height: 2px; background: var(--accent); border-radius: 1px;
+    }
+
+    /* Tab Content */
+    .tab-content { padding: 1rem 1.25rem; }
+    .tab-content[hidden] { display: none; }
+
+    /* Config Section */
+    .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .config-item { padding: 0.6rem 0.75rem; background: var(--surface2); border-radius: 8px; }
+    .config-item .label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
+    .config-item .value { font-size: 0.85rem; font-weight: 500; word-break: break-all; }
+    .config-item.full { grid-column: 1 / -1; }
+
+    /* Document Editor */
+    .doc-list { display: flex; gap: 0.4rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+    .doc-tab {
+      background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+      padding: 0.35rem 0.7rem; border-radius: 6px; font-size: 0.75rem; font-weight: 500;
+      transition: all 0.12s; cursor: pointer;
+    }
+    .doc-tab:hover { color: var(--text); border-color: var(--border-light); }
+    .doc-tab.active { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+    .doc-tab.missing { opacity: 0.4; font-style: italic; }
+    .editor-wrap { position: relative; }
+    .editor-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.4rem 0.6rem; background: var(--surface3); border: 1px solid var(--border);
+      border-bottom: none; border-radius: 8px 8px 0 0; font-size: 0.72rem; color: var(--muted);
+    }
+    .editor-toolbar .path { font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace; }
+    .editor-toolbar .toolbar-actions { display: flex; gap: 0.4rem; }
+    .editor-toolbar button {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 0.25rem 0.6rem; border-radius: 5px; font-size: 0.72rem; font-weight: 500;
+      transition: all 0.12s;
+    }
+    .editor-toolbar button:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .editor-toolbar button.saving { background: var(--green); border-color: var(--green); color: #fff; pointer-events: none; }
+    .editor-area {
+      width: 100%; min-height: 300px; max-height: 500px; padding: 0.75rem;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 0 0 8px 8px;
+      color: var(--text); font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.8rem; line-height: 1.6; resize: vertical;
+      outline: none; tab-size: 2;
+    }
+    .editor-area:focus { border-color: var(--accent); }
+    .editor-empty { padding: 2rem; text-align: center; color: var(--muted); font-size: 0.85rem; background: var(--bg); border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; }
+    .editor-empty button { margin-top: 0.5rem; background: var(--accent); border: none; color: #fff; padding: 0.4rem 1rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500; }
+
+    /* Session List */
+    .session-item {
+      display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .session-item:last-child { border-bottom: none; }
+    .session-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; color: var(--muted); }
+    .session-info { flex: 1; min-width: 0; }
+    .session-name { font-size: 0.82rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .session-meta { font-size: 0.7rem; color: var(--muted); display: flex; gap: 0.75rem; }
+    .session-badge {
+      font-size: 0.65rem; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 600;
+      flex-shrink: 0; align-self: center;
+    }
+    .badge-ok { background: var(--green-dim); color: var(--green); }
+    .badge-err { background: var(--red-dim); color: var(--red); }
+    .badge-idle { background: var(--surface2); color: var(--muted); }
+
+    /* Cron List */
+    .cron-item {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.75rem; margin-bottom: 0.5rem; transition: border-color 0.12s;
+    }
+    .cron-item:hover { border-color: var(--border-light); }
+    .cron-top { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+    .cron-name { font-size: 0.85rem; font-weight: 500; flex: 1; }
+    .cron-toggle { position: relative; width: 36px; height: 20px; }
+    .cron-toggle input { opacity: 0; width: 0; height: 0; }
+    .cron-toggle .slider {
+      position: absolute; inset: 0; background: var(--border); border-radius: 10px; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .cron-toggle .slider::before {
+      content: ''; position: absolute; width: 16px; height: 16px; left: 2px; top: 2px;
+      background: var(--text); border-radius: 50%; transition: transform 0.2s;
+    }
+    .cron-toggle input:checked + .slider { background: var(--green); }
+    .cron-toggle input:checked + .slider::before { transform: translateX(16px); }
+    .cron-details { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .cron-detail { font-size: 0.72rem; color: var(--muted); }
+    .cron-detail strong { color: var(--text); font-weight: 500; }
+    .cron-actions { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
+    .cron-actions button {
+      background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+      padding: 0.25rem 0.5rem; border-radius: 5px; font-size: 0.7rem; transition: all 0.12s;
+    }
+    .cron-actions button:hover { color: var(--text); border-color: var(--border-light); }
+    .cron-edit-area { margin-top: 0.5rem; display: none; }
+    .cron-edit-area.open { display: block; }
+    .cron-edit-area textarea {
+      width: 100%; min-height: 120px; padding: 0.5rem; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); font-family: 'SF Mono', monospace; font-size: 0.75rem; line-height: 1.5;
+      resize: vertical; outline: none;
+    }
+    .cron-edit-area textarea:focus { border-color: var(--accent); }
+    .cron-edit-actions { display: flex; gap: 0.4rem; margin-top: 0.4rem; justify-content: flex-end; }
+    .cron-edit-actions button { padding: 0.3rem 0.7rem; border-radius: 5px; font-size: 0.72rem; font-weight: 500; border: none; }
+    .cron-edit-actions .save-btn { background: var(--accent); color: #fff; }
+    .cron-edit-actions .cancel-btn { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+
+    /* Skills List */
+    .skill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .skill-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.75rem; }
+    .skill-item .skill-name { font-size: 0.82rem; font-weight: 500; margin-bottom: 2px; }
+    .skill-item .skill-desc { font-size: 0.7rem; color: var(--muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* Bindings */
+    .binding-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0; font-size: 0.82rem; }
+    .binding-item .channel-badge { background: var(--surface3); padding: 0.2rem 0.5rem; border-radius: 5px; font-size: 0.72rem; font-weight: 600; color: var(--muted); }
+
+    /* Empty State */
+    .empty-state { padding: 2rem; text-align: center; color: var(--muted); font-size: 0.85rem; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+      padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 500;
+      opacity: 0; transition: all 0.3s; z-index: 200; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--green); }
+    .toast.error { border-color: var(--red); }
+
+    /* Desktop */
+    @media (min-width: 768px) {
+      .sidebar { display: flex; }
+      .tab-bar { display: none; }
+      .header .mark-mobile { display: none; }
+      .page { padding: 2rem 2.5rem; }
+      .agent-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+      .config-grid { grid-template-columns: 1fr 1fr 1fr; }
+      .skill-grid { grid-template-columns: 1fr 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar"></aside>
+    <div class="page">
+      <div class="page-inner">
+        <div class="header">
+          <div class="mark-mobile">M</div>
+          <h1>Agents</h1>
+          <div class="sub" id="updated"></div>
+        </div>
+
+        <div class="agent-grid" id="agentGrid"></div>
+
+        <div class="detail-panel empty" id="detailPanel">
+          Select an agent to view details
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav class="tab-bar"></nav>
+  <div class="toast" id="toast"></div>
+
+  <script src="/nav.js"></script>
+  <script>
+// ─── Agent Data ───
+const AGENTS = [
+  { id: 'main', name: 'Morgan', role: 'Orchestrator', letter: 'M', color: 'c-morgan', agentDir: null, theme: 'sharp AI partner', emoji: '🧠', channel: '#hub', channelId: 'C0AECGM60UE', slackAccount: 'morgan' },
+  { id: 'ops', name: 'Atlas', role: 'Revenue & Operations', letter: 'A', color: 'c-atlas', agentDir: 'agents/ops', theme: 'sharp COO, numbers-driven', emoji: '📊', channel: '#ops', channelId: 'C0AE86UQUJX', slackAccount: 'atlas' },
+  { id: 'tech', name: 'Forge', role: 'Engineering', letter: 'F', color: 'c-forge', agentDir: 'agents/tech', theme: 'terse senior engineer', emoji: '⚡', channel: '#build', channelId: 'C0AECGMHV62', slackAccount: 'forge' },
+  { id: 'content', name: 'Echo', role: 'Content Strategy', letter: 'E', color: 'c-echo', agentDir: 'agents/content', theme: 'strategic content editor', emoji: '✍️', channel: '#content', channelId: 'C0AEEJDPCJE', slackAccount: 'echo' },
+  { id: 'personal', name: 'Haven', role: 'Personal & Health', letter: 'H', color: 'c-haven', agentDir: 'agents/personal', theme: 'warm personal assistant', emoji: '🏡', channel: '#life', channelId: 'C0AEJ6STRHA', slackAccount: 'haven' },
+  { id: 'research', name: 'Scout', role: 'Research & Intel', letter: 'S', color: 'c-scout', agentDir: 'agents/research', theme: 'thorough research analyst', emoji: '🔍', channel: null, slackAccount: 'scout' },
+  { id: 'siri', name: 'Siri Agent', role: 'Voice Interface', letter: 'S', color: 'c-siri', agentDir: 'agents/siri', theme: 'voice assistant', emoji: '🎙️', channel: null, slackAccount: null },
+];
+
+const DOC_FILES = ['AGENTS.md', 'SOUL.md', 'HEARTBEAT.md', 'TOOLS.md'];
+
+let selectedAgent = null;
+let sessions = [];
+let cronJobs = [];
+let docCache = {};
+
+// ─── API ───
+async function apiCall(tool, params) {
+  return gwCall(tool, params);
+}
+
+async function readFile(filePath) {
+  if (docCache[filePath] !== undefined) return docCache[filePath];
+  try {
+    const r = await fetch(`/api/file?path=${encodeURIComponent(filePath)}`);
+    if (!r.ok) { docCache[filePath] = null; return null; }
+    const text = await r.text();
+    docCache[filePath] = text;
+    return text;
+  } catch { docCache[filePath] = null; return null; }
+}
+
+async function writeFile(filePath, content) {
+  try {
+    const r = await fetch('/api/file', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: filePath, content }) });
+    if (!r.ok) return false;
+    docCache[filePath] = content;
+    return true;
+  } catch { return false; }
+}
+
+async function loadSessions() {
+  try {
+    const res = await apiCall('sessions_list', { limit: 50, messageLimit: 1 });
+    sessions = res?.sessions ?? [];
+  } catch { sessions = []; }
+}
+
+async function loadCronJobs() {
+  try {
+    const res = await gwCall('cron', { action: 'list', includeDisabled: true });
+    cronJobs = res?.jobs ?? [];
+  } catch { cronJobs = []; }
+}
+
+async function cronAction(params) {
+  return gwCall('cron', params);
+}
+
+// Match schedule.html pattern: use 'args' field
+async function gwCall(tool, args) {
+  const r = await fetch('/api/gw', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tool, args }) });
+  if (!r.ok) throw new Error(`API ${r.status}`);
+  const data = await r.json();
+  if (data.ok && data.result?.content?.[0]?.text) { try { return JSON.parse(data.result.content[0].text); } catch { return data.result; } }
+  return data.result || data;
+}
+
+// ─── Helpers ───
+function getDocPath(agent, doc) {
+  if (agent.id === 'main') {
+    if (doc === 'AGENTS.md' || doc === 'SOUL.md' || doc === 'TOOLS.md' || doc === 'HEARTBEAT.md') return doc;
+  }
+  return agent.agentDir ? `${agent.agentDir}/${doc}` : doc;
+}
+
+function getAgentSessions(agentId) {
+  const prefixes = [];
+  const agent = AGENTS.find(a => a.id === agentId);
+  if (agent?.channelId) {
+    prefixes.push(`agent:main:slack:channel:${agent.channelId.toLowerCase()}`);
+  }
+  prefixes.push(`agent:${agentId}:`);
+  if (agent?.slackAccount) {
+    prefixes.push(`slack:${agent.slackAccount}`);
+  }
+  return sessions.filter(s => {
+    if (s.key.includes(`:cron:`)) return false;
+    return prefixes.some(p => s.key.toLowerCase().includes(p.toLowerCase().replace('agent:main:', 'agent:main:')))
+      || (s.deliveryContext?.accountId === agent?.slackAccount);
+  });
+}
+
+function getAgentCrons(agentId) {
+  const agent = AGENTS.find(a => a.id === agentId);
+  return cronJobs.filter(j => {
+    const msg = (j.payload?.message || '').toLowerCase();
+    const name = (j.name || '').toLowerCase();
+    const agentName = agent?.name?.toLowerCase();
+    // Match by agent name in cron payload or cron name
+    if (agentName && agentName !== 'morgan') {
+      if (msg.includes(`you are ${agentName}`) || msg.includes(`you're ${agentName}`) || name.includes(agentName)) return true;
+    }
+    // Morgan gets everything not claimed by another agent
+    if (agentId === 'main') {
+      const otherAgents = AGENTS.filter(a => a.id !== 'main' && a.name);
+      const claimedByOther = otherAgents.some(a => {
+        const n = a.name.toLowerCase();
+        return msg.includes(`you are ${n}`) || msg.includes(`you're ${n}`) || name.includes(n);
+      });
+      if (!claimedByOther) return true;
+    }
+    return false;
+  });
+}
+
+function timeAgo(ms) {
+  if (!ms) return 'never';
+  const diff = Date.now() - ms;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return `${Math.floor(diff/60000)}m ago`;
+  if (diff < 86400000) return `${Math.floor(diff/3600000)}h ago`;
+  return `${Math.floor(diff/86400000)}d ago`;
+}
+
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type}`;
+  setTimeout(() => el.className = 'toast', 2500);
+}
+
+function formatSchedule(sched) {
+  if (!sched) return '—';
+  if (sched.kind === 'cron') return sched.expr + (sched.tz ? ` (${sched.tz})` : '');
+  if (sched.kind === 'every') return `every ${Math.round(sched.everyMs / 60000)}m`;
+  if (sched.kind === 'at') return new Date(sched.at).toLocaleString();
+  return JSON.stringify(sched);
+}
+
+// ─── Render Agent Grid ───
+function renderGrid() {
+  const grid = document.getElementById('agentGrid');
+  grid.innerHTML = AGENTS.map(a => {
+    const agentSessions = getAgentSessions(a.id);
+    const agentCrons = getAgentCrons(a.id);
+    const lastActivity = agentSessions.reduce((max, s) => Math.max(max, s.updatedAt || 0), 0);
+    const isRecent = lastActivity && (Date.now() - lastActivity < 3600000);
+    const statusClass = isRecent ? 'online' : lastActivity ? 'idle' : 'offline';
+    return `
+      <div class="agent-card${selectedAgent?.id === a.id ? ' selected' : ''}" data-id="${a.id}">
+        <div class="status-dot ${statusClass}"></div>
+        <div class="card-top">
+          <div class="avi ${a.color}">${a.letter}</div>
+          <div>
+            <div class="card-name">${a.name}</div>
+            <div class="card-role">${a.role}</div>
+          </div>
+        </div>
+        <div class="card-stats">
+          <div class="stat"><strong>${agentSessions.length}</strong> sessions</div>
+          <div class="stat"><strong>${agentCrons.length}</strong> crons</div>
+          ${lastActivity ? `<div class="stat">${timeAgo(lastActivity)}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  grid.querySelectorAll('.agent-card').forEach(card => {
+    card.onclick = () => selectAgent(card.dataset.id);
+  });
+}
+
+// ─── Select Agent ───
+async function selectAgent(id) {
+  selectedAgent = AGENTS.find(a => a.id === id);
+  renderGrid();
+  renderDetail();
+}
+
+// ─── Render Detail Panel ───
+function renderDetail() {
+  const panel = document.getElementById('detailPanel');
+  if (!selectedAgent) {
+    panel.className = 'detail-panel empty';
+    panel.innerHTML = 'Select an agent to view details';
+    return;
+  }
+  const a = selectedAgent;
+  panel.className = 'detail-panel';
+  panel.innerHTML = `
+    <div class="detail-header">
+      <div class="avi ${a.color}">${a.letter}</div>
+      <div class="info">
+        <h2>${a.emoji} ${a.name}</h2>
+        <div class="meta">ID: ${a.id} &middot; ${a.theme} ${a.channel ? `&middot; ${a.channel}` : ''}</div>
+      </div>
+      <div class="actions">
+        <button onclick="sendMessage()">Message</button>
+      </div>
+    </div>
+    <div class="detail-tabs" id="detailTabs">
+      <button class="active" data-tab="overview">Overview</button>
+      <button data-tab="documents">Documents</button>
+      <button data-tab="sessions">Sessions</button>
+      <button data-tab="crons">Cron Jobs</button>
+      <button data-tab="skills">Skills</button>
+    </div>
+    <div class="tab-content" id="tab-overview"></div>
+    <div class="tab-content" id="tab-documents" hidden></div>
+    <div class="tab-content" id="tab-sessions" hidden></div>
+    <div class="tab-content" id="tab-crons" hidden></div>
+    <div class="tab-content" id="tab-skills" hidden></div>
+  `;
+
+  // Tab switching
+  panel.querySelectorAll('.detail-tabs button').forEach(btn => {
+    btn.onclick = () => {
+      panel.querySelectorAll('.detail-tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      panel.querySelectorAll('.tab-content').forEach(tc => tc.hidden = true);
+      document.getElementById(`tab-${btn.dataset.tab}`).hidden = false;
+    };
+  });
+
+  renderOverviewTab();
+  renderDocumentsTab();
+  renderSessionsTab();
+  renderCronsTab();
+  renderSkillsTab();
+}
+
+function renderOverviewTab() {
+  const a = selectedAgent;
+  const agentSessions = getAgentSessions(a.id);
+  const agentCrons = getAgentCrons(a.id);
+  const totalTokens = agentSessions.reduce((sum, s) => sum + (s.totalTokens || 0), 0);
+  const lastActivity = agentSessions.reduce((max, s) => Math.max(max, s.updatedAt || 0), 0);
+  const docs = DOC_FILES.map(d => getDocPath(a, d));
+
+  document.getElementById('tab-overview').innerHTML = `
+    <div class="config-grid">
+      <div class="config-item"><div class="label">Agent ID</div><div class="value">${a.id}</div></div>
+      <div class="config-item"><div class="label">Name</div><div class="value">${a.name}</div></div>
+      <div class="config-item"><div class="label">Theme</div><div class="value">${a.theme}</div></div>
+      <div class="config-item"><div class="label">Emoji</div><div class="value">${a.emoji}</div></div>
+      <div class="config-item"><div class="label">Slack Account</div><div class="value">${a.slackAccount || '—'}</div></div>
+      <div class="config-item"><div class="label">Channel</div><div class="value">${a.channel || '—'} ${a.channelId ? `(${a.channelId})` : ''}</div></div>
+      <div class="config-item"><div class="label">Agent Dir</div><div class="value">${a.agentDir || 'workspace root'}</div></div>
+      <div class="config-item"><div class="label">Last Active</div><div class="value">${lastActivity ? timeAgo(lastActivity) : 'never'}</div></div>
+      <div class="config-item"><div class="label">Active Sessions</div><div class="value">${agentSessions.length}</div></div>
+      <div class="config-item"><div class="label">Cron Jobs</div><div class="value">${agentCrons.length}</div></div>
+      <div class="config-item"><div class="label">Total Tokens (sessions)</div><div class="value">${totalTokens.toLocaleString()}</div></div>
+      <div class="config-item"><div class="label">Documents</div><div class="value">${docs.length} files</div></div>
+    </div>
+    <h3 style="margin: 1rem 0 0.5rem; font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px;">Bindings</h3>
+    ${a.slackAccount ? `
+      <div class="binding-item">
+        <span class="channel-badge">Slack</span>
+        <span>Account: ${a.slackAccount}${a.channel ? ` → ${a.channel}` : ''}</span>
+      </div>` : '<div class="empty-state">No bindings configured</div>'}
+  `;
+}
+
+// ─── Documents Tab ───
+let currentDoc = null;
+let docDirty = false;
+
+async function renderDocumentsTab() {
+  const a = selectedAgent;
+  const container = document.getElementById('tab-documents');
+
+  // Check which docs exist
+  const docStatuses = {};
+  for (const doc of DOC_FILES) {
+    const path = getDocPath(a, doc);
+    const content = await readFile(path);
+    docStatuses[doc] = content !== null && content !== undefined;
+  }
+
+  const firstExisting = DOC_FILES.find(d => docStatuses[d]) || DOC_FILES[0];
+  currentDoc = firstExisting;
+
+  container.innerHTML = `
+    <div class="doc-list" id="docList">
+      ${DOC_FILES.map(d => `<button class="doc-tab${d === firstExisting ? ' active' : ''}${!docStatuses[d] ? ' missing' : ''}" data-doc="${d}">${d}${!docStatuses[d] ? ' (missing)' : ''}</button>`).join('')}
+    </div>
+    <div class="editor-wrap" id="editorWrap"></div>
+  `;
+
+  container.querySelectorAll('.doc-tab').forEach(btn => {
+    btn.onclick = () => {
+      currentDoc = btn.dataset.doc;
+      container.querySelectorAll('.doc-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      loadDocContent();
+    };
+  });
+
+  loadDocContent();
+}
+
+async function loadDocContent() {
+  const a = selectedAgent;
+  const path = getDocPath(a, currentDoc);
+  const wrap = document.getElementById('editorWrap');
+  wrap.innerHTML = `<div class="editor-toolbar"><span class="path">Loading...</span></div><div style="padding:2rem;text-align:center;color:var(--muted)">Loading...</div>`;
+
+  const content = await readFile(path);
+  if (content === null || content === undefined) {
+    wrap.innerHTML = `
+      <div class="editor-toolbar"><span class="path">${path}</span></div>
+      <div class="editor-empty">
+        File doesn't exist yet.
+        <br><button onclick="createDoc()">Create ${currentDoc}</button>
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div class="editor-toolbar">
+      <span class="path">${path}</span>
+      <div class="toolbar-actions">
+        <button id="saveBtn" onclick="saveDoc()">Save</button>
+      </div>
+    </div>
+    <textarea class="editor-area" id="editorArea" spellcheck="false">${escapeHtml(content)}</textarea>
+  `;
+
+  const area = document.getElementById('editorArea');
+  area.addEventListener('input', () => { docDirty = true; });
+  area.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      saveDoc();
+    }
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = area.selectionStart;
+      area.value = area.value.substring(0, start) + '  ' + area.value.substring(area.selectionEnd);
+      area.selectionStart = area.selectionEnd = start + 2;
+    }
+  });
+}
+
+async function saveDoc() {
+  const path = getDocPath(selectedAgent, currentDoc);
+  const content = document.getElementById('editorArea').value;
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = 'Saving...';
+  btn.classList.add('saving');
+  const ok = await writeFile(path, content);
+  btn.classList.remove('saving');
+  if (ok) {
+    btn.textContent = 'Saved';
+    docDirty = false;
+    toast('File saved', 'success');
+    setTimeout(() => { if (btn) btn.textContent = 'Save'; }, 1500);
+  } else {
+    btn.textContent = 'Save';
+    toast('Failed to save', 'error');
+  }
+}
+
+async function createDoc() {
+  const path = getDocPath(selectedAgent, currentDoc);
+  const template = currentDoc === 'AGENTS.md' ? `# ${selectedAgent.name} — AGENTS.md\n\n` :
+    currentDoc === 'SOUL.md' ? `# ${selectedAgent.name} — Soul\n\n` :
+    currentDoc === 'HEARTBEAT.md' ? `# HEARTBEAT.md\n\n## Checks\n- [ ] Add checks here\n` :
+    `# ${currentDoc}\n\n`;
+  const ok = await writeFile(path, template);
+  if (ok) {
+    toast(`Created ${currentDoc}`, 'success');
+    delete docCache[path];
+    docCache[path] = template;
+    loadDocContent();
+    // Update doc tab to remove "missing"
+    document.querySelectorAll('.doc-tab').forEach(btn => {
+      if (btn.dataset.doc === currentDoc) {
+        btn.classList.remove('missing');
+        btn.textContent = currentDoc;
+      }
+    });
+  } else {
+    toast('Failed to create file', 'error');
+  }
+}
+
+// ─── Sessions Tab ───
+function renderSessionsTab() {
+  const agentSessions = getAgentSessions(selectedAgent.id);
+  const container = document.getElementById('tab-sessions');
+
+  if (!agentSessions.length) {
+    container.innerHTML = '<div class="empty-state">No active sessions</div>';
+    return;
+  }
+
+  container.innerHTML = agentSessions.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)).map(s => {
+    const name = s.displayName || s.label || s.key.split(':').slice(-1)[0];
+    const lastMsg = s.messages?.[0];
+    const preview = lastMsg?.content?.[0]?.text?.substring(0, 100) || '';
+    const model = s.model || '—';
+    const tokens = s.totalTokens?.toLocaleString() || '0';
+    const icon = s.channel === 'slack' ? 'S' : s.channel === 'webchat' ? 'W' : '?';
+    return `
+      <div class="session-item">
+        <div class="session-icon">${icon}</div>
+        <div class="session-info">
+          <div class="session-name" title="${escapeHtml(s.key)}">${escapeHtml(name)}</div>
+          <div class="session-meta">
+            <span>${model}</span>
+            <span>${tokens} tok</span>
+            <span>${timeAgo(s.updatedAt)}</span>
+          </div>
+          ${preview ? `<div style="font-size:0.72rem;color:var(--dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:500px">${escapeHtml(preview)}</div>` : ''}
+        </div>
+        <span class="session-badge ${s.abortedLastRun ? 'badge-err' : 'badge-ok'}">${s.abortedLastRun ? 'ERR' : 'OK'}</span>
+      </div>`;
+  }).join('');
+}
+
+// ─── Crons Tab ───
+function renderCronsTab() {
+  const agentCrons = getAgentCrons(selectedAgent.id);
+  const container = document.getElementById('tab-crons');
+
+  if (!agentCrons.length) {
+    container.innerHTML = '<div class="empty-state">No cron jobs for this agent</div>';
+    return;
+  }
+
+  container.innerHTML = agentCrons.map(j => {
+    const state = j.state || {};
+    const statusClass = state.lastStatus === 'ok' ? 'badge-ok' : state.lastStatus === 'error' ? 'badge-err' : 'badge-idle';
+    const statusText = state.lastStatus || 'pending';
+    return `
+      <div class="cron-item" data-cron-id="${j.id}">
+        <div class="cron-top">
+          <span class="cron-name">${escapeHtml(j.name || 'Unnamed')}</span>
+          <span class="session-badge ${statusClass}">${statusText}</span>
+          <label class="cron-toggle">
+            <input type="checkbox" ${j.enabled ? 'checked' : ''} onchange="toggleCron('${j.id}', this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="cron-details">
+          <div class="cron-detail"><strong>Schedule:</strong> ${formatSchedule(j.schedule)}</div>
+          <div class="cron-detail"><strong>Next:</strong> ${state.nextRunAtMs ? new Date(state.nextRunAtMs).toLocaleString() : '—'}</div>
+          <div class="cron-detail"><strong>Last:</strong> ${state.lastRunAtMs ? timeAgo(state.lastRunAtMs) : 'never'}${state.lastDurationMs ? ` (${(state.lastDurationMs/1000).toFixed(1)}s)` : ''}</div>
+          ${state.consecutiveErrors ? `<div class="cron-detail" style="color:var(--red)"><strong>Errors:</strong> ${state.consecutiveErrors}x</div>` : ''}
+          ${state.lastError ? `<div class="cron-detail" style="color:var(--red);grid-column:1/-1"><strong>Error:</strong> ${escapeHtml(state.lastError)}</div>` : ''}
+        </div>
+        <div class="cron-actions">
+          <button onclick="runCron('${j.id}')">Run Now</button>
+          <button onclick="toggleCronEdit('${j.id}')">Edit</button>
+        </div>
+        <div class="cron-edit-area" id="cron-edit-${j.id}">
+          <textarea id="cron-payload-${j.id}">${escapeHtml(j.payload?.message || '')}</textarea>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;margin-top:0.4rem">
+            <div>
+              <label style="font-size:0.7rem;color:var(--muted)">Schedule (cron expr)</label>
+              <input type="text" id="cron-schedule-${j.id}" value="${escapeHtml(j.schedule?.expr || j.schedule?.everyMs?.toString() || '')}" style="width:100%;padding:0.3rem;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:0.75rem;font-family:monospace">
+            </div>
+            <div>
+              <label style="font-size:0.7rem;color:var(--muted)">Name</label>
+              <input type="text" id="cron-name-${j.id}" value="${escapeHtml(j.name || '')}" style="width:100%;padding:0.3rem;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:0.75rem">
+            </div>
+          </div>
+          <div class="cron-edit-actions">
+            <button class="cancel-btn" onclick="toggleCronEdit('${j.id}')">Cancel</button>
+            <button class="save-btn" onclick="saveCron('${j.id}')">Save Changes</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function toggleCron(id, enabled) {
+  await cronAction({ action: 'update', jobId: id, patch: { enabled } });
+  toast(enabled ? 'Cron enabled' : 'Cron disabled', 'success');
+}
+
+async function runCron(id) {
+  await cronAction({ action: 'run', jobId: id });
+  toast('Cron triggered', 'success');
+}
+
+function toggleCronEdit(id) {
+  const el = document.getElementById(`cron-edit-${id}`);
+  el.classList.toggle('open');
+}
+
+async function saveCron(id) {
+  const message = document.getElementById(`cron-payload-${id}`).value;
+  const name = document.getElementById(`cron-name-${id}`).value;
+  const scheduleInput = document.getElementById(`cron-schedule-${id}`).value;
+
+  const patch = { payload: { kind: 'agentTurn', message } };
+  if (name) patch.name = name;
+
+  // If it looks like a cron expression (has spaces, not just a number)
+  if (scheduleInput && isNaN(scheduleInput)) {
+    patch.schedule = { kind: 'cron', expr: scheduleInput, tz: 'America/Toronto' };
+  } else if (scheduleInput && !isNaN(scheduleInput)) {
+    patch.schedule = { kind: 'every', everyMs: parseInt(scheduleInput) };
+  }
+
+  await cronAction({ action: 'update', jobId: id, patch });
+  toast('Cron updated', 'success');
+  toggleCronEdit(id);
+
+  // Refresh
+  await loadCronJobs();
+  renderCronsTab();
+}
+
+// ─── Skills Tab ───
+const SKILLS = [
+  { name: 'research-process', desc: 'Structured research on any topic' },
+  { name: 'daily-briefing', desc: 'Morning executive briefing synthesis' },
+  { name: 'pipeline-management', desc: 'CRM, deals, revenue forecasting' },
+  { name: 'code-review', desc: 'PRs, ADRs, deployments, feature specs' },
+  { name: 'content-creation', desc: 'Content sprints, brand voice, social' },
+  { name: 'market-monitoring', desc: 'Competitors, intel briefs, trends' },
+  { name: 'fitness-tracking', desc: 'Workouts, habits, meal planning' },
+  { name: 'notion', desc: 'Notion workspace API integration' },
+  { name: 'defuddle', desc: 'Clean markdown from web pages' },
+  { name: 'obsidian-cli', desc: 'Obsidian vault management via CLI' },
+  { name: 'obsidian-markdown', desc: 'Obsidian-flavored markdown syntax' },
+  { name: 'obsidian-bases', desc: 'Obsidian Bases (.base files)' },
+  { name: 'json-canvas', desc: 'JSON Canvas files for Obsidian' },
+];
+
+const AGENT_SKILLS = {
+  main: ['daily-briefing', 'research-process', 'notion', 'obsidian-cli', 'obsidian-markdown'],
+  ops: ['pipeline-management', 'research-process', 'obsidian-cli'],
+  tech: ['code-review', 'obsidian-cli', 'obsidian-markdown'],
+  content: ['content-creation', 'research-process', 'defuddle'],
+  personal: ['fitness-tracking', 'obsidian-cli'],
+  research: ['research-process', 'market-monitoring', 'defuddle'],
+  siri: [],
+};
+
+function renderSkillsTab() {
+  const container = document.getElementById('tab-skills');
+  const agentSkills = AGENT_SKILLS[selectedAgent.id] || [];
+
+  // All skills available to all agents, but highlight primary ones
+  container.innerHTML = `
+    <p style="font-size:0.75rem;color:var(--muted);margin-bottom:0.75rem">All skills are workspace-level and available to every agent. Primary skills for ${selectedAgent.name} are highlighted.</p>
+    <div class="skill-grid">
+      ${SKILLS.map(s => {
+        const isPrimary = agentSkills.includes(s.name);
+        return `<div class="skill-item" style="${isPrimary ? 'border-color:var(--accent)' : ''}">
+          <div class="skill-name">${s.name} ${isPrimary ? '<span style="color:var(--accent);font-size:0.7rem">PRIMARY</span>' : ''}</div>
+          <div class="skill-desc">${s.desc}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+// ─── Message Agent ───
+function sendMessage() {
+  if (!selectedAgent?.channelId) {
+    toast('No channel for this agent', 'error');
+    return;
+  }
+  const msg = prompt(`Send message to ${selectedAgent.name} in ${selectedAgent.channel}:`);
+  if (!msg) return;
+  apiCall('message', {
+    action: 'send',
+    channel: 'slack',
+    accountId: 'morgan',
+    target: `channel:${selectedAgent.channelId}`,
+    message: msg
+  }).then(() => toast('Message sent', 'success')).catch(() => toast('Failed to send', 'error'));
+}
+
+// ─── Util ───
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── Init ───
+async function init() {
+  document.getElementById('updated').textContent = new Date().toLocaleString('en-US', {
+    timeZone: 'America/Toronto', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+  });
+
+  await Promise.all([loadSessions(), loadCronJobs()]);
+  renderGrid();
+}
+
+init();
+  </script>
+</body>
+</html>
