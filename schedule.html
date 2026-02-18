@@ -805,6 +805,31 @@
         newWrap.scrollLeft = scrollRatio * (newWrap.scrollWidth - newWrap.clientWidth);
       }
     }
+    // Smooth zoom — updates grid CSS in-place without full re-render
+    let zoomRafId = null;
+    function zoomWeekSmooth(delta) {
+      const current = getWeekColWidth();
+      const newW = Math.max(WEEK_COL_MIN, Math.min(WEEK_COL_MAX, current + delta));
+      if (newW === current) return;
+      weekColWidth = newW;
+      localStorage.setItem('mhub-week-col-width', newW);
+      const wrap = document.querySelector('.week-wrap');
+      const grid = wrap && wrap.querySelector('.week-grid');
+      if (!grid || !wrap) { renderWeekView($('calendar-area')); return; }
+      // Preserve center point
+      const centerX = wrap.scrollLeft + wrap.clientWidth / 2;
+      const oldTotal = wrap.scrollWidth;
+      const centerRatio = oldTotal > 0 ? centerX / oldTotal : 0.5;
+      grid.style.gridTemplateColumns = `48px repeat(${WEEK_DAYS_BUFFER}, ${newW}px)`;
+      // Restore center after reflow
+      if (zoomRafId) cancelAnimationFrame(zoomRafId);
+      zoomRafId = requestAnimationFrame(() => {
+        const newTotal = wrap.scrollWidth;
+        wrap.scrollLeft = centerRatio * newTotal - wrap.clientWidth / 2;
+        updateZoomLabel();
+        zoomRafId = null;
+      });
+    }
 
     function renderWeekView(area) {
       const now = new Date();
@@ -1052,14 +1077,18 @@
     // Zoom controls
     $('zoom-out').onclick = () => zoomWeek(-WEEK_COL_STEP);
     $('zoom-in').onclick = () => zoomWeek(WEEK_COL_STEP);
-    // Ctrl+scroll to zoom week view (debounced)
-    let zoomTimeout = null;
+    // Ctrl+scroll to zoom week view (smooth, proportional to scroll delta)
+    let zoomAccum = 0;
     document.addEventListener('wheel', e => {
       if (view !== 'week' || !e.ctrlKey) return;
       e.preventDefault();
-      if (zoomTimeout) return;
-      zoomWeek(e.deltaY < 0 ? WEEK_COL_STEP : -WEEK_COL_STEP);
-      zoomTimeout = setTimeout(() => { zoomTimeout = null; }, 120);
+      // Accumulate fractional pixels for smooth feel
+      zoomAccum += -e.deltaY * 0.15;
+      if (Math.abs(zoomAccum) >= 1) {
+        const delta = Math.sign(zoomAccum) * Math.min(Math.abs(Math.round(zoomAccum)), 8);
+        zoomAccum -= delta;
+        zoomWeekSmooth(delta);
+      }
     }, { passive: false });
     // Show zoom controls on initial load (week is default)
     $('zoom-controls').style.display = 'flex';
