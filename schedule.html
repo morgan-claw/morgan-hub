@@ -1083,7 +1083,7 @@
       if (view !== 'week' || !e.ctrlKey) return;
       e.preventDefault();
       // Accumulate fractional pixels for smooth feel
-      zoomAccum += -e.deltaY * 0.15;
+      zoomAccum += -e.deltaY * 0.5;
       if (Math.abs(zoomAccum) >= 1) {
         const delta = Math.sign(zoomAccum) * Math.min(Math.abs(Math.round(zoomAccum)), 8);
         zoomAccum -= delta;
