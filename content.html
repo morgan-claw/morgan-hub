@@ -910,7 +910,31 @@ function renderDay(area) {
   area.querySelectorAll('.ev-card[data-idx]').forEach(c => { c.onclick = () => openDetail(parseInt(c.dataset.idx)); });
 
   const g = area.querySelector('.day-grid');
-  if (g) g.scrollTop = isToday ? Math.max(0, (now.getHours()-1)*HOUR_H) : 8*HOUR_H;
+  if (g) {
+    g.scrollTop = isToday ? Math.max(0, (now.getHours()-1)*HOUR_H) : 8*HOUR_H;
+    // Touch swipe between days
+    let startX = 0, startTime = 0;
+    g.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startTime = Date.now(); }, { passive: true });
+    g.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - startX;
+      const dt = Date.now() - startTime;
+      if (Math.abs(dx) > 50 && dt < 500) {
+        viewDate.setDate(viewDate.getDate() + (dx > 0 ? -1 : 1));
+        g.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+        g.style.transform = `translateX(${dx > 0 ? '30' : '-30'}px)`;
+        g.style.opacity = '0';
+        setTimeout(() => renderCalView(), 200);
+      }
+    }, { passive: true });
+    // Mouse wheel horizontal scroll between days
+    g.addEventListener('wheel', e => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 30) {
+        e.preventDefault();
+        viewDate.setDate(viewDate.getDate() + (e.deltaX > 0 ? 1 : -1));
+        renderCalView();
+      }
+    }, { passive: false });
+  }
 }
 
 // ===== MONTH VIEW (schedule-style infinite scroll) =====
@@ -1155,6 +1179,11 @@ document.querySelectorAll('.list-table th[data-sort]').forEach(th=>{
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if ($('detailPanel').classList.contains('open')) closeDetail();
+  }
+  // Arrow keys navigate day view
+  if (currentView === 'calendar' && calMode === 'day' && !$('detailPanel').classList.contains('open')) {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); viewDate.setDate(viewDate.getDate() - 1); renderCalView(); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); viewDate.setDate(viewDate.getDate() + 1); renderCalView(); }
   }
 });
 
